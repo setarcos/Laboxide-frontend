@@ -3,17 +3,14 @@
   <div class="flex flex-col h-screen max-h-screen overflow-hidden bg-base-200">
 
     <!-- 1. Banner - Ensure it doesn't shrink -->
-    <AppBanner class="flex-shrink-0" />
+    <AppBanner class="flex-shrink-0" /> <!-- Assumes h-16 (4rem) -->
 
     <!-- 2. Drawer Structure - Takes remaining vertical space, constrained height -->
-    <!-- Added overflow-hidden -->
     <div class="drawer lg:drawer-open flex-1 overflow-hidden">
       <input id="my-drawer-toggle" type="checkbox" class="drawer-toggle" />
 
       <!-- Drawer Content (Main Area) -->
-      <!-- Added h-full and overflow-hidden -->
       <div class="drawer-content flex flex-col h-full overflow-hidden">
-
         <!-- Main content area scrolls independently -->
         <main class="flex-1 overflow-y-auto p-4 lg:p-6 bg-base-100">
            <div class="max-w-7xl mx-auto">
@@ -24,17 +21,23 @@
               </router-view>
            </div>
         </main>
-
       </div>
 
       <!-- Drawer Side (Sidebar) -->
-      <!--
-        Make the sidebar container scrollable if its content overflows.
-        ADDED h-full here to explicitly constrain its height within the parent drawer.
-      -->
+      <!-- No custom class needed on drawer-side itself for this -->
       <div class="drawer-side h-full lg:border-r border-base-300 overflow-y-auto">
-        <label for="my-drawer-toggle" aria-label="close sidebar" class="drawer-overlay"></label>
-        <!-- Navbar itself uses h-full internally -->
+         <!--
+           Overlay Label: Needs position adjustment on mobile when open.
+           Kept custom class 'mobile-drawer-overlay'.
+         -->
+        <label
+          for="my-drawer-toggle"
+          aria-label="close sidebar"
+          class="drawer-overlay mobile-drawer-overlay"
+        ></label>
+        <!--
+           Navbar: It's the menu content. We'll target it via its own class or structure.
+        -->
         <AppNavbar />
       </div>
 
@@ -45,19 +48,51 @@
 <script setup>
 import AppBanner from '@/components/AppBanner.vue'
 import AppNavbar from '@/components/AppNavbar.vue'
-import { RouterView } from 'vue-router' // Make sure RouterView is imported
+import { RouterView } from 'vue-router'
 </script>
 
 <style scoped>
-/* Ensure no conflicting height/min-height styles here */
 /* Basic fade transition */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease;
 }
-
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+/*
+ * Custom overrides for mobile drawer positioning (below lg breakpoint).
+ * Adjust '4rem' if your banner height (h-16) changes.
+ */
+@media (max-width: 1023px) {
+  /* Target the overlay when drawer is open */
+  .drawer-toggle:checked ~ .drawer-side > .mobile-drawer-overlay {
+    position: fixed; /* Position relative to viewport */
+    top: 4rem;       /* Start below banner */
+    left: 0;
+    height: calc(100vh - 4rem); /* Fill remaining height */
+    width: 100%;                /* Cover full width */
+    z-index: 40;                /* Below menu, above main content (adjust if needed) */
+    /* Ensure it's visible and clickable (optional background for debug) */
+    /* background-color: rgba(0, 0, 0, 0.4); */
+    pointer-events: auto; /* Explicitly ensure it can receive clicks */
+  }
+
+  /* Target the AppNavbar component (its root element has class 'menu') */
+  .drawer-toggle:checked ~ .drawer-side > .menu { /* Targets AppNavbar's root */
+    position: fixed; /* Position relative to viewport */
+    top: 4rem;       /* Start below banner */
+    left: 0;         /* Align left (transform handles slide-in) */
+    height: calc(100vh - 4rem); /* Fill height below banner */
+    z-index: 50;                /* Above overlay (adjust if needed) */
+    /* DaisyUI handles width/transform, but ensure it doesn't break */
+    /* Reset transform if position:fixed overrides DaisyUI's slide-in */
+    transform: translateX(0%) !important; /* Force it visible if needed */
+    pointer-events: auto; /* Ensure menu items are clickable */
+     /* Add overflow-y-auto here if needed, since drawer-side might not scroll correctly now */
+     overflow-y: auto;
+  }
 }
 </style>
