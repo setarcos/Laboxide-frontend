@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: Add any global custom styles here */
+body {
+  @apply bg-base-200 min-h-screen; /* Basic background from DaisyUI */
+}
+
+/* Customize base component styles here */
+@layer components {
+  .input:focus {
+       @apply outline-none ring-2 ring-primary;
+  }
+}
+
+/* Improve scrollbar styling (optional) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: theme('colors.base-300');
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--n)); /* Use DaisyUI variable for neutral */
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+   /* Use DaisyUI variable for neutral-focus */
+   /* hsl() wrapper ensures color format compatibility */
+  background: hsl(var(--nf, var(--n))); /* Use --nf, fallback to --n if --nf not set */
+}
