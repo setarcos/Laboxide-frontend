@@ -1,11 +1,20 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-base-200"> <!-- Use flex-col for vertical layout -->
+  <!-- Make the root container exactly screen height and prevent it from scrolling -->
+  <div class="flex flex-col h-screen max-h-screen overflow-hidden bg-base-200">
 
-    <AppBanner />
+    <!-- 1. Banner - Ensure it doesn't shrink -->
+    <AppBanner class="flex-shrink-0" />
 
-    <div class="drawer lg:drawer-open flex-1">
+    <!-- 2. Drawer Structure - Takes remaining vertical space, constrained height -->
+    <!-- Added overflow-hidden -->
+    <div class="drawer lg:drawer-open flex-1 overflow-hidden">
       <input id="my-drawer-toggle" type="checkbox" class="drawer-toggle" />
-      <div class="drawer-content flex flex-col items-stretch">
+
+      <!-- Drawer Content (Main Area) -->
+      <!-- Added h-full and overflow-hidden -->
+      <div class="drawer-content flex flex-col h-full overflow-hidden">
+
+        <!-- Main content area scrolls independently -->
         <main class="flex-1 overflow-y-auto p-4 lg:p-6 bg-base-100">
            <div class="max-w-7xl mx-auto">
               <router-view v-slot="{ Component }">
@@ -15,46 +24,33 @@
               </router-view>
            </div>
         </main>
+
       </div>
 
       <!-- Drawer Side (Sidebar) -->
-      <!-- The AppNavbar component inside should handle its own height/scrolling -->
-      <div class="drawer-side lg:border-r border-base-300">
+      <!--
+        Make the sidebar container scrollable if its content overflows.
+        ADDED h-full here to explicitly constrain its height within the parent drawer.
+      -->
+      <div class="drawer-side h-full lg:border-r border-base-300 overflow-y-auto">
         <label for="my-drawer-toggle" aria-label="close sidebar" class="drawer-overlay"></label>
+        <!-- Navbar itself uses h-full internally -->
         <AppNavbar />
       </div>
-    </div>
-  </div>
+
+    </div> <!-- End of drawer -->
+  </div> <!-- End of main flex container -->
 </template>
 
 <script setup>
 import AppBanner from '@/components/AppBanner.vue'
 import AppNavbar from '@/components/AppNavbar.vue'
+import { RouterView } from 'vue-router' // Make sure RouterView is imported
 </script>
 
 <style scoped>
-/* Scoped styles for the layout */
-
-/* Ensure drawer fills height (though flex-1 should handle this) */
-.drawer {
-  /* height: calc(100vh - H); */ /* H = banner height, potentially complex */
-  /* flex-1 on the drawer container is usually sufficient with flex-col parent */
-}
-
-/* Make sure sidebar content is scrollable if it exceeds height */
-/* AppNavbar already uses flex-col and h-full, which should work */
-/* If sidebar content overflows strangely, you might need: */
-/*
-.drawer-side {
-  overflow-y: auto;
-}
-.drawer-side > :not(.drawer-overlay) {
-   height: 100%;
-}
-*/
-
-
-/* Transition for router-view */
+/* Ensure no conflicting height/min-height styles here */
+/* Basic fade transition */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease;
