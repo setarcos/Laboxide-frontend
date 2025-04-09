@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { PERMISSION_ADMIN, PERMISSION_TEACHER, PERMISSION_LAB_MANAGER } from '@/utils/permissions'
+// Import nextTick if you want extra safety, though often not needed for document.title
+// import { nextTick } from 'vue'
 
 // View Components (Lazy Loaded)
 const DashboardView = () => import('@/views/DashboardView.vue')
@@ -15,37 +17,56 @@ const routes = [
     path: '/',
     name: 'Dashboard',
     component: DashboardView,
-    meta: { requiresAuth: true } // Dashboard requires login
+    // Add meta.title
+    meta: { requiresAuth: true, title: 'Dashboard' }
   },
   {
     path: '/courses',
     name: 'Courses',
     component: CourseListView,
-    meta: { requiresAuth: true } // Viewing courses might require login, specific actions checked in component
+    // Add meta.title
+    meta: { requiresAuth: true, title: 'Manage Courses' }
   },
   {
     path: '/labrooms',
     name: 'Labrooms',
     component: LabroomListView,
-    meta: { requiresAuth: true, requiredPermission: PERMISSION_LAB_MANAGER | PERMISSION_ADMIN } // Only Lab Managers or Admins
+    // Add meta.title
+    meta: {
+        requiresAuth: true,
+        requiredPermission: PERMISSION_LAB_MANAGER | PERMISSION_ADMIN,
+        title: 'Manage Lab Rooms'
+    }
   },
   {
     path: '/users',
     name: 'Users',
     component: UserListView,
-    meta: { requiresAuth: true, requiredPermission: PERMISSION_ADMIN } // Only Admins
+    // Add meta.title
+    meta: {
+        requiresAuth: true,
+        requiredPermission: PERMISSION_ADMIN,
+        title: 'Manage Users'
+    }
   },
   {
     path: '/semesters',
     name: 'Semesters',
     component: SemesterListView,
-    meta: { requiresAuth: true, requiredPermission: PERMISSION_ADMIN } // Only Admins
+    // Add meta.title
+    meta: {
+        requiresAuth: true,
+        requiredPermission: PERMISSION_ADMIN,
+        title: 'Manage Semesters'
+    }
   },
    // Catch-all 404 route
    {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: NotFoundView
+    component: NotFoundView,
+    // Add meta.title for 404
+    meta: { title: 'Page Not Found' }
   }
 ]
 
@@ -55,12 +76,11 @@ const router = createRouter({
   linkActiveClass: 'active', // Add active class for DaisyUI menu items
 })
 
-// Navigation Guard
+// --- Existing Navigation Guard (Authentication/Authorization) ---
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
   // 1. Wait if initial auth check is still loading
-  // This prevents race conditions on initial load or refresh
   while (authStore.isLoading) {
     await new Promise(resolve => setTimeout(resolve, 50)); // Wait briefly
   }
@@ -71,17 +91,12 @@ router.beforeEach(async (to, from, next) => {
   // 2. Check if route requires authentication
   if (requiresAuth && !authStore.isAuthenticated) {
     console.log('Redirecting to login (or handling via UI)');
-    // In a real app, you might redirect to a login page:
-    // window.location.href = '/login'; // If login is external
-    // Or show a login modal / redirect to an internal login route
-    // For this example, we rely on the UI hiding elements, but prevent access
     next({ name: 'Dashboard' }); // Or redirect to a public page if you have one
   }
   // 3. Check if route requires specific permissions
   else if (requiredPermission && authStore.isAuthenticated) {
     if (!authStore.hasPermission(requiredPermission)) {
       console.warn(`User does not have required permission (${requiredPermission}) for route ${to.name}`);
-      // Redirect to a safe page like dashboard or show an unauthorized message
       next({ name: 'Dashboard' });
     } else {
       next(); // User is authenticated and has permission
@@ -92,5 +107,16 @@ router.beforeEach(async (to, from, next) => {
     next();
   }
 })
+
+// --- New Navigation Guard (Update Page Title) ---
+const baseTitle = 'Admin Panel'; // Set your default/base title here
+
+router.afterEach((to, from) => {
+  // Optional: Use nextTick to wait for potential DOM updates, though often unnecessary for title
+  // nextTick(() => {
+    document.title = to.meta?.title ? `${to.meta.title}`: baseTitle;
+  // });
+});
+
 
 export default router
