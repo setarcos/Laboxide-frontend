@@ -67,7 +67,18 @@ import { RouterView } from 'vue-router'
  * Adjust '4rem' if your banner height (h-16) changes.
  */
 @media (max-width: 1023px) {
-  /* Target the overlay when drawer is open */
+  /*
+   * Define the transition *outside* the :checked state so it applies
+   * when transitioning *both* in and out.
+   * Apply it to the element that DaisyUI actually animates (often the drawer content).
+   */
+  .drawer-side > .menu { /* Or adjust selector if DaisyUI animates drawer-side itself */
+    transition-property: transform; /* Add other properties if needed (e.g., opacity) */
+    transition-duration: 0.3s; /* Match DaisyUI's default or set your own */
+    transition-timing-function: ease-out; /* Match DaisyUI's default */
+  }
+
+  /* Overlay positioning when drawer is open */
   .drawer-toggle:checked ~ .drawer-side > .mobile-drawer-overlay {
     position: fixed; /* Position relative to viewport */
     top: 4rem;       /* Start below banner */
@@ -78,7 +89,15 @@ import { RouterView } from 'vue-router'
     /* Ensure it's visible and clickable (optional background for debug) */
     /* background-color: rgba(0, 0, 0, 0.4); */
     pointer-events: auto; /* Explicitly ensure it can receive clicks */
+    /* Fade in/out the overlay slightly */
+    opacity: 1;
+    transition: opacity 0.3s ease-out;
   }
+  /* Default state for overlay (when drawer is closed/closing) */
+   .drawer-side > .mobile-drawer-overlay {
+     opacity: 0;
+     pointer-events: none; /* Ensure it's not clickable when hidden */
+   }
 
   /* Target the AppNavbar component (its root element has class 'menu') */
   .drawer-toggle:checked ~ .drawer-side > .menu { /* Targets AppNavbar's root */
@@ -92,7 +111,24 @@ import { RouterView } from 'vue-router'
     transform: translateX(0%) !important; /* Force it visible if needed */
     pointer-events: auto; /* Ensure menu items are clickable */
      /* Add overflow-y-auto here if needed, since drawer-side might not scroll correctly now */
-     overflow-y: auto;
+    overflow-y: auto;
+    /* Explicitly set transform for the open state */
+    transform: translateX(0%);
+    /* The transition defined above will handle the slide */
+  }
+  /* Default state for menu (when drawer is closed/closing) */
+  .drawer-side > .menu {
+     /* Ensure it respects the top offset even in its 'closed' transform state */
+     /* Note: Fixed position isn't ideal here, but needed for the overlay interaction.
+        Let transform handle the hiding. */
+      position: fixed; /* Keep fixed so top offset applies */
+      top: 4rem;
+      height: calc(100vh - 4rem);
+      left: 0; /* Important */
+      transform: translateX(-100%); /* Default DaisyUI closed state */
+      z-index: 50; /* Keep z-index consistent */
+      pointer-events: none; /* Not interactive when closed */
+      overflow-y: auto; /* Allow scrolling if content was tall */
   }
 }
 </style>
