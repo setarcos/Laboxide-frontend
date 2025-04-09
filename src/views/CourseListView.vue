@@ -49,7 +49,7 @@
                  <!-- Edit Button (Admin or Teacher - API check might be needed for specific course) -->
                  <!-- Using Admin PUT for now, adjust if /stuff/course PUT has different fields -->
                  <button
-                    v-if="authStore.isAdmin"
+                    v-if="authStore.isAdmin || (authStore.user && authStore.user.userId === course.tea_id)"
                     class="btn btn-xs btn-ghost btn-circle"
                     title="Edit"
                     @click="openEditModal(course)"
@@ -163,7 +163,10 @@ const handleSave = async (formData) => {
   try {
     if (isEditing.value) {
       // Admin Edit API
-      await dataService.updateCourse(currentItem.value.id, formData)
+      if (authStore.isAdmin)
+        await dataService.updateCourse(currentItem.value.id, formData)
+      else
+        await dataService.stuffUpdateCourse(currentItem.value.id, formData)
       // Add logic here if you need to distinguish Teacher edit (stuffUpdateCourse)
     } else {
       // Create API

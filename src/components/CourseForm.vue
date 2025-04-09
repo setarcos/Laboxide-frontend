@@ -4,25 +4,25 @@
       <label class="label" for="course-name">
         <span class="label-text">Course Name</span>
       </label>
-      <input id="course-name" type="text" v-model="formData.name" placeholder="e.g., Introduction to Programming" class="input input-bordered w-full" required />
+      <input id="course-name" type="text" v-model="formData.name" placeholder="e.g., Introduction to Programming" class="input input-bordered w-full" required :disabled="!authStore.isAdmin"/>
     </div>
     <div>
       <label class="label" for="course-ename">
         <span class="label-text">English Name</span>
       </label>
-      <input id="course-ename" type="text" v-model="formData.ename" placeholder="e.g., Intro to Programming" class="input input-bordered w-full" required/>
+      <input id="course-ename" type="text" v-model="formData.ename" placeholder="e.g., Intro to Programming" class="input input-bordered w-full" required :disabled="!authStore.isAdmin"/>
     </div>
     <div>
       <label class="label" for="course-code">
         <span class="label-text">Course Code</span>
       </label>
-      <input id="course-code" type="text" v-model="formData.code" placeholder="e.g., CS101" class="input input-bordered w-full" required/>
+      <input id="course-code" type="text" v-model="formData.code" placeholder="e.g., CS101" class="input input-bordered w-full" required :disabled="!authStore.isAdmin"/>
     </div>
      <div>
       <label class="label" for="course-tea_id">
         <span class="label-text">Teacher ID</span>
       </label>
-      <input id="course-tea_id" type="text" v-model="formData.tea_id" placeholder="Teacher's unique ID" class="input input-bordered w-full" required/>
+      <input id="course-tea_id" type="text" v-model="formData.tea_id" placeholder="Teacher's unique ID" class="input input-bordered w-full" required :disabled="!authStore.isAdmin"/>
     </div>
      <div>
       <label class="label" for="course-tea_name">
@@ -40,14 +40,14 @@
       <label class="label" for="course-mailbox">
         <span class="label-text">Mailbox</span>
       </label>
-      <input id="course-mailbox" type="email" v-model="formData.mailbox" placeholder="Contact email" class="input input-bordered w-full"/>
+      <input id="course-mailbox" type="email" v-model="formData.mailbox" placeholder="Contact email" class="input input-bordered w-full" required/>
     </div>
      <div>
       <label class="label" for="course-term">
         <span class="label-text">Term (Semester ID)</span>
       </label>
       <!-- Consider using a dropdown populated from semesters -->
-      <input id="course-term" type="number" v-model.number="formData.term" placeholder="ID of the semester" class="input input-bordered w-full" required/>
+      <input id="course-term" type="number" v-model.number="formData.term" placeholder="ID of the semester" class="input input-bordered w-full" required :disabled="!authStore.isAdmin"/>
     </div>
 
     <div class="flex justify-end gap-2 pt-4">
@@ -59,6 +59,8 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth';
+const authStore = useAuthStore();
 
 const props = defineProps({
   initialData: {
