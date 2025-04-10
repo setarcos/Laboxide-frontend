@@ -11,6 +11,7 @@ const LabroomListView = () => import('@/views/LabroomListView.vue')
 const UserListView = () => import('@/views/UserListView.vue')
 const SemesterListView = () => import('@/views/SemesterListView.vue')
 const NotFoundView = () => import('@/views/NotFoundView.vue')
+const CourseDetailView = () => import('@/views/CourseDetailView.vue')
 
 const routes = [
   {
@@ -67,6 +68,13 @@ const routes = [
     component: NotFoundView,
     // Add meta.title for 404
     meta: { title: 'Page Not Found' }
+  },
+  {
+    path: '/courses/:id', // :id is a dynamic parameter
+    name: 'CourseDetail', // Matches the name used in <router-link>
+    component: CourseDetailView,
+    props: true, // Automatically pass route params as props to the component
+    meta: { title: '课程详情' }
   }
 ]
 

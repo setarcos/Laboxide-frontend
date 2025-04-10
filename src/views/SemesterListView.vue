@@ -26,7 +26,6 @@
       <table class="table table-zebra w-full">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Name</th>
             <th>Start Date</th>
             <th>End Date</th>
@@ -38,7 +37,6 @@
             <td colspan="5" class="text-center italic py-4">No semesters found.</td>
           </tr>
           <tr v-for="semester in semesters" :key="semester.id">
-            <th>{{ semester.id }}</th>
             <td>{{ semester.name }}</td>
             <td>{{ formatDate(semester.start) }}</td>
             <td>{{ formatDate(semester.end) }}</td>

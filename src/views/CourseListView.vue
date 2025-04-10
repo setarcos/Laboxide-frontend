@@ -26,7 +26,6 @@
       <table class="table table-zebra w-full">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Name</th>
             <th>Code</th>
             <th>Teacher</th>
@@ -39,10 +38,13 @@
             <td colspan="6" class="text-center italic py-4">No courses found.</td>
           </tr>
           <tr v-for="course in courses" :key="course.id">
-            <th>{{ course.id }}</th>
-            <td>{{ course.name }} ({{ course.ename }})</td>
+            <td>
+              <router-link :to="{ name: 'CourseDetail', params: { id: course.id } }" class="link link-hover link-primary">
+                {{ course.name }} ({{ course.ename }})
+              </router-link>
+            </td>
             <td>{{ course.code }}</td>
-            <td>{{ course.tea_name }} ({{ course.tea_id }})</td>
+            <td>{{ course.tea_name }}</td>
             <td>{{ course.term }}</td>
             <td>
               <div class="flex gap-1">

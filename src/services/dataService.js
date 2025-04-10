@@ -2,7 +2,7 @@ import api from './api'
 
 // --- Course ---
 export const getCourses = () => api.get('/course')
-export const getCourse = (id) => api.get(`/stuff/course/${id}`)
+export const getCourse = (id) => api.get(`/course/${id}`)
 export const createCourse = (data) => api.post('/admin/course', data)
 export const updateCourse = (id, data) => api.put(`/admin/course/${id}`, data) // Admin edit
 export const stuffUpdateCourse = (id, data) => api.put(`/stuff/course/${id}`, data) // Teacher/Stuff edit
@@ -11,9 +11,9 @@ export const deleteCourse = (id) => api.delete(`/admin/course/${id}`)
 // --- Labroom ---
 export const getLabrooms = () => api.get('/stuff/labroom')
 // export const getLabroom = (id) => api.get(`/stuff/labroom/${id}`) // API missing? Assuming not needed for list view
-export const createLabroom = (data) => api.post('/admin/labroom', data)
-export const updateLabroom = (id, data) => api.put(`/admin/labroom/${id}`, data)
-export const deleteLabroom = (id) => api.delete(`/admin/labroom/${id}`)
+export const createLabroom = (data) => api.post('/lab/labroom', data)
+export const updateLabroom = (id, data) => api.put(`/lab/labroom/${id}`, data)
+export const deleteLabroom = (id) => api.delete(`/lab/labroom/${id}`)
 // GET /admin/course/{id}, update labroom - API seems mismatched? Assuming PUT /admin/labroom/{id} is correct for updates
 
 // --- Semester ---
