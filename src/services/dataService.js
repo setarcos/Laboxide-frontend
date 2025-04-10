@@ -9,8 +9,8 @@ export const stuffUpdateCourse = (id, data) => api.put(`/stuff/course/${id}`, da
 export const deleteCourse = (id) => api.delete(`/admin/course/${id}`)
 
 // --- Labroom ---
-export const getLabrooms = () => api.get('/stuff/labroom')
-// export const getLabroom = (id) => api.get(`/stuff/labroom/${id}`) // API missing? Assuming not needed for list view
+export const getLabrooms = () => api.get('/labroom')
+export const getLabroom = (id) => api.get(`/labroom/${id}`)
 export const createLabroom = (data) => api.post('/lab/labroom', data)
 export const updateLabroom = (id, data) => api.put(`/lab/labroom/${id}`, data)
 export const deleteLabroom = (id) => api.delete(`/lab/labroom/${id}`)
@@ -22,6 +22,7 @@ export const getSemesters = () => api.get('/admin/semester')
 export const createSemester = (data) => api.post('/admin/semester', data)
 export const updateSemester = (id, data) => api.put(`/admin/semester/${id}`, data)
 export const deleteSemester = (id) => api.delete(`/admin/semester/${id}`)
+export const getCurrentSemester = () => api.get('/semester/current')
 // GET /admin/course/{id}, update semester - API seems mismatched? Assuming PUT /admin/semester/{id} is correct
 
 // --- User ---
@@ -31,3 +32,9 @@ export const createUser = (data) => api.post('/admin/user', data)
 export const updateUser = (id, data) => api.put(`/admin/user/${id}`, data)
 export const deleteUser = (id) => api.delete(`/admin/user/${id}`)
 // GET /admin/course/{id}, update user - API seems mismatched? Assuming PUT /admin/user/{id} is correct
+// --- Subcourse (Student Grouping) ---
+// params could be { course_id: number, semester_id?: number }
+export const getSubcourses = (params) => api.get('/subcourse', { params })
+export const createSubcourse = (data) => api.post('/stuff/subcourse', data)
+export const updateSubcourse = (id, data) => api.put(`/stuff/subcourse/${id}`, data)
+export const deleteSubcourse = (id) => api.delete(`/stuff/subcourse/${id}`)

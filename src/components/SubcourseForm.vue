@@ -1,0 +1,244 @@
+// src/components/SubcourseForm.vue
+<template>
+  <form @submit.prevent="submitForm">
+
+    <!-- Weekday -->
+    <div class="form-control mb-4">
+        <label class="label" for="subcourse-weekday">
+            <span class="label-text">Weekday</span>
+        </label>
+        <select
+            id="subcourse-weekday"
+            class="select select-bordered w-full"
+            v-model.number="formData.weekday"
+            required
+        >
+            <option disabled :value="undefined">Select a day</option>
+            <option :value="1">Monday</option>
+            <option :value="2">Tuesday</option>
+            <option :value="3">Wednesday</option>
+            <option :value="4">Thursday</option>
+            <option :value="5">Friday</option>
+            <option :value="6">Saturday</option>
+            <option :value="7">Sunday</option>
+        </select>
+    </div>
+
+    <!-- Room ID (Labroom) -->
+    <div class="form-control mb-4">
+        <label class="label" for="subcourse-room">
+            <span class="label-text">Lab Room</span>
+        </label>
+        <select
+            id="subcourse-room"
+            class="select select-bordered w-full"
+            v-model.number="formData.room_id"
+            required
+            :disabled="isLoadingLabrooms || !!labroomError"
+        >
+             <option disabled :value="undefined">
+                {{ isLoadingLabrooms ? 'Loading rooms...' : (labroomError ? 'Error loading rooms' : 'Select a room') }}
+            </option>
+             <option v-for="room in labrooms" :key="room.id" :value="room.id">
+                {{ room.name }} ({{ room.room }}) - Manager: {{ room.manager }}
+            </option>
+        </select>
+         <label v-if="labroomError" class="label">
+             <span class="label-text-alt text-error">{{ labroomError }}</span>
+         </label>
+    </div>
+
+    <!-- Teacher Name -->
+    <div class="form-control mb-4">
+      <label class="label" for="subcourse-teacher">
+        <span class="label-text">Teacher Name</span>
+         <span class="label-text-alt">(Consider pre-filling)</span>
+      </label>
+      <input
+        id="subcourse-teacher"
+        type="text"
+        placeholder="Teacher responsible for this group"
+        class="input input-bordered w-full"
+        v-model.trim="formData.tea_name"
+        required
+      />
+    </div>
+
+    <!-- Student Limit -->
+    <div class="form-control mb-4">
+        <label class="label" for="subcourse-limit">
+            <span class="label-text">Student Limit</span>
+        </label>
+        <input
+            id="subcourse-limit"
+            type="number"
+            min="0"
+            placeholder="Max number of students"
+            class="input input-bordered w-full"
+            v-model.number="formData.stu_limit"
+            required
+        />
+    </div>
+
+     <!-- Lag Week -->
+    <div class="form-control mb-4">
+        <label class="label" for="subcourse-lag">
+            <span class="label-text">Lag Week</span>
+             <span class="label-text-alt">(Offset from semester start)</span>
+        </label>
+        <input
+            id="subcourse-lag"
+            type="number"
+            min="0"
+            placeholder="e.g., 0 for starts week 1"
+            class="input input-bordered w-full"
+            v-model.number="formData.lag_week"
+            required
+        />
+    </div>
+
+    <!-- Context Info (Read Only Display - Optional) -->
+    <!-- These values are set programmatically via props and added on submit -->
+    <!-- They are not directly editable in this form -->
+    <div class="text-xs text-gray-500 mt-4 space-y-1 bg-base-200 p-2 rounded">
+        <p><strong>Context Course ID:</strong> {{ props.courseId }}</p>
+        <p><strong>Context Semester/Year ID:</strong> {{ props.semesterId }}</p>
+        <p>(These IDs are automatically included when saving)</p>
+    </div>
+
+
+    <!-- Actions -->
+    <div class="modal-action mt-6">
+        <button type="button" class="btn btn-ghost" @click="$emit('close')">Cancel</button>
+        <button type="submit" class="btn btn-primary" :disabled="isSaving || isLoadingLabrooms || !formDataIsValid">
+             <span v-if="isSaving" class="loading loading-spinner loading-xs mr-2"></span>
+            {{ isSaving ? 'Saving...' : 'Save Subcourse' }}
+        </button>
+    </div>
+  </form>
+</template>
+
+<script setup>
+import { ref, watch, reactive, onMounted, computed } from 'vue';
+import * as dataService from '@/services/dataService';
+
+const props = defineProps({
+  initialData: {
+    type: Object,
+    default: () => ({}), // Default to empty object, let createInitialFormData handle structure
+  },
+  isSaving: {
+    type: Boolean,
+    default: false,
+  },
+  courseId: { // This is the context Course ID from the parent view
+      type: Number,
+      required: true
+  },
+  semesterId: { // This is the context Semester ID (used as year_id) from the parent view or current semester
+      type: Number,
+      required: true
+  }
+});
+
+const emit = defineEmits(['save', 'close']);
+
+// --- Labroom State ---
+const labrooms = ref([]);
+const isLoadingLabrooms = ref(false);
+const labroomError = ref(null);
+
+// --- Form State ---
+const formData = reactive(createInitialFormData()); // Initialize reactive form data
+
+// Helper to create initial form data structure based on props.initialData
+// Only includes fields that are editable within this form.
+function createInitialFormData() {
+    const data = props.initialData || {}; // Use empty object if initialData is null/undefined
+    return {
+        weekday: data.weekday ?? undefined,
+        room_id: data.room_id ?? undefined,
+        tea_name: data.tea_name ?? '',
+        stu_limit: data.stu_limit ?? null,
+        lag_week: data.lag_week ?? 0,
+        // NOTE: course_id and year_id (from props.semesterId) are NOT part of this
+        // reactive formData object because they are contextual and come from props.
+        // They are added explicitly during the submitForm process.
+    };
+}
+
+// Watch for changes in initialData to reset the form
+// This is crucial when the modal is reused for editing different items.
+watch(() => props.initialData, () => {
+    console.log("Initial data changed, resetting form:", props.initialData);
+    // Re-create the form data structure based on the potentially new initialData
+    Object.assign(formData, createInitialFormData());
+}, { deep: true }); // No immediate: true needed if initialized directly
+
+// --- Fetch Labrooms ---
+const fetchLabrooms = async () => {
+    isLoadingLabrooms.value = true;
+    labroomError.value = null;
+    labrooms.value = [];
+    try {
+        const response = await dataService.getLabrooms();
+        labrooms.value = response.data || [];
+        if (labrooms.value.length === 0) {
+             labroomError.value = "No lab rooms found.";
+        }
+    } catch (err) {
+        console.error("Failed to fetch lab rooms:", err);
+        labroomError.value = `Error loading rooms: ${err.response?.data?.error || err.message}`;
+    } finally {
+        isLoadingLabrooms.value = false;
+    }
+};
+
+// --- Computed Validation ---
+const formDataIsValid = computed(() => {
+    return formData.weekday !== undefined && formData.weekday >= 1 && formData.weekday <= 7 &&
+           formData.room_id !== undefined &&
+           formData.tea_name.trim() !== '' &&
+           formData.stu_limit !== null && formData.stu_limit >= 0 &&
+           formData.lag_week !== null && formData.lag_week >= 0;
+});
+
+
+// --- Submit Logic ---
+const submitForm = () => {
+  if (!formDataIsValid.value) {
+      alert('Please fill in all required fields correctly.');
+      return;
+  }
+
+  // Construct the payload according to SubCourseRequest structure.
+  // This is where the contextual props `courseId` and `semesterId` are added.
+  const payload = {
+    // Fields directly edited in the form:
+    weekday: Number(formData.weekday),
+    room_id: Number(formData.room_id),
+    tea_name: formData.tea_name,
+    stu_limit: Number(formData.stu_limit),
+    lag_week: Number(formData.lag_week),
+
+    // Fields added from component props (context):
+    year_id: props.semesterId,   // Map semesterId prop to year_id field
+    course_id: props.courseId,   // Use courseId prop directly
+  };
+
+  console.log("Submitting payload:", payload);
+  // Emit the complete payload expected by the backend
+  emit('save', payload);
+};
+
+// --- Lifecycle ---
+onMounted(() => {
+  fetchLabrooms();
+  // The watcher handles the initial setting of formData based on initialData
+});
+
+</script>
+
+<style scoped>
+/* Add any specific styles if needed */
+</style>

@@ -6,6 +6,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import { useAuthStore } from './stores/auth' // Import the auth store
+import { useSemesterStore } from './stores/semester' // Import the auth store
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -15,6 +16,7 @@ app.use(pinia) // Use Pinia before router or accessing store
 // --- Authentication Check ---
 // Try to fetch user info before mounting the app
 const authStore = useAuthStore() // Needs pinia instance registered first
+const semesterStore = useSemesterStore()
 
 try {
     // We await this so the initial loading state is handled correctly
@@ -28,6 +30,13 @@ try {
 }
 // --- End Authentication Check ---
 
+try {
+    await semesterStore.fetchCurrentSemester()
+} catch (error) {
+    console.error("Load semester info failed:", error)
+} finally {
+    semesterStore.isSemesterLoading = false;
+}
 
 app.use(router) // Use router after Pinia setup and initial auth check
 
