@@ -49,9 +49,8 @@
                     <th>Room</th>
                     <th>Teacher</th>
                     <th>Limit</th>
-                    <!-- Add other relevant subcourse headers -->
                     <th v-if="showAllSemesters && isTeacher">Semester ID</th>
-                    <th v-if="isTeacher">Actions</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -68,12 +67,11 @@
                         <span v-else>{{ getRoomName(subcourse.room_id) }}</span>
                     </td>
                     <td>{{ subcourse.tea_name }}</td>
-                    <td class="text-center">{{ subcourse.stu_limit }}</td>
+                    <td>{{ subcourse.stu_limit }}</td>
 
-                    <!-- Add other relevant subcourse data cells -->
                     <td v-if="showAllSemesters && isTeacher">{{ subcourse.semester_id }}</td>
-                    <td v-if="isTeacher">
-                        <div class="flex gap-1">
+                    <td>
+                        <div class="flex gap-1" v-if="isTeacher">
                             <button
                                 class="btn btn-xs btn-ghost btn-circle"
                                 title="Edit"
@@ -139,7 +137,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useSemesterStore } from '@/stores/semester';
 import * as dataService from '@/services/dataService';
 import SubcourseForm from '@/components/SubcourseForm.vue';
-import ConfirmDialog from '@/components/ConfirmDialog.vue'; // Assuming you have this
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 
 const props = defineProps({
   courseId: {

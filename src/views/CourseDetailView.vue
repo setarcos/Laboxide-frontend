@@ -51,9 +51,9 @@
                Materials
             </a>
             <a class="tab tab-lg"
-               :class="{ 'tab-active': activeTab === 'students' }"
-               @click.prevent="setActiveTab('students')">
-               Students
+               :class="{ 'tab-active': activeTab === 'subcourse' }"
+               @click.prevent="setActiveTab('subcourse')">
+               分组信息
             </a>
         </div>
 
@@ -116,9 +116,8 @@
                     </div>
                 </div>
 
-                 <!-- Students Tab Content (Placeholder) -->
-                <div v-if="activeTab === 'students'">
-                    <CourseStudentsTab v-if="activeTab === 'students'" :courseId="course.id" />
+                <div v-if="activeTab === 'subcourse'">
+                    <SubcourseTab v-if="activeTab === 'subcourse'" :courseId="course.id" />
                 </div>
 
             </div>
@@ -141,8 +140,7 @@ import * as dataService from '@/services/dataService'
 // Optional: Import child components if you create them later
 // import CourseSchedule from '@/components/CourseSchedule.vue';
 // import CourseMaterials from '@/components/CourseMaterials.vue';
-// import CourseStudents from '@/components/CourseStudents.vue';
-import CourseStudentsTab from '@/components/CourseStudentsTab.vue'
+import SubcourseTab from '@/components/SubcourseTab.vue'
 // Define props passed from the router
 const props = defineProps({
   id: {
