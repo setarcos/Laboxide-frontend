@@ -16,11 +16,6 @@ export default defineConfig({
   server: {
     port: 3000, // You can change the development port if needed
     proxy: {
-      '/auth': 'http://localhost:8080',
-      '/greet': 'http://localhost:8080',
-      '/logout': 'http://localhost:8080',
-      '/stuff': 'http://localhost:8080',
-      '/admin': 'http://localhost:8080',
       '/api': {
         target: 'http://localhost:8080', // Your backend URL
         changeOrigin: true,           // <-- VERY IMPORTANT
