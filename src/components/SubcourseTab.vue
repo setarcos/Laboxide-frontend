@@ -45,12 +45,12 @@
             <table class="table table-zebra w-full">
                 <thead>
                 <tr>
-                    <th>Day</th>
-                    <th>Room</th>
-                    <th>Teacher</th>
-                    <th>Limit</th>
-                    <th v-if="showAllSemesters && isTeacher">Semester ID</th>
-                    <th>Actions</th>
+                    <th>上课时间</th>
+                    <th>地点</th>
+                    <th>教师</th>
+                    <th>人数上限</th>
+                    <th v-if="showAllSemesters && isTeacher">学期</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -195,8 +195,14 @@ const getRoomName = (roomId) => {
 };
 
 const getWeekdayName = (dayNumber) => {
-    const days = ['Unknown', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']; // Index 0 for unknown/error case
-    return days[dayNumber] || days[0]; // Return name or 'Unknown'
+    const days = ['未定', '周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+    const parts = ['上午', '下午', '晚上', '下午后段', '晚上后段'];
+    const day = Math.floor(dayNumber / 10);  // 十位数：星期几
+    const part = dayNumber % 10;            // 个位数：时间段
+    const dayStr = days[day] || days[0];
+    const partStr = parts[part] || parts[0];
+
+    return `${dayStr}${partStr}`;
 };
 
 // Fetch subcourses logic

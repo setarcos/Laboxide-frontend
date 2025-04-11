@@ -5,7 +5,7 @@
     <!-- Weekday -->
     <div class="form-control mb-4">
         <label class="label" for="subcourse-weekday">
-            <span class="label-text">Weekday</span>
+            <span class="label-text">星期</span>
         </label>
         <select
             id="subcourse-weekday"
@@ -13,21 +13,41 @@
             v-model.number="formData.weekday"
             required
         >
-            <option disabled :value="undefined">Select a day</option>
-            <option :value="1">Monday</option>
-            <option :value="2">Tuesday</option>
-            <option :value="3">Wednesday</option>
-            <option :value="4">Thursday</option>
-            <option :value="5">Friday</option>
-            <option :value="6">Saturday</option>
-            <option :value="7">Sunday</option>
+            <option disabled :value="undefined">星期</option>
+            <option :value="1">周一</option>
+            <option :value="2">周二</option>
+            <option :value="3">周三</option>
+            <option :value="4">周四</option>
+            <option :value="5">周五</option>
+            <option :value="6">周六</option>
+            <option :value="7">周日</option>
+        </select>
+    </div>
+
+    <!-- Part of a day -->
+    <div class="form-control mb-4">
+        <label class="label" for="subcourse-weekday">
+            <span class="label-text">时间</span>
+        </label>
+        <select
+            id="subcourse-weekday"
+            class="select select-bordered w-full"
+            v-model.number="formData.partday"
+            required
+        >
+            <option disabled :value="undefined">时间</option>
+            <option :value="0">上午</option>
+            <option :value="1">下午</option>
+            <option :value="2">晚上</option>
+            <option :value="3">下午后段</option>
+            <option :value="4">晚上后段</option>
         </select>
     </div>
 
     <!-- Room ID (Labroom) -->
     <div class="form-control mb-4">
         <label class="label" for="subcourse-room">
-            <span class="label-text">Lab Room</span>
+            <span class="label-text">教室</span>
         </label>
         <select
             id="subcourse-room"
@@ -40,7 +60,7 @@
                 {{ isLoadingLabrooms ? 'Loading rooms...' : (labroomError ? 'Error loading rooms' : 'Select a room') }}
             </option>
              <option v-for="room in labrooms" :key="room.id" :value="room.id">
-                {{ room.name }} ({{ room.room }}) - Manager: {{ room.manager }}
+                {{ room.name }} ({{ room.room }})
             </option>
         </select>
          <label v-if="labroomError" class="label">
@@ -51,8 +71,7 @@
     <!-- Teacher Name -->
     <div class="form-control mb-4">
       <label class="label" for="subcourse-teacher">
-        <span class="label-text">Teacher Name</span>
-         <span class="label-text-alt">(Consider pre-filling)</span>
+        <span class="label-text">教师姓名</span>
       </label>
       <input
         id="subcourse-teacher"
@@ -67,7 +86,7 @@
     <!-- Student Limit -->
     <div class="form-control mb-4">
         <label class="label" for="subcourse-limit">
-            <span class="label-text">Student Limit</span>
+            <span class="label-text">人数上限</span>
         </label>
         <input
             id="subcourse-limit"
@@ -83,7 +102,7 @@
      <!-- Lag Week -->
     <div class="form-control mb-4">
         <label class="label" for="subcourse-lag">
-            <span class="label-text">Lag Week</span>
+            <span class="label-text">落后课时</span>
              <span class="label-text-alt">(Offset from semester start)</span>
         </label>
         <input
@@ -156,7 +175,8 @@ const formData = reactive(createInitialFormData()); // Initialize reactive form 
 function createInitialFormData() {
     const data = props.initialData || {}; // Use empty object if initialData is null/undefined
     return {
-        weekday: data.weekday ?? undefined,
+        weekday: Math.floor(data.weekday / 10) ?? undefined,
+        partday: data.weekday % 10 ?? undefined,
         room_id: data.room_id ?? undefined,
         tea_name: data.tea_name ?? '',
         stu_limit: data.stu_limit ?? null,
@@ -215,7 +235,7 @@ const submitForm = () => {
   // This is where the contextual props `courseId` and `semesterId` are added.
   const payload = {
     // Fields directly edited in the form:
-    weekday: Number(formData.weekday),
+    weekday: Number(formData.weekday) * 10 + Number(formData.partday),
     room_id: Number(formData.room_id),
     tea_name: formData.tea_name,
     stu_limit: Number(formData.stu_limit),
