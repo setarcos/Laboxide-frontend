@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Teacher Controls: Add Button and Semester Toggle -->
-    <div v-if="isTeacher" class="flex justify-between items-center mb-4 p-4 bg-base-200 rounded-lg">
+    <div v-if="isTeacher || authStore.isAdmin" class="flex justify-between items-center mb-4 p-4 bg-base-200 rounded-lg">
         <div class="form-control">
             <label class="label cursor-pointer gap-2">
                 <span class="label-text">Show All Semesters</span>
@@ -71,7 +71,7 @@
 
                     <td v-if="showAllSemesters && isTeacher">{{ subcourse.semester_id }}</td>
                     <td>
-                        <div class="flex gap-1" v-if="isTeacher">
+                        <div class="flex gap-1" v-if="isTeacher || authStore.isAdmin">
                             <button
                                 class="btn btn-xs btn-ghost btn-circle"
                                 title="Edit"
@@ -106,6 +106,9 @@
                 :is-saving="isSaving"
                 :course-id="courseId"
                 :semester-id="currentItem?.semester_id || semesterStore.getCurrentSemesterId"
+                :user-id="authStore.user.userId"
+                :realname="authStore.user.realname"
+                :is-admin="authStore.isAdmin"
                 @save="handleSave"
                 @close="closeModal"
                 class="py-4"

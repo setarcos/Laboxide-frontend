@@ -30,7 +30,7 @@
             <span class="label-text">时间</span>
         </label>
         <select
-            id="subcourse-weekday"
+            id="subcourse-daypart"
             class="select select-bordered w-full"
             v-model.number="formData.partday"
             required
@@ -79,6 +79,23 @@
         placeholder="Teacher responsible for this group"
         class="input input-bordered w-full"
         v-model.trim="formData.tea_name"
+        :disabled="!props.isAdmin"
+        required
+      />
+    </div>
+
+    <!-- Teacher ID -->
+    <div class="form-control mb-4">
+      <label class="label" for="subcourse-teacher">
+        <span class="label-text">教师ID</span>
+      </label>
+      <input
+        id="subcourse-teacher-id"
+        type="text"
+        placeholder="Teacher responsible for this group"
+        class="input input-bordered w-full"
+        v-model.trim="formData.tea_id"
+        :disabled="!props.isAdmin"
         required
       />
     </div>
@@ -116,16 +133,6 @@
         />
     </div>
 
-    <!-- Context Info (Read Only Display - Optional) -->
-    <!-- These values are set programmatically via props and added on submit -->
-    <!-- They are not directly editable in this form -->
-    <div class="text-xs text-gray-500 mt-4 space-y-1 bg-base-200 p-2 rounded">
-        <p><strong>Context Course ID:</strong> {{ props.courseId }}</p>
-        <p><strong>Context Semester/Year ID:</strong> {{ props.semesterId }}</p>
-        <p>(These IDs are automatically included when saving)</p>
-    </div>
-
-
     <!-- Actions -->
     <div class="modal-action mt-6">
         <button type="button" class="btn btn-ghost" @click="$emit('close')">Cancel</button>
@@ -157,6 +164,18 @@ const props = defineProps({
   semesterId: { // This is the context Semester ID (used as year_id) from the parent view or current semester
       type: Number,
       required: true
+  },
+  userId: {
+      type: String,
+      required: true
+  },
+  realname: {
+      type: String,
+      required: true
+  },
+  isAdmin: {
+      type: Boolean,
+      required: true
   }
 });
 
@@ -178,7 +197,8 @@ function createInitialFormData() {
         weekday: Math.floor(data.weekday / 10) ?? undefined,
         partday: data.weekday % 10 ?? undefined,
         room_id: data.room_id ?? undefined,
-        tea_name: data.tea_name ?? '',
+        tea_name: data.tea_name ?? props.realname,
+        tea_id: data.tea_id ?? props.userId,
         stu_limit: data.stu_limit ?? null,
         lag_week: data.lag_week ?? 0,
         // NOTE: course_id and year_id (from props.semesterId) are NOT part of this
@@ -219,6 +239,7 @@ const formDataIsValid = computed(() => {
     return formData.weekday !== undefined && formData.weekday >= 1 && formData.weekday <= 7 &&
            formData.room_id !== undefined &&
            formData.tea_name.trim() !== '' &&
+           formData.tea_id.trim() !== '' &&
            formData.stu_limit !== null && formData.stu_limit >= 0 &&
            formData.lag_week !== null && formData.lag_week >= 0;
 });
@@ -235,9 +256,11 @@ const submitForm = () => {
   // This is where the contextual props `courseId` and `semesterId` are added.
   const payload = {
     // Fields directly edited in the form:
+    id: 0, // will be ignored
     weekday: Number(formData.weekday) * 10 + Number(formData.partday),
     room_id: Number(formData.room_id),
     tea_name: formData.tea_name,
+    tea_id: formData.tea_id,
     stu_limit: Number(formData.stu_limit),
     lag_week: Number(formData.lag_week),
 
