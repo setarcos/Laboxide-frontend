@@ -26,11 +26,13 @@
       <table class="table table-zebra w-full">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Code</th>
-            <th>Teacher</th>
-            <th>Term ID</th>
-            <th>Actions</th>
+            <th>课程名</th>
+            <th>课程号</th>
+            <th>学分</th>
+            <th>学时</th>
+            <th>学期</th>
+            <th>教师</th>
+            <th>操作</th>
           </tr>
         </thead>
         <tbody>
@@ -43,9 +45,11 @@
                 {{ course.name }} ({{ course.ename }})
               </router-link>
             </td>
-            <td>{{ course.code }}</td>
+            <td>{{ course.code.split(',')[0] }}</td>
+            <td>{{ course.code.split(',')[1] }}</td>
+            <td>{{ course.code.split(',')[2] }}</td>
+            <td>{{ course.term === '1' ? '春季' : course.term === '2' ? '秋季' : '暑期' }}</td>
             <td>{{ course.tea_name }}</td>
-            <td>{{ course.term }}</td>
             <td>
               <div class="flex gap-1">
                  <!-- Edit Button (Admin or Teacher - API check might be needed for specific course) -->

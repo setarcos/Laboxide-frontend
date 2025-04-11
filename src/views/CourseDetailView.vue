@@ -65,27 +65,37 @@
                 <div v-if="activeTab === 'details'">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-6">
                         <div>
-                            <p class="font-semibold text-sm text-gray-500 uppercase">Course Code</p>
-                            <p class="text-lg">{{ course.code }}</p>
+                            <p class="font-semibold text-sm text-gray-500">课程号</p>
+                            <p class="text-lg">{{ course.code.split(',')[0] }}</p>
                         </div>
                         <div>
-                            <p class="font-semibold text-sm text-gray-500 uppercase">Teacher</p>
+                            <p class="font-semibold text-sm text-gray-500">学分</p>
+                            <p class="text-lg">{{ course.code.split(',')[1] }}</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-sm text-gray-500">学时</p>
+                            <p class="text-lg">{{ course.code.split(',')[2] }}</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-sm text-gray-500">学期</p>
+                            <p class="text-lg">
+                         {{ course.term === '1' ? '春季' : course.term === '2' ? '秋季' : '暑期' }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-sm text-gray-500">教师</p>
                             <p class="text-lg">{{ course.tea_name }}</p>
                         </div>
                         <div>
-                            <p class="font-semibold text-sm text-gray-500 uppercase">Teacher Email</p>
+                            <p class="font-semibold text-sm text-gray-500">邮箱</p>
                             <p class="text-lg">
                                 <a :href="`mailto:${course.mailbox}`" class="link link-hover">{{ course.mailbox }}</a>
                             </p>
                         </div>
-                        <div>
-                            <p class="font-semibold text-sm text-gray-500 uppercase">Term ID</p>
-                            <p class="text-lg">{{ course.term }}</p>
-                        </div>
                     </div>
 
                     <div>
-                        <p class="font-semibold text-sm text-gray-500 uppercase mb-2">Introduction</p>
+                        <p class="font-semibold text-sm text-gray-500 mb-2">课程大纲</p>
                         <div class="prose max-w-none bg-base-200 p-4 rounded-md">
                             <p style="white-space: pre-wrap;">{{ course.intro }}</p>
                         </div>
