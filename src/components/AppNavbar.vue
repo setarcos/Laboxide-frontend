@@ -86,7 +86,7 @@ const authStore = useAuthStore()
 
 // --- Theme Switcher Logic ---
 const availableThemes = ref([ // Make sure these are in tailwind.config.js and html data-theme attribute
-    'light', 'dark', 'cupcake', /* add other themes */
+    'light', 'dark', 'cupcake', 'autumn' /* add other themes */
 ]);
 const selectedTheme = ref(availableThemes.value[0]); // Default theme
 const storageKey = 'daisyui-theme';
