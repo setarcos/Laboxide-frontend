@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api from '@/services/api'
-import { PERMISSION_ADMIN, PERMISSION_TEACHER, PERMISSION_LAB_MANAGER } from '@/utils/permissions'
+import { PERMISSION_ADMIN, PERMISSION_TEACHER, PERMISSION_LAB_MANAGER, PERMISSION_STUDENT } from '@/utils/permissions'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
@@ -14,6 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAdmin = computed(() => (permissions.value & PERMISSION_ADMIN) === PERMISSION_ADMIN)
   const isTeacher = computed(() => (permissions.value & PERMISSION_TEACHER) === PERMISSION_TEACHER)
   const isLabManager = computed(() => (permissions.value & PERMISSION_LAB_MANAGER) === PERMISSION_LAB_MANAGER)
+  const isStudent = computed(() => (permissions.value & PERMISSION_STUDENT) === PERMISSION_STUDENT)
 
   // Actions
   async function checkAuth() {
@@ -78,6 +79,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAdmin,
     isTeacher,
     isLabManager,
+    isStudent,
     checkAuth,
     logout,
     hasPermission,
