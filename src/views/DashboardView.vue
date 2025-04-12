@@ -15,9 +15,9 @@
         <span v-else>{{ semesterGreeting }}</span>
     </p>
 
-    <div class="divider"></div>
+    <div v-if="authStore.isTeacher | authStore.isStudent" class="divider"></div>
     <!-- My Courses Card (Only for authenticated users) -->
-    <div v-if="authStore.isAuthenticated" class="card bg-base-100 shadow-xl mt-6">
+    <div v-if="authStore.isTeacher | authStore.isStudent" class="card bg-base-100 shadow-xl mt-6">
       <div class="card-body">
         <h2 class="card-title">My Courses</h2>
 
@@ -70,12 +70,12 @@
       </div>
     </div>
 
-    <div class="divider" v-if="authStore.isTeacher"></div>
-    <div class="mt-6 p-4 bg-base-200 rounded-box" v-if="authStore.isTeacher">
+    <div class="divider" v-if="isSuper"></div>
+    <div class="mt-6 p-4 bg-base-200 rounded-box" v-if="isSuper">
        <h3 class="text-lg font-semibold mb-2">Quick Actions</h3>
        <div class="flex flex-wrap gap-2">
-            <router-link v-if="authStore.hasPermission(PERMISSION_ADMIN | PERMISSION_TEACHER)" :to="{ name: 'Courses'}" class="btn btn-sm btn-outline">Manage Courses</router-link>
-            <router-link v-if="authStore.hasPermission(PERMISSION_ADMIN | PERMISSION_LAB_MANAGER)" :to="{ name: 'Labrooms'}" class="btn btn-sm btn-outline">Manage Lab Rooms</router-link>
+            <router-link v-if="authStore.isAdmin | authStore.isTeacher" :to="{ name: 'Courses'}" class="btn btn-sm btn-outline">Manage Courses</router-link>
+            <router-link v-if="authStore.isAdmin | authStore.isLabManager" :to="{ name: 'Labrooms'}" class="btn btn-sm btn-outline">Manage Lab Rooms</router-link>
             <router-link v-if="authStore.isAdmin" :to="{ name: 'Users'}" class="btn btn-sm btn-outline">Manage Users</router-link>
             <router-link v-if="authStore.isAdmin" :to="{ name: 'Semesters'}" class="btn btn-sm btn-outline">Manage Semesters</router-link>
        </div>
@@ -98,6 +98,7 @@ const semesterStore = useSemesterStore() // <-- Use semester store
 const myCourses = ref([]);
 const isLoadingMyCourses = ref(false);
 const myCoursesError = ref(null);
+const isSuper = computed(() => (authStore.isTeacher | authStore.isAdmin | authStore.isLabManager))
 
 // --- Fetch My Courses Logic ---
 const fetchMyCourses = async () => {
@@ -170,11 +171,13 @@ const semesterGreeting = computed(() => {
         return "Could not determine the current week.";
     }
 });
+
 watch(() => authStore.isAuthenticated, (isAuth, wasAuth) => {
     console.log(`Auth state changed: ${wasAuth} -> ${isAuth}`); // Add log
     if (isAuth) {
         // User is authenticated (either initially or just logged in)
-        fetchMyCourses();
+        if (authStore.isTeacher | authStore.isStudent)
+            fetchMyCourses();
     } else {
         // User is not authenticated (either initially or just logged out)
         myCourses.value = []; // Clear data
