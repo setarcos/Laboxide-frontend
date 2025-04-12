@@ -2,11 +2,10 @@
 <template>
   <div>
     <!-- Upload Section (Teacher Only) -->
-    <div v-if="isTeacher" class="mb-6 p-4 bg-base-200 rounded-lg shadow">
-        <h3 class="text-lg font-medium mb-3">Upload New Material</h3>
-         <div class="form-control w-full mb-3">
-            <label class="label" for="file-description">
-                <span class="label-text">File Description (finfo)</span>
+    <div v-if="isTeacher" class="mb-6 p-3 bg-base-200 rounded-lg shadow">
+         <div class="form-control w-full mb-2">
+            <label class="label py-1" for="file-description">
+                <span class="label-text text-sm">New File Description:</span>
             </label>
             <input
                 id="file-description"
@@ -16,29 +15,26 @@
                 v-model="fileDescription"
             />
         </div>
-         <div class="form-control w-full mb-3">
-             <label class="label" for="course-file">
-                 <span class="label-text">Select File</span>
-             </label>
-            <input
+
+         <div class="flex items-center gap-2 mt-1">
+             <input
                 id="course-file"
                 type="file"
                 ref="fileInputRef"
-                class="file-input file-input-bordered file-input-primary file-input-sm w-full"
-                @change="handleFileSelect"
+                class="file-input file-input-bordered file-input-primary file-input-sm w-full max-w-xs flex-grow" @change="handleFileSelect"
              />
+             <button
+                class="btn btn-sm btn-primary"
+                @click="handleUpload"
+                :disabled="!selectedFile || !fileDescription || isUploading"
+            >
+                 <span v-if="isUploading" class="loading loading-spinner loading-xs"></span>
+                {{ isUploading ? '...' : 'Upload' }}
+            </button>
          </div>
 
-        <button
-            class="btn btn-sm btn-primary mt-2"
-            @click="handleUpload"
-            :disabled="!selectedFile || !fileDescription || isUploading"
-        >
-             <span v-if="isUploading" class="loading loading-spinner loading-xs mr-2"></span>
-            {{ isUploading ? 'Uploading...' : 'Upload File' }}
-        </button>
-        <p v-if="uploadError" class="text-error text-sm mt-2">{{ uploadError }}</p>
-         <p v-if="uploadSuccess" class="text-success text-sm mt-2">File uploaded successfully!</p>
+         <p v-if="uploadError" class="text-error text-xs mt-1">{{ uploadError }}</p>
+         <p v-if="uploadSuccess" class="text-success text-xs mt-1">Uploaded!</p>
     </div>
 
     <!-- Loading Files State -->
