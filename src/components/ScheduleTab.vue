@@ -1,8 +1,6 @@
 // src/components/CourseScheduleTab.vue
 <template>
     <div>
-        <h2 class="text-xl font-semibold mb-4">Course Schedule</h2>
-
         <!-- Teacher Controls: Add Button -->
         <div v-if="isTeacher" class="text-right mb-4">
             <button class="btn btn-sm btn-primary" @click="openAddModal">

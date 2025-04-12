@@ -54,3 +54,13 @@ export const getSchedules = (courseId) => api.get(`/courseschedule/${courseId}`)
 export const createSchedule = (data) => api.post('/teacher/schedule', data)
 export const updateSchedule = (id, data) => api.put(`/teacher/schedule/${id}`, data)
 export const deleteSchedule = (id) => api.delete(`/teacher/schedule/${id}`)
+
+// --- Course File Functions ---
+export const listCourseFiles = (courseId) => api.get(`/coursefilelist/${courseId}`)
+export const uploadCourseFile = (formData) => api.post('/teacher/coursefile/upload', formData, {
+    headers: {
+        'Content-Type': 'multipart/form-data'
+    }
+})
+export const deleteCourseFile = (fileId) => api.delete(`/teacher/coursefile/${fileId}`)
+

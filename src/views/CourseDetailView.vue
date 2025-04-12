@@ -109,14 +109,7 @@
 
                 <!-- Materials Tab Content (Placeholder) -->
                 <div v-if="activeTab === 'materials'">
-                    <h2 class="text-xl font-semibold mb-4">Downloadable Materials</h2>
-                    <p class="italic text-gray-500">Links to course materials will appear here.</p>
-                     <!-- TODO: Replace with your materials component -->
-                     <!-- Example: <CourseMaterials :courseId="course.id" /> -->
-                    <div class="text-center py-10">
-                         <span class="loading loading-dots loading-md"></span>
-                         <p>Loading materials...</p>
-                    </div>
+                    <MaterialTab v-if="activeTab === 'materials'" :courseId="course.id" />
                 </div>
 
                 <div v-if="activeTab === 'subcourse'">
@@ -140,9 +133,8 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue' // Added watch back
 import { useRouter, useRoute } from 'vue-router' // Added useRoute back
 import * as dataService from '@/services/dataService'
-// Optional: Import child components if you create them later
 import ScheduleTab from '@/components/ScheduleTab.vue';
-// import CourseMaterials from '@/components/CourseMaterials.vue';
+import MaterialTab from '@/components/MaterialTab.vue';
 import SubcourseTab from '@/components/SubcourseTab.vue'
 // Define props passed from the router
 const props = defineProps({
