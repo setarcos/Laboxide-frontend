@@ -47,3 +47,10 @@ export const teacherRemove = (cid, stu_id) => api.delete(`/teacher/groupremove/$
 export const joinGroup = (cid) => api.post(`/stu/group/join/${cid}`)
 export const leaveGroup = (cid) => api.delete(`/stu/group/leave/${cid}`)
 export const getGroup = (cid) => api.get(`/member/group/${cid}`)
+
+// --- Course Schedule ---
+// Get schedules for a specific course
+export const getSchedules = (courseId) => api.get(`/courseschedule/${courseId}`)
+export const createSchedule = (data) => api.post('/teacher/schedule', data)
+export const updateSchedule = (id, data) => api.put(`/teacher/schedule/${id}`, data)
+export const deleteSchedule = (id) => api.delete(`/teacher/schedule/${id}`)
