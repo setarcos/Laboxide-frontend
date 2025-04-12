@@ -1,7 +1,7 @@
 <template>
   <div class="prose max-w-none"> <!-- Use prose for nice typography -->
     <p v-if="authStore.isLoading">Loading user information...</p>
-    <p v-else-if="authStore.isAuthenticated && authStore.user">
+    <p v-else-if="authStore.user">
       Welcome back, <strong>{{ authStore.user.realname }}</strong>!
     </p>
     <p v-else>

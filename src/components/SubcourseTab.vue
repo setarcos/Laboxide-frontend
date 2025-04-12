@@ -58,7 +58,7 @@
                     <th>教师</th>
                     <th>人数上限</th>
                     <th v-if="showAllSemesters && (isTeacher || authStore.isAdmin)">学期</th>
-                    <th>操作</th>
+                    <th v-if="authStore.user">操作</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -85,7 +85,7 @@
 
                     <!-- Actions Column -->
                     <td class="whitespace-nowrap">
-                        <div class="flex gap-1 items-center">
+                        <div class="flex gap-1 items-center" v-if="authStore.user">
 
                             <!-- View Button (Common to Teacher/Admin/Student) -->
                             <router-link
@@ -170,8 +170,8 @@
                 :is-saving="isSaving"
                 :course-id="courseId"
                 :semester-id="currentItem?.semester_id || semesterStore.getCurrentSemesterId"
-                :user-id="authStore.user.userId"
-                :realname="authStore.user.realname"
+                :user-id="authStore.user?.userId || ''"
+                :realname="authStore.user?.realname || ''"
                 :is-admin="authStore.isAdmin"
                 @save="handleSave"
                 @close="closeModal"

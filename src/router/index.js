@@ -20,14 +20,14 @@ const routes = [
     name: 'Dashboard',
     component: DashboardView,
     // Add meta.title
-    meta: { requiresAuth: true, title: 'Dashboard' }
+    meta: { requiresAuth: false, title: 'Dashboard' }
   },
   {
     path: '/courses',
     name: 'Courses',
     component: CourseListView,
     // Add meta.title
-    meta: { requiresAuth: true, title: 'Manage Courses' }
+    meta: { requiresAuth: false, title: 'Manage Courses' }
   },
   {
     path: '/labrooms',
@@ -82,7 +82,7 @@ const routes = [
     name: 'SubcourseStudents',
     component: SubcourseStudentsView,
     props: true, // Pass route param 'id' as prop to the component
-    meta: { title: '学生列表' }
+    meta: { requiresAuth: true, title: '学生列表' }
   },
 ]
 

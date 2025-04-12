@@ -29,7 +29,7 @@ export const getCurrentSemester = () => api.get('/semester/current')
 export const getUsers = () => api.get('/admin/user')
 // export const getUser = (id) => api.get(`/admin/user/${id}`) // API missing? Assuming not needed for list view
 export const createUser = (data) => api.post('/admin/user', data)
-export const updateUser = (id, data) => api.put(`/admin/user/${id}`, data)
+export const updateUser = (data) => api.put('/admin/user', data)
 export const deleteUser = (id) => api.delete(`/admin/user/${id}`)
 // GET /admin/course/{id}, update user - API seems mismatched? Assuming PUT /admin/user/{id} is correct
 // --- Subcourse (Student Group) ---

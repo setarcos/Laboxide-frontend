@@ -190,7 +190,7 @@ const handleSave = async (formData) => {
   try {
     if (isEditing.value) {
        // The API uses PUT /admin/user/{id} where id is the user_id
-      await dataService.updateUser(currentItem.value.user_id, formData)
+      await dataService.updateUser(formData)
     } else {
       await dataService.createUser(formData)
     }
