@@ -19,13 +19,19 @@
       <div v-else-if="subcourseError" class="alert alert-warning shadow-sm mb-4">
           Could not load group details: {{ subcourseError.message || subcourseError }}
       </div>
-     <!-- Subcourse Info Display (hidden for now) -->
-     <div v-else-if="subcourse" class="mb-6 p-4 bg-base-200 rounded-lg shadow" hidden>
-         <h1 class="text-2xl font-bold mb-2">Students in Group</h1>
-         <p><strong>Course:</strong> {{ subcourse.name || 'N/A' }}</p>
-         <p><strong>Teacher:</strong> {{ subcourse.tea_name }}</p>
-         <p><strong>Day:</strong> {{ getWeekdayName(subcourse.weekday) }}</p>
-         <p><strong>Room:</strong> {{ subcourse.room || 'N/A' }}</p>
+     <!-- Subcourse Info Display -->
+     <div v-else-if="subcourse" class="mb-6 p-4 bg-base-200 rounded-lg shadow">
+         <h1 class="text-2xl font-bold mb-4">Students in Group</h1>
+         <div class="grid grid-cols-2 gap-4">
+             <div>
+                 <p class="mb-2"><strong>Course:</strong> {{ subcourse.course_name || 'N/A' }}</p>
+                 <p class="mb-2"><strong>Teacher:</strong> {{ subcourse.tea_name }}</p>
+             </div>
+             <div>
+                 <p class="mb-2"><strong>Day:</strong> {{ getWeekdayName(subcourse.weekday) }}</p>
+                 <p class="mb-2"><strong>Room:</strong> {{ subcourse.room_name || 'N/A' }}</p>
+             </div>
+         </div>
      </div>
 
     <!-- Main Content: Student List -->
@@ -222,7 +228,7 @@ const goBack = () => {
 
 // --- Lifecycle Hook ---
 onMounted(() => {
-//  fetchSubcourseDetails(); // Fetch subcourse details for context
+  fetchSubcourseDetails(); // Fetch subcourse details for context
   fetchStudents(); // Fetch the student list
 });
 </script>
