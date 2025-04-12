@@ -84,48 +84,73 @@
                     <td v-if="showAllSemesters && (isTeacher || authStore.isAdmin)">{{ subcourse.year_id }}</td>
 
                     <!-- Actions Column -->
-                    <td>
-                        <!-- Teacher/Admin Buttons -->
-                        <div class="flex gap-1" v-if="isTeacher || authStore.isAdmin">
-                             <!-- ... existing teacher buttons ... -->
-                            <button
+                    <td class="whitespace-nowrap">
+                        <div class="flex gap-1 items-center">
+
+                            <!-- View Button (Common to Teacher/Admin/Student) -->
+                            <router-link
+                                :to="{ name: 'SubcourseStudents', params: { id: subcourse.id } }"
                                 class="btn btn-xs btn-ghost btn-circle"
-                                title="Edit"
-                                @click="openEditModal(subcourse)"
+                                title="View Students"
                             >
-                               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                            </button>
-                            <button
-                                class="btn btn-xs btn-ghost btn-circle text-error"
-                                title="Delete"
-                                @click="openDeleteModal(subcourse)"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                            </button>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </router-link>
+
+                            <!-- Teacher/Admin Specific Buttons -->
+                            <template v-if="isTeacher || authStore.isAdmin">
+                                <button
+                                    class="btn btn-xs btn-ghost btn-circle"
+                                    title="Edit"
+                                    @click="openEditModal(subcourse)"
+                                >
+                                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                </button>
+                                <button
+                                    class="btn btn-xs btn-ghost btn-circle text-error"
+                                    title="Delete"
+                                    @click="openDeleteModal(subcourse)"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                            </template>
+
+                            <!-- Student Specific Buttons -->
+                            <template v-else-if="isStudent">
+                                <!-- Leave Button -->
+                                <button
+                                    v-if="myEnrolledSubcourseId === subcourse.id"
+                                    class="btn btn-xs btn-warning btn-circle"
+                                    title="Leave Group"
+                                    @click="handleLeaveGroup(subcourse.id)"
+                                    :disabled="isProcessingAction"
+                                    :class="{ 'loading': isProcessingAction && processingSubcourseId === subcourse.id }"
+                                >
+                                    <span v-if="!(isProcessingAction && processingSubcourseId === subcourse.id)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                        </svg>
+                                    </span>
+                                </button>
+                                <!-- Join Button -->
+                                <button
+                                    v-else-if="myEnrolledSubcourseId === null"
+                                    class="btn btn-xs btn-success btn-circle"
+                                    title="Join Group"
+                                    @click="handleJoinGroup(subcourse.id)"
+                                    :disabled="isProcessingAction || isLoadingMyEnrollment"
+                                    :class="{ 'loading': isProcessingAction && processingSubcourseId === subcourse.id }"
+                                >
+                                     <span v-if="!(isProcessingAction && processingSubcourseId === subcourse.id)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                     </span>
+                                </button>
+                            </template>
                         </div>
-                        <!-- Student Buttons -->
-                         <div class="flex gap-1" v-else-if="isStudent">
-                            <!-- Leave Button: Show if student is enrolled in THIS subcourse -->
-                            <button
-                                v-if="myEnrolledSubcourseId === subcourse.id"
-                                class="btn btn-xs btn-warning"
-                                @click="handleLeaveGroup(subcourse.id)"
-                                :disabled="isProcessingAction"
-                                :class="{ 'loading': isProcessingAction && processingSubcourseId === subcourse.id }"
-                            >
-                                Leave
-                            </button>
-                            <!-- Join Button: Show if student is NOT enrolled in ANY subcourse for this course -->
-                            <button
-                                v-else-if="myEnrolledSubcourseId === null"
-                                class="btn btn-xs btn-success"
-                                @click="handleJoinGroup(subcourse.id)"
-                                :disabled="isProcessingAction || isLoadingMyEnrollment"
-                                :class="{ 'loading': isProcessingAction && processingSubcourseId === subcourse.id }"
-                            >
-                                Join
-                            </button>
-                         </div>
                     </td>
                 </tr>
                 </tbody>
@@ -177,6 +202,7 @@
 import { ref, computed, watch, onMounted} from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useSemesterStore } from '@/stores/semester';
+import { getWeekdayName } from '@/utils/weekday';
 import * as dataService from '@/services/dataService';
 import SubcourseForm from '@/components/SubcourseForm.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
@@ -256,16 +282,6 @@ const getRoomName = (roomId) => {
     if (!roomId || labrooms.value.length === 0) return 'N/A';
     const room = labrooms.value.find(r => r.id === roomId);
     return room ? `${room.name} (${room.room})` : `Unknown Room (ID: ${roomId})`;
-};
-
-const getWeekdayName = (dayNumber) => {
-    const days = ['未定', '周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-    const parts = ['未定','上午', '下午', '晚上', '下午后段', '晚上后段']; // Adjust index if needed
-    const day = Math.floor(dayNumber / 10);
-    const part = dayNumber % 10;
-    const dayStr = days[day] || days[0];
-    const partStr = parts[part] || parts[0];
-    return `${dayStr}${partStr}`;
 };
 
 // Fetch subcourses logic (Slightly adjusted for clarity)

@@ -35,6 +35,7 @@ export const deleteUser = (id) => api.delete(`/admin/user/${id}`)
 // --- Subcourse (Student Group) ---
 // params could be { course_id: number, semester_id?: number }
 export const getSubcourses = (params) => api.get('/subcourse', { params })
+export const getSubcourse = (id) => api.get(`/subcourse/${id}`)
 export const getMySubcourses = () => api.get('/mycourse')
 export const createSubcourse = (data) => api.post('/teacher/subcourse', data)
 export const updateSubcourse = (id, data) => api.put(`/teacher/subcourse/${id}`, data)
@@ -45,4 +46,4 @@ export const deleteSubcourse = (id) => api.delete(`/teacher/subcourse/${id}`)
 export const teacherRemove = (cid, stu_id) => api.delete(`/teacher/groupremove/${cid}/${stu_id}`)
 export const joinGroup = (cid) => api.post(`/stu/group/join/${cid}`)
 export const leaveGroup = (cid) => api.delete(`/stu/group/leave/${cid}`)
-export const getGroup = (cid) => api.get(`/stu/group/${cid}`)
+export const getGroup = (cid) => api.get(`/member/group/${cid}`)

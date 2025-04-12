@@ -12,6 +12,7 @@ const UserListView = () => import('@/views/UserListView.vue')
 const SemesterListView = () => import('@/views/SemesterListView.vue')
 const NotFoundView = () => import('@/views/NotFoundView.vue')
 const CourseDetailView = () => import('@/views/CourseDetailView.vue')
+const SubcourseStudentsView = () => import('@/views/SubcourseStudentsView.vue')
 
 const routes = [
   {
@@ -75,7 +76,14 @@ const routes = [
     component: CourseDetailView,
     props: true, // Automatically pass route params as props to the component
     meta: { title: '课程详情' }
-  }
+  },
+  {
+    path: '/subcourses/:id',
+    name: 'SubcourseStudents',
+    component: SubcourseStudentsView,
+    props: true, // Pass route param 'id' as prop to the component
+    meta: { title: '学生列表' }
+  },
 ]
 
 const router = createRouter({
