@@ -130,8 +130,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue' // Added watch back
-import { useRouter, useRoute } from 'vue-router' // Added useRoute back
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import * as dataService from '@/services/dataService'
 import ScheduleTab from '@/components/ScheduleTab.vue';
 import MaterialTab from '@/components/MaterialTab.vue';
@@ -150,8 +150,10 @@ const route = useRoute() // Get the current route instance
 const course = ref(null)
 const isLoading = ref(true)
 const error = ref(null)
-const originalTitle = ref(document.title)
-const activeTab = ref('details') // State for the active tab, default to 'details'
+const baseTitle = '课程详情';
+const defaultTab = 'details'; // Your default tab key
+const activeTab = ref(defaultTab) // State for the active tab, default to 'details'
+const validTabs = ['details', 'schedule', 'materials', 'subcourse']; // List all valid tab keys
 
 // Helper function to set the document title
 const updateTitle = (title) => {
@@ -161,10 +163,28 @@ const updateTitle = (title) => {
 // Function to change the active tab
 const setActiveTab = (tabName) => {
     activeTab.value = tabName;
-    // Optional: If you want the URL to reflect the active tab, you could use:
-    // router.replace({ query: { tab: tabName } })
-    // But this adds complexity to managing state on page load/refresh.
+    router.replace({ query: { ...route.query, tab: tabName } });
+    if (course) {
+        updateTitle(`${course.value.name} | ${baseTitle}`)
+    }
 }
+
+// Function to read the tab from the route query and set the active tab
+const setTabFromRoute = () => {
+  const tabFromQuery = route.query.tab;
+  if (tabFromQuery && validTabs.includes(tabFromQuery)) {
+    activeTab.value = tabFromQuery;
+  } else {
+    // If query param is missing or invalid, set to default
+    activeTab.value = defaultTab;
+    // Optional: Update URL to reflect the default tab if it wasn't set correctly
+    // Be careful not to create infinite loops if route watching triggers this again
+    if (route.query.tab !== defaultTab) {
+        // Check if query needs updating only if it's not already the default or undefined
+         router.replace({ query: { ...route.query, tab: defaultTab } });
+    }
+  }
+};
 
 // Function to fetch course details
 const fetchCourseDetails = async (courseId) => {
@@ -172,7 +192,6 @@ const fetchCourseDetails = async (courseId) => {
   error.value = null
   course.value = null; // Reset course data
   activeTab.value = 'details'; // Reset to details tab on fetch/refetch
-  updateTitle(`Loading Course... | ${originalTitle.value}`) // Set loading title
 
   console.log(`Fetching course with ID: ${courseId}`)
   try {
@@ -182,21 +201,18 @@ const fetchCourseDetails = async (courseId) => {
 
     if (course.value) {
         // Set title on success
-        updateTitle(`${course.value.name} | ${originalTitle.value}`)
+        updateTitle(`${course.value.name} | ${baseTitle}`)
     } else {
          // Handle case where API returns success but empty data
          error.value = new Error("Course data not found.");
-         updateTitle(`Course Not Found | ${originalTitle.value}`);
     }
 
   } catch (err) {
     console.error(`Failed to fetch course ${courseId}:`, err)
     if (err.response && err.response.status === 404) {
         error.value = new Error("Course not found.")
-        updateTitle(`Course Not Found | ${originalTitle.value}`)
     } else {
         error.value = err.response?.data || err
-        updateTitle(`Error Loading Course | ${originalTitle.value}`)
     }
     course.value = null // Ensure course is null on error
   } finally {
@@ -211,13 +227,8 @@ const goBack = () => {
 
 // Fetch details when the component is mounted
 onMounted(() => {
-  originalTitle.value = document.title; // Store original title
   fetchCourseDetails(props.id); // Fetch initial data
-})
-
-// Reset title when component is unmounted
-onUnmounted(() => {
-  updateTitle(originalTitle.value); // Restore the original title
+  setTabFromRoute();
 })
 
 // Watch for route param changes (e.g., navigating /courses/1 -> /courses/2)
@@ -228,9 +239,9 @@ watch(() => route.params.id, (newId, oldId) => {
     if (newId && newId !== oldId) {
         console.log(`Route ID changed from ${oldId} to ${newId}. Refetching...`);
         fetchCourseDetails(newId);
+        setTabFromRoute();
     }
 }, { immediate: false }) // immediate: false prevents running on initial mount
-
 
 </script>
 

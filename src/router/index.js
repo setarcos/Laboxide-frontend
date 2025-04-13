@@ -75,7 +75,6 @@ const routes = [
     name: 'CourseDetail', // Matches the name used in <router-link>
     component: CourseDetailView,
     props: true, // Automatically pass route params as props to the component
-    meta: { title: '课程详情' }
   },
   {
     path: '/subcourses/:id',
@@ -130,7 +129,8 @@ const baseTitle = 'Admin Panel'; // Set your default/base title here
 router.afterEach((to, from) => {
   // Optional: Use nextTick to wait for potential DOM updates, though often unnecessary for title
   // nextTick(() => {
-    document.title = to.meta?.title ? `${to.meta.title}`: baseTitle;
+    if (to.meta?.title)
+      document.title = `${to.meta.title}`;
   // });
 });
 
