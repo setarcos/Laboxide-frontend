@@ -55,7 +55,15 @@
                     {{ course.course_name }}
                   </router-link>
                 </td>
-                <td>{{ getWeekdayName(course.weekday) }}</td>
+                <td>
+                  <router-link
+                    :to="{ name: 'SubcourseStudents', params: { id: course.id} }"
+                    class="link link-hover link-primary"
+                    title="View Students"
+                  >
+                    {{ getWeekdayName(course.weekday) }}
+                  </router-link>
+                </td>
                 <td>{{ course.room_name }}</td>
               </tr>
             </tbody>

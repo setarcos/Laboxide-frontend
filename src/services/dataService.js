@@ -43,21 +43,21 @@ export const deleteSubcourse = (id) => api.delete(`/teacher/subcourse/${id}`)
 
 // -- Student Grouping ----
 
-export const teacherRemove = (cid, stu_id) => api.delete(`/teacher/groupremove/${cid}/${stu_id}`)
+export const teacherRemove = (cid, stu_id) => api.delete(`/teacher/group/remove/${cid}/${stu_id}`)
 export const joinGroup = (cid) => api.post(`/stu/group/join/${cid}`)
 export const leaveGroup = (cid) => api.delete(`/stu/group/leave/${cid}`)
 export const getGroup = (cid) => api.get(`/member/group/${cid}`)
-export const setSeat = (data) => api.put('/teacher/group/seat', data)
+export const setSeat = (sid, seat) => api.put(`/teacher/group/seat/${sid}/${seat}`)
 
 // --- Course Schedule ---
 // Get schedules for a specific course
-export const getSchedules = (courseId) => api.get(`/courseschedule/${courseId}`)
+export const getSchedules = (courseId) => api.get(`/schedule/course/${courseId}`)
 export const createSchedule = (data) => api.post('/teacher/schedule', data)
 export const updateSchedule = (id, data) => api.put(`/teacher/schedule/${id}`, data)
 export const deleteSchedule = (id) => api.delete(`/teacher/schedule/${id}`)
 
 // --- Course File Functions ---
-export const listCourseFiles = (courseId) => api.get(`/coursefilelist/${courseId}`)
+export const listCourseFiles = (courseId) => api.get(`/coursefile/list/${courseId}`)
 export const uploadCourseFile = (formData) => api.post('/teacher/coursefile/upload', formData, {
     headers: {
         'Content-Type': 'multipart/form-data'

@@ -21,7 +21,6 @@
       </div>
      <!-- Subcourse Info Display -->
      <div v-else-if="subcourse" class="mb-6 p-4 bg-base-200 rounded-lg shadow">
-         <h1 class="text-2xl font-bold mb-4">Students in Group</h1>
          <div class="grid grid-cols-2 gap-4">
              <div>
                  <p class="mb-2"><strong>Course:</strong> {{ subcourse.course_name || 'N/A' }}</p>
@@ -33,9 +32,6 @@
              </div>
          </div>
      </div>
-
-    <!-- Main Content: Student List -->
-    <h2 class="text-xl font-semibold mb-4">Enrolled Students</h2>
 
     <!-- Loading State (Student List) -->
     <div v-if="isLoadingStudents" class="text-center py-10">
@@ -263,7 +259,6 @@ const handleRemoveStudent = async () => {
     const studentIdToRemove = studentToRemove.value.stu_id;
     try {
         await dataService.teacherRemove(subcourseId, studentIdToRemove);
-        alert(`Successfully removed student ${studentIdToRemove}.`);
         closeRemoveConfirm();
         await fetchStudents();
     } catch (err) {
@@ -277,7 +272,7 @@ const handleRemoveStudent = async () => {
 };
 
 // Change Seat Logic
-const openSeatModal = (student) => { // *** REMOVED nextTick from here ***
+const openSeatModal = (student) => {
     studentToEditSeat.value = student;
     newSeatValue.value = typeof student.seat === 'number' ? student.seat : null;
     seatSaveError.value = null;
@@ -312,19 +307,13 @@ const handleSaveSeat = async () => {
         return;
     }
 
-    const payload = {
-        stu_id: studentToEditSeat.value.stu_id,
-        subcourse_id: subcourseIdNumber,
-        seat: newSeatValue.value
-    };
-
     isSavingSeat.value = true;
     try {
-        await dataService.setSeat(payload);
+        await dataService.setSeat(studentToEditSeat.value.id, newSeatValue.value);
         closeSeatModal();
         await fetchStudents();
     } catch (err) {
-        console.error(`Failed to update seat for student ${payload.stu_id}:`, err);
+        console.error(`Failed to update seat for student ${studentToEditSeat.value.stu_name}:`, err);
         seatSaveError.value = err.response?.data?.error
                               || err.response?.data?.message
                               || err.message
