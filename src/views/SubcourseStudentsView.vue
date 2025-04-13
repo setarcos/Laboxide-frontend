@@ -45,10 +45,8 @@
 
     <!-- Error State (Student List) -->
     <div v-else-if="studentsError" class="alert alert-error shadow-lg">
-      <div>
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        <span>Error loading students: {{ studentsError.message || studentsError }}</span>
-      </div>
+        <!-- ... error display ... -->
+        Error loading students: {{ studentsError.message || studentsError }}
     </div>
 
     <!-- Student Table -->
@@ -63,7 +61,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-if="students.length === 0">
+                <tr v-if="!isLoadingStudents && students.length === 0">
                     <td colspan="3" class="text-center italic py-4">
                         No students enrolled in this group yet.
                     </td>
@@ -71,18 +69,33 @@
                 <tr v-for="student in students" :key="student.id">
                     <td>{{ student.stu_id }}</td>
                     <td>{{ student.stu_name }}</td>
-                    <td class="text-center">{{ student.seat ?? '-' }}</td>
+                    <td class="text-center">
+                         <!-- Make seat clickable for teachers -->
+                        <button
+                            v-if="isTeacher"
+                            @click="openSeatModal(student)"
+                            class="btn btn-xs btn-ghost"
+                            title="Change Seat"
+                        >
+                            {{ student.seat ?? '-' }}
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                        </button>
+                        <span v-else>
+                            {{ student.seat ?? '-' }}
+                        </span>
+                    </td>
                     <td v-if="isTeacher" class="whitespace-nowrap">
-                        <div class="flex gap-1 items-center">
+                        <div class="flex gap-1 items-center justify-start">
                              <button
-                                v-if="isTeacher"
-                                class="btn btn-xs btn-success text-error"
+                                class="btn btn-xs btn-ghost text-error"
                                 title="Remove Student from Group"
                                 @click="openRemoveConfirm(student)"
                                 :disabled="isRemovingStudent"
                                 :class="{ 'loading': isRemovingStudent && studentToRemove?.stu_id === student.stu_id }"
-                              > Del
+                              >
+                               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                               </button>
+                              <!-- Add other actions here if needed -->
                         </div>
                     </td>
                 </tr>
@@ -95,67 +108,116 @@
       dialogId="student_remove_confirm_modal"
       title="Remove Student"
       :message="removeConfirmationMessage"
+      confirmButtonClass="btn-error"
       @confirm="handleRemoveStudent"
       @close="closeRemoveConfirm"
    />
+    <!-- Change Seat Modal -->
+     <dialog id="change_seat_modal" class="modal" :open="showSeatModal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Change Seat for {{ studentToEditSeat?.stu_name }}</h3>
+            <p class="py-2 text-sm text-base-content text-opacity-80">Student ID: {{ studentToEditSeat?.stu_id }}</p>
+
+            <div class="form-control w-full max-w-xs py-4">
+                <label class="label" for="seat_input">
+                    <span class="label-text">New Seat Number</span>
+                </label>
+                 <!-- Changed input type to number -->
+                <input
+                    id="seat_input"
+                    type="number"
+                    placeholder="Enter seat number"
+                    class="input input-bordered w-full"
+                    v-model.number="newSeatValue"
+                    @keyup.enter="handleSaveSeat"
+                    ref="seatInputRef" />
+                 <!-- Display validation errors for seat input -->
+                 <label class="label" v-if="seatInputError">
+                    <span class="label-text-alt text-error">{{ seatInputError }}</span>
+                 </label>
+            </div>
+
+             <!-- Saving Seat Error Display (from API) -->
+            <div v-if="seatSaveError" class="alert alert-error text-sm p-2 my-2">
+                <span>Failed to save seat: {{ seatSaveError.message || seatSaveError }}</span>
+            </div>
+
+            <div class="modal-action">
+                <button class="btn btn-primary"
+                    @click="handleSaveSeat"
+                    :disabled="isSavingSeat"
+                    :class="{ 'loading': isSavingSeat }">
+                    Save Seat
+                </button>
+                <button class="btn btn-ghost" @click="closeSeatModal" :disabled="isSavingSeat">Cancel</button>
+            </div>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeSeatModal" :disabled="isSavingSeat">✕</button>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button @click="closeSeatModal" :disabled="isSavingSeat">close</button>
+        </form>
+    </dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, nextTick, watch } from 'vue'; // Added watch
 import { useRouter } from 'vue-router';
 import { getWeekdayName } from '@/utils/weekday';
 import * as dataService from '@/services/dataService';
-import { useAuthStore } from '@/stores/auth'; // Import Auth Store
-import ConfirmDialog from '@/components/ConfirmDialog.vue'; // Import Confirm Dialog
+import { useAuthStore } from '@/stores/auth';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
+// import { useLabroomStore } from '@/stores/labroom';
 
+// --- Props, Router, Stores ---
 const props = defineProps({
-  id: { // Corresponds to the :id route parameter (subcourse ID)
-    type: [String, Number],
-    required: true
-  }
+  id: { type: [String, Number], required: true }
 });
-
 const router = useRouter();
 const authStore = useAuthStore();
 
-const subcourse = ref(null); // To store details of the specific subcourse/group
+// --- Component State ---
+const subcourse = ref(null);
 const students = ref([]);
 const isLoadingSubcourse = ref(false);
-const isLoadingStudents = ref(true); // Start loading students immediately
+const isLoadingStudents = ref(true);
 const subcourseError = ref(null);
 const studentsError = ref(null);
 
-// --- State for Remove Student Action ---
+// Remove Student State
 const showRemoveConfirmDialog = ref(false);
-const studentToRemove = ref(null); // Stores the student object being removed
+const studentToRemove = ref(null);
 const isRemovingStudent = ref(false);
-const removeError = ref(null); // To display errors specifically from removal
+const removeError = ref(null);
 
-// --- Computed Properties ---
-const isTeacher = computed(() => authStore.isTeacher);
+// Change Seat State
+const showSeatModal = ref(false);
+const studentToEditSeat = ref(null);
+const newSeatValue = ref(null); // Keep as null for number type
+const isSavingSeat = ref(false);
+const seatSaveError = ref(null);
+const seatInputError = ref(null);
+const seatInputRef = ref(null); // Ref for the input element
 
-// Computed property for the remove confirmation message
+// --- Computed ---
+const isTeacher = computed(() => authStore.isTeacher || authStore.isAdmin);
 const removeConfirmationMessage = computed(() => {
-  if (!studentToRemove.value) {
-    return 'Are you sure you want to remove this student?';
-  }
-  return `Are you sure you want to remove student '${studentToRemove.value.stu_name}' (ID: ${studentToRemove.value.stu_id}) from this group?`;
+  if (!studentToRemove.value) return 'Are you sure?';
+  return `Remove student '${studentToRemove.value.stu_name}' (ID: ${studentToRemove.value.stu_id})?`;
 });
 
-// --- Data Fetching ---
+// --- Methods ---
+
+// Utility (Placeholder - Adapt as needed)
+const getRoomName = (roomId) => `Room ${roomId}`;
+
+// Data Fetching
 const fetchSubcourseDetails = async () => {
     isLoadingSubcourse.value = true;
     subcourseError.value = null;
     try {
-        // Fetch details of the specific subcourse for context display
         const response = await dataService.getSubcourse(props.id);
-        subcourse.value = response.data;
-        // Optionally fetch related room name here if needed and not included
-        // if (subcourse.value?.room_id) {
-        //   const roomRes = await dataService.getLabroom(subcourse.value.room_id);
-        //   subcourse.value.room_name = roomRes.data ? `${roomRes.data.name} (${roomRes.data.room})` : 'N/A';
-        // }
+        subcourse.value = response.data?.data || response.data;
     } catch (err) {
         console.error(`Failed to fetch subcourse details ${props.id}:`, err);
         subcourseError.value = err.response?.data || err;
@@ -167,72 +229,142 @@ const fetchSubcourseDetails = async () => {
 const fetchStudents = async () => {
     isLoadingStudents.value = true;
     studentsError.value = null;
-    students.value = []; // Clear previous results
+    students.value = [];
     try {
-        // Use the getGroup API call with the subcourse ID from props
         const response = await dataService.getGroup(props.id);
-        students.value = response.data || []; // Ensure it's an array
+        const fetchedData = response.data?.data || response.data || [];
+        console.log(`Fetched ${fetchedData.length} students for group ${props.id}.`); // Basic log
+        // Add more detailed key validation logs here if the "invalid character" error returns
+        students.value = fetchedData;
     } catch (err) {
         console.error(`Failed to fetch students for group ${props.id}:`, err);
         studentsError.value = err.response?.data || err;
+        students.value = [];
     } finally {
         isLoadingStudents.value = false;
     }
 };
 
-// --- Remove Student Logic ---
+// Remove Student Logic
 const openRemoveConfirm = (student) => {
     studentToRemove.value = student;
     showRemoveConfirmDialog.value = true;
 };
-
 const closeRemoveConfirm = () => {
     showRemoveConfirmDialog.value = false;
     studentToRemove.value = null;
-    removeError.value = null; // Clear error when closing
+    removeError.value = null;
 };
-
 const handleRemoveStudent = async () => {
     if (!studentToRemove.value || !isTeacher.value) return;
-
     isRemovingStudent.value = true;
-    removeError.value = null; // Clear previous errors
+    removeError.value = null;
     const subcourseId = props.id;
     const studentIdToRemove = studentToRemove.value.stu_id;
-
     try {
         await dataService.teacherRemove(subcourseId, studentIdToRemove);
-        // Success!
-        closeRemoveConfirm(); // Close the dialog
-        await fetchStudents(); // Refresh the student list
-        // TODO: Add success notification (e.g., toast)
-        alert(`Successfully removed student ${studentIdToRemove}.`); // Simple alert for now
-
-    } catch (err) {
-        console.error(`Failed to remove student ${studentIdToRemove} from group ${subcourseId}:`, err);
-        removeError.value = err.response?.data || err; // Store error to display
-        // Keep the dialog open? Or close it? Closing for now.
+        alert(`Successfully removed student ${studentIdToRemove}.`);
         closeRemoveConfirm();
-        // TODO: Add error notification (e.g., toast)
-         alert(`Failed to remove student: ${removeError.value.message || 'Unknown error'}`); // Simple alert
+        await fetchStudents();
+    } catch (err) {
+        console.error(`Failed to remove student ${studentIdToRemove}:`, err);
+        removeError.value = err.response?.data || err;
+        alert(`Failed to remove student: ${removeError.value?.message || 'Unknown error'}`);
+        closeRemoveConfirm();
     } finally {
         isRemovingStudent.value = false;
-        // studentToRemove.value = null; // Already handled in closeRemoveConfirm
     }
 };
 
-// --- Navigation ---
-const goBack = () => {
-  router.back(); // Or router.push({ name: 'CourseDetail', params: { courseId: subcourse.value?.course_id }}) if you want explicit back
+// Change Seat Logic
+const openSeatModal = (student) => { // *** REMOVED nextTick from here ***
+    studentToEditSeat.value = student;
+    newSeatValue.value = typeof student.seat === 'number' ? student.seat : null;
+    seatSaveError.value = null;
+    seatInputError.value = null;
+    showSeatModal.value = true; // Trigger the watch
 };
 
-// --- Lifecycle Hook ---
+const closeSeatModal = () => {
+    showSeatModal.value = false;
+    studentToEditSeat.value = null;
+    newSeatValue.value = null;
+    seatSaveError.value = null;
+    seatInputError.value = null;
+    isSavingSeat.value = false;
+};
+
+const handleSaveSeat = async () => {
+    if (!studentToEditSeat.value || !isTeacher.value || isSavingSeat.value) return;
+    seatSaveError.value = null;
+    seatInputError.value = null;
+
+    if (newSeatValue.value === null || newSeatValue.value === undefined || isNaN(newSeatValue.value)) {
+        seatInputError.value = "Please enter a valid seat number.";
+        nextTick(() => { seatInputRef.value?.focus(); });
+        return;
+    }
+
+    const subcourseIdNumber = Number(props.id);
+    if (isNaN(subcourseIdNumber)) {
+        seatSaveError.value = "Internal error: Invalid group ID.";
+        console.error("Subcourse ID prop is not a number:", props.id);
+        return;
+    }
+
+    const payload = {
+        stu_id: studentToEditSeat.value.stu_id,
+        subcourse_id: subcourseIdNumber,
+        seat: newSeatValue.value
+    };
+
+    isSavingSeat.value = true;
+    try {
+        await dataService.setSeat(payload);
+        closeSeatModal();
+        await fetchStudents();
+    } catch (err) {
+        console.error(`Failed to update seat for student ${payload.stu_id}:`, err);
+        seatSaveError.value = err.response?.data?.error
+                              || err.response?.data?.message
+                              || err.message
+                              || "An unknown error occurred";
+         alert(`Failed to update seat: ${seatSaveError.value}`);
+    } finally {
+        isSavingSeat.value = false;
+    }
+};
+
+// Navigation
+const goBack = () => {
+  router.back();
+};
+
+watch(showSeatModal, (isShowing) => {
+    if (isShowing) {
+        // Wait for the DOM update triggered by showSeatModal = true
+        nextTick(() => {
+            // Check if the ref is populated before focusing
+            if (seatInputRef.value) {
+                 seatInputRef.value.focus();
+            } else {
+                 console.warn("Seat input ref not available in watch/nextTick");
+            }
+        });
+    }
+});
+
+// --- Lifecycle Hooks ---
 onMounted(() => {
-  fetchSubcourseDetails(); // Fetch subcourse details for context
-  fetchStudents(); // Fetch the student list
+  fetchSubcourseDetails();
+  fetchStudents();
 });
 </script>
 
 <style scoped>
-/* Add any specific styles for this view */
+/* Make the clickable seat look more like a button */
+td button.btn-ghost {
+    text-decoration: underline dotted; /* Subtle indication it's clickable */
+    padding: 0.1rem 0.25rem; /* Fine-tune padding */
+}
 </style>
