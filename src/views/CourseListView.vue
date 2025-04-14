@@ -48,7 +48,7 @@
             <td>{{ course.code.split(',')[0] }}</td>
             <td>{{ course.code.split(',')[1] }}</td>
             <td>{{ course.code.split(',')[2] }}</td>
-            <td>{{ course.term === '1' ? '春季' : course.term === '2' ? '秋季' : '暑期' }}</td>
+            <td>{{ course.term === 1 ? '春季' : course.term === 2 ? '秋季' : '暑期' }}</td>
             <td>{{ course.tea_name }}</td>
             <td>
               <div class="flex gap-1">
