@@ -42,6 +42,7 @@
                 <th>Course Name</th>
                 <th>Day</th>
                 <th>Room</th>
+                <th v-if="authStore.isStudent">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -65,6 +66,17 @@
                   </router-link>
                 </td>
                 <td>{{ course.room_name }}</td>
+                <td v-if="authStore.isStudent">
+                    <button
+                        class="btn btn-xs btn-outline btn-info"
+                        @click="openLogModal(course)"
+                        :disabled="isLoadingDefaults && selectedSubcourseForLog?.id === course.id"
+                        :class="{'loading': isLoadingDefaults && selectedSubcourseForLog?.id === course.id}"
+                        title="Write or View Experiment Log"
+                    >
+                        {{ (isLoadingDefaults && selectedSubcourseForLog?.id === course.id) ? '' : 'Write Log' }}
+                    </button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -89,6 +101,44 @@
        </div>
     </div>
 
+    <!-- Student Log Modal -->
+    <dialog id="student_log_modal" class="modal" :open="showLogModal">
+        <div class="modal-box w-11/12 max-w-2xl">
+            <h3 class="font-bold text-lg mb-4">
+                Experiment Log for {{ selectedSubcourseForLog?.course_name }} ({{ getWeekdayName(selectedSubcourseForLog?.weekday) }})
+            </h3>
+
+            <!-- Loading Defaults State -->
+             <div v-if="isLoadingDefaults" class="text-center p-10">
+                <span class="loading loading-lg loading-spinner text-info"></span>
+                <p>Loading log data...</p>
+             </div>
+            <!-- Error Loading Defaults State -->
+             <div v-else-if="logDefaultError" class="alert alert-error">
+                Could not load log data: {{ logDefaultError }}
+             </div>
+             <!-- Log Form -->
+             <StudentLogForm
+                v-else-if="logDefaultData"
+                :key="logFormKey"
+                :initial-data="logDefaultData"
+                :is-saving="isSavingLog"
+                @save="handleLogSave"
+                @close="closeLogModal"
+             />
+             <!-- Fallback if data is somehow null after loading -->
+              <div v-else class="text-center p-5 text-warning">
+                 Could not display log form. Default data unavailable.
+              </div>
+
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeLogModal">✕</button>
+        </div>
+        {/* Click outside to close */}
+        <form method="dialog" class="modal-backdrop">
+            <button @click="closeLogModal">close</button>
+        </form>
+    </dialog>
+
   </div>
 </template>
 
@@ -98,6 +148,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useSemesterStore } from '@/stores/semester' // <-- Import semester store
 import * as dataService from '@/services/dataService'; // Import dataService
 import { getWeekdayName } from '@/utils/weekday';
+import StudentLogForm from '@/components/StudentLogForm.vue';
 
 const authStore = useAuthStore()
 const semesterStore = useSemesterStore() // <-- Use semester store
@@ -107,6 +158,15 @@ const myCourses = ref([]);
 const isLoadingMyCourses = ref(false);
 const myCoursesError = ref(null);
 const isSuper = computed(() => (authStore.isTeacher | authStore.isAdmin | authStore.isLabManager))
+
+// --- State for Student Log Modal ---
+const showLogModal = ref(false);
+const selectedSubcourseForLog = ref(null); // Store the whole subcourse object
+const isLoadingDefaults = ref(false);
+const logDefaultData = ref(null);        // Store the data fetched for the form
+const logDefaultError = ref(null);
+const isSavingLog = ref(false);
+const logFormKey = ref(0); // To force re-render form if needed
 
 // --- Fetch My Courses Logic ---
 const fetchMyCourses = async () => {
@@ -179,6 +239,102 @@ const semesterGreeting = computed(() => {
         return "Could not determine the current week.";
     }
 });
+
+// --- Methods for Student Log ---
+const openLogModal = async (subcourse) => {
+    if (!authStore.isStudent || !authStore.user?.userId) {
+        console.error("User is not a student or userId is missing.");
+        alert("Cannot open log: User information is missing.");
+        // toast.error("Cannot open log: User information is missing.");
+        return;
+    }
+    console.log("Opening log modal for subcourse:", subcourse.id);
+    selectedSubcourseForLog.value = subcourse;
+    isLoadingDefaults.value = true;
+    logDefaultError.value = null;
+    logDefaultData.value = null; // Clear previous data
+    showLogModal.value = true; // Open modal immediately, show loading state inside
+
+    try {
+        const response = await dataService.getDefaultStudentLog(subcourse.id, authStore.user.userId);
+        logDefaultData.value = response.data?.data || response.data; // Adjust based on API response
+         // Handle cases where backend might return null or empty object if no log exists yet
+        if (!logDefaultData.value) {
+            // If backend returns nothing for a new log, create a basic structure
+            // based on the subcourse and user info.
+            logDefaultData.value = {
+                id: null, // Indicate it's new
+                stu_id: authStore.user.userId,
+                stu_name: authStore.user.realname,
+                subcourse_id: subcourse.id,
+                room_id: subcourse.room_id, // Assuming subcourse has room_id
+                lab_name: subcourse.room_name, // Assuming subcourse has room_name
+                seat: null,
+                note: '',
+                tea_note: '',
+                tea_name: subcourse.tea_name, // Assuming subcourse has tea_name
+                fin_time: null,
+                confirm: 0,
+            };
+            console.log("No existing default log found, created initial structure:", logDefaultData.value);
+        } else {
+             console.log("Fetched default log data:", logDefaultData.value);
+        }
+        logFormKey.value++; // Increment key to force re-render StudentLogForm with new data
+    } catch (err) {
+        console.error("Failed to fetch default student log:", err);
+        logDefaultError.value = err.response?.data?.error || err.message || 'Unknown error';
+        // Keep modal open but show error message inside
+        // toast.error(`Failed to load log data: ${logDefaultError.value}`);
+    } finally {
+        isLoadingDefaults.value = false;
+    }
+};
+
+const closeLogModal = () => {
+    showLogModal.value = false;
+    selectedSubcourseForLog.value = null;
+    logDefaultData.value = null;
+    logDefaultError.value = null;
+    isSavingLog.value = false; // Reset saving state
+};
+
+const handleLogSave = async (logData) => {
+    console.log("Attempting to save log:", logData);
+    isSavingLog.value = true;
+    logDefaultError.value = null; // Clear previous save errors shown in modal
+
+    try {
+        let response;
+        let successMessage = '';
+        if (logData.id) {
+            // Update existing log
+            response = await dataService.updateStudentLog(logData.id, logData);
+            successMessage = "Log updated successfully!";
+            console.log("Log update response:", response);
+        } else {
+            // Create new log
+            response = await dataService.createStudentLog(logData);
+             // Update local data with the ID returned from backend if needed immediately
+             // logDefaultData.value = response.data; // Or update specific fields like ID
+            successMessage = "Log saved successfully!";
+            console.log("Log create response:", response);
+        }
+        // toast.success(successMessage);
+        alert(successMessage); // Simple feedback
+        closeLogModal();
+        // Optionally refetch myCourses if the dashboard needs to reflect log status somehow
+        // await fetchMyCourses();
+    } catch (err) {
+        console.error("Failed to save student log:", err);
+        const errorMsg = err.response?.data?.error || err.message || 'Unknown error during save';
+        logDefaultError.value = errorMsg; // Show error within the modal
+        alert(`Error saving log: ${errorMsg}`); // Also show alert
+        // toast.error(`Error saving log: ${errorMsg}`);
+    } finally {
+        isSavingLog.value = false;
+    }
+};
 
 watch(() => authStore.isAuthenticated, (isAuth, wasAuth) => {
     console.log(`Auth state changed: ${wasAuth} -> ${isAuth}`); // Add log

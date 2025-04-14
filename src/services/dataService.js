@@ -65,3 +65,14 @@ export const uploadCourseFile = (formData) => api.post('/teacher/coursefile/uplo
 })
 export const deleteCourseFile = (fileId) => api.delete(`/teacher/coursefile/${fileId}`)
 
+// --- StudentLog Functions ---
+export const getDefaultStudentLog = (subcourseId, stuId) =>
+  api.get('/stu/student_log/default', {
+    params: {
+      subcourse_id: subcourseId,
+      stu_id: stuId,
+    },
+  });
+export const createStudentLog = (logData) => api.post('/stu/student_log', logData);
+export const updateStudentLog = (logId, logData) => api.put(`/stu/student_log/${logId}`, logData);
+
