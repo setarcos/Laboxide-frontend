@@ -66,8 +66,8 @@
                   </router-link>
                 </td>
                 <td>{{ course.room_name }}</td>
-                <td v-if="authStore.isStudent">
-                    <button
+                <td>
+                    <button v-if="authStore.isStudent"
                         class="btn btn-xs btn-outline btn-primary"
                         @click="openTimelineModal(course)"
                         :disabled="!currentWeekNumber"  
@@ -75,6 +75,15 @@
                     >
                         Log Progress
                     </button>
+                    <div v-if="authStore.isTeacher" class="flex gap-1">
+                         <router-link
+                            :to="{ name: 'SubcourseProgress', params: { id: course.id } }"
+                            class="btn btn-xs btn-outline btn-secondary"
+                            title="View Student Progress"
+                         >
+                            View Progress
+                         </router-link>
+                    </div>
                 </td>
               </tr>
             </tbody>
@@ -108,7 +117,6 @@
                 :key="timelineModalKey"
                 :subcourse="selectedSubcourseForTimeline"
                 :student-id="authStore.user.userId"
-                :teacher-name="selectedSubcourseForTimeline.tea_name || 'N/A'"
                 :current-week="currentWeekNumber"
                 @close="closeTimelineModal"
                 @request-finish-log="handleRequestFinishLog"
@@ -119,7 +127,6 @@
              </div>
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeTimelineModal">✕</button>
         </div>
-         {/* Click outside to close */}
         <form method="dialog" class="modal-backdrop">
             <button @click="closeTimelineModal">close</button>
         </form>

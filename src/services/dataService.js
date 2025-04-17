@@ -81,7 +81,7 @@ export const updateStudentLog = (logId, logData) => api.put(`/stu/student_log/${
 export const getSubSchedules = (scheduleId) => api.get(`/member/subschedules/${scheduleId}`)
 export const createSubSchedule = (subScheduleData) => api.post('/teacher/subschedule', subScheduleData)
 export const updateSubSchedule = (subScheduleId, subScheduleData) => api.put(`/teacher/subschedule/${subScheduleId}`, subScheduleData)
-export const deleteSubSchedule = (subScheduleId) => api.delete(`/teacher/subschedule/{subScheduleId}`)
+export const deleteSubSchedule = (subScheduleId) => api.delete(`/teacher/subschedule/${subScheduleId}`)
 
 // --- Timeline Functions ---
 export const createTimeline = (formData) => api.post('/member/timeline', formData,
@@ -93,4 +93,4 @@ export const createTimeline = (formData) => api.post('/member/timeline', formDat
 export const listTimelinesByStudent = (subcourseId, studentId) => api.get(`/member/timeline/student/${subcourseId}/${studentId}`);
 export const deleteTimeline = (timelineId) => api.delete(`/member/timeline/${timelineId}`);
 export const downloadTimelineFile = (timelineId) => api.get(`/timeline/file/${timelineId}`);
-
+export const listTimelinesBySchedule = (subcourse_id, schedule_id) => api.get(`/teacher/timeline/schedule/${subcourse_id}/${schedule_id}`);

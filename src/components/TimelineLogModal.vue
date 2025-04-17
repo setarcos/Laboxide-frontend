@@ -131,7 +131,6 @@ import { useAuthStore } from '@/stores/auth';
 const props = defineProps({
   subcourse: { type: Object, required: true },
   studentId: { type: String, required: true },
-  teacherName: { type: String, required: true },
   currentWeek: { type: Number, required: true },
 });
 
@@ -287,11 +286,7 @@ const submitTimelineEntry = async () => {
     // --- 2. Create the New Entry ---
     const formData = new FormData();
     formData.append('stu_id', props.studentId);
-    if (authStore.isStudent) { // Don't let the teacher delete student's log
-      formData.append('tea_name', '-');
-    } else {
-      formData.append('tea_name', props.teacherName);
-    }
+    formData.append('tea_name', '-');
     formData.append('schedule_id', scheduleForWeek.value.id);
     formData.append('subsch_id', selectedStepId.value);
     formData.append('subcourse_id', props.subcourse.id);
@@ -315,6 +310,7 @@ const submitTimelineEntry = async () => {
 
     resetFormFields();
     emit('log-saved'); // Notify parent (optional)
+    emit('close');
 
   } catch (err) { // Catch errors from the creation step or the listTimelinesByStudent refresh
     console.error("Failed during timeline save process (create/refresh):", err);
