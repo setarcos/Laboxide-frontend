@@ -68,13 +68,12 @@
                 <td>{{ course.room_name }}</td>
                 <td v-if="authStore.isStudent">
                     <button
-                        class="btn btn-xs btn-outline btn-info"
-                        @click="openLogModal(course)"
-                        :disabled="isLoadingDefaults && selectedSubcourseForLog?.id === course.id"
-                        :class="{'loading': isLoadingDefaults && selectedSubcourseForLog?.id === course.id}"
-                        title="Write or View Experiment Log"
+                        class="btn btn-xs btn-outline btn-primary"
+                        @click="openTimelineModal(course)"
+                        :disabled="!currentWeekNumber"  
+                        title="Log Progress Steps"
                     >
-                        {{ (isLoadingDefaults && selectedSubcourseForLog?.id === course.id) ? '' : 'Write Log' }}
+                        Log Progress
                     </button>
                 </td>
               </tr>
@@ -101,41 +100,61 @@
        </div>
     </div>
 
+    <!-- Timeline Log Modal -->
+    <dialog id="timeline_log_modal" class="modal" :open="showTimelineModal">
+        <div class="modal-box w-11/12 max-w-3xl">
+             <TimelineLogModal
+                v-if="selectedSubcourseForTimeline && currentWeekNumber && authStore.user"
+                :key="timelineModalKey"
+                :subcourse="selectedSubcourseForTimeline"
+                :student-id="authStore.user.userId"
+                :teacher-name="selectedSubcourseForTimeline.tea_name || 'N/A'"
+                :current-week="currentWeekNumber"
+                @close="closeTimelineModal"
+                @request-finish-log="handleRequestFinishLog"
+                @log-saved="handleTimelineLogSaved"
+             />
+             <div v-else class="p-4 text-center text-error">
+                Missing data required to open the timeline log.
+             </div>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeTimelineModal">✕</button>
+        </div>
+         {/* Click outside to close */}
+        <form method="dialog" class="modal-backdrop">
+            <button @click="closeTimelineModal">close</button>
+        </form>
+    </dialog>
+
     <!-- Student Log Modal -->
-    <dialog id="student_log_modal" class="modal" :open="showLogModal">
+    <dialog id="finish_log_modal" class="modal" :open="showFinishLogModal">
         <div class="modal-box w-11/12 max-w-2xl">
             <h3 class="font-bold text-lg mb-4">
-                Experiment Log for {{ selectedSubcourseForLog?.course_name }} ({{ getWeekdayName(selectedSubcourseForLog?.weekday) }})
+                 Final Experiment Log for {{ selectedSubcourseForFinishLog?.course_name }} ({{ getWeekdayName(selectedSubcourseForFinishLog?.weekday) }})
             </h3>
 
-            <!-- Loading Defaults State -->
-             <div v-if="isLoadingDefaults" class="text-center p-10">
+            <div v-if="isLoadingFinishLogDefaults" class="text-center p-10">
                 <span class="loading loading-lg loading-spinner text-info"></span>
-                <p>Loading log data...</p>
+                <p>Loading final log data...</p>
+            </div>
+             <div v-else-if="finishLogDefaultError" class="alert alert-error">
+                Could not load final log data: {{ finishLogDefaultError }}
              </div>
-            <!-- Error Loading Defaults State -->
-             <div v-else-if="logDefaultError" class="alert alert-error">
-                Could not load log data: {{ logDefaultError }}
-             </div>
-             <!-- Log Form -->
              <StudentLogForm
-                v-else-if="logDefaultData"
-                :key="logFormKey"
-                :initial-data="logDefaultData"
-                :is-saving="isSavingLog"
-                @save="handleLogSave"
-                @close="closeLogModal"
+                v-else-if="finishLogDefaultData"
+                :key="finishLogFormKey"
+                :initial-data="finishLogDefaultData"
+                :is-saving="isSavingFinishLog"
+                @save="handleFinishLogSave"
+                @close="closeFinishLogModal"
              />
-             <!-- Fallback if data is somehow null after loading -->
               <div v-else class="text-center p-5 text-warning">
-                 Could not display log form. Default data unavailable.
+                 Could not display final log form. Default data unavailable.
               </div>
 
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeLogModal">✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeFinishLogModal">✕</button>
         </div>
-        {/* Click outside to close */}
         <form method="dialog" class="modal-backdrop">
-            <button @click="closeLogModal">close</button>
+            <button @click="closeFinishLogModal">close</button>
         </form>
     </dialog>
 
@@ -149,6 +168,7 @@ import { useSemesterStore } from '@/stores/semester' // <-- Import semester stor
 import * as dataService from '@/services/dataService'; // Import dataService
 import { getWeekdayName } from '@/utils/weekday';
 import StudentLogForm from '@/components/StudentLogForm.vue';
+import TimelineLogModal from '@/components/TimelineLogModal.vue';
 
 const authStore = useAuthStore()
 const semesterStore = useSemesterStore() // <-- Use semester store
@@ -159,14 +179,51 @@ const isLoadingMyCourses = ref(false);
 const myCoursesError = ref(null);
 const isSuper = computed(() => (authStore.isTeacher | authStore.isAdmin | authStore.isLabManager))
 
-// --- State for Student Log Modal ---
-const showLogModal = ref(false);
-const selectedSubcourseForLog = ref(null); // Store the whole subcourse object
-const isLoadingDefaults = ref(false);
-const logDefaultData = ref(null);        // Store the data fetched for the form
-const logDefaultError = ref(null);
-const isSavingLog = ref(false);
-const logFormKey = ref(0); // To force re-render form if needed
+// --- State for Timeline Log Modal ---
+const showTimelineModal = ref(false);
+const selectedSubcourseForTimeline = ref(null);
+const timelineModalKey = ref(0); // To potentially force remount
+
+// --- State for FINAL Student Log Modal (Finish Step) ---
+const showFinishLogModal = ref(false);
+const selectedSubcourseForFinishLog = ref(null);
+const isLoadingFinishLogDefaults = ref(false);
+const finishLogDefaultData = ref(null);
+const finishLogDefaultError = ref(null);
+const isSavingFinishLog = ref(false);
+const finishLogFormKey = ref(0);
+
+// --- Current Week Calculation ---
+const currentWeekNumber = computed(() => {
+    if (semesterStore.isSemesterLoading || semesterStore.semesterError || !semesterStore.currentSemester) {
+        return null;
+    }
+    const semester = semesterStore.currentSemester;
+    const startDateStr = semester.start;
+    const endDateStr = semester.end;
+
+    if (!startDateStr || !endDateStr) return null;
+
+    try {
+        const now = new Date();
+        const startDate = new Date(startDateStr);
+        const endDate = new Date(endDateStr);
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return null;
+
+        now.setHours(0, 0, 0, 0);
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(0, 0, 0, 0);
+
+        if (now < startDate || now > endDate) return null; // Not within semester dates
+
+        const diffTime = Math.abs(now - startDate);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        return Math.floor(diffDays / 7) + 1;
+    } catch (e) {
+        console.error("Error calculating current week:", e);
+        return null;
+    }
+});
 
 // --- Fetch My Courses Logic ---
 const fetchMyCourses = async () => {
@@ -240,118 +297,140 @@ const semesterGreeting = computed(() => {
     }
 });
 
-// --- Methods for Student Log ---
-const openLogModal = async (subcourse) => {
+// --- Methods for Timeline Log ---
+const openTimelineModal = (subcourse) => {
     if (!authStore.isStudent || !authStore.user?.userId) {
-        console.error("User is not a student or userId is missing.");
         alert("Cannot open log: User information is missing.");
-        // toast.error("Cannot open log: User information is missing.");
         return;
     }
-    console.log("Opening log modal for subcourse:", subcourse.id);
-    selectedSubcourseForLog.value = subcourse;
-    isLoadingDefaults.value = true;
-    logDefaultError.value = null;
-    logDefaultData.value = null; // Clear previous data
-    showLogModal.value = true; // Open modal immediately, show loading state inside
+     if (!currentWeekNumber.value) {
+         alert("Cannot open log: Current semester week could not be determined.");
+        return;
+     }
+     if (subcourse.course_id === undefined || subcourse.tea_name === undefined) {
+         alert("Cannot open log: Missing required course information (parent course ID or teacher name).");
+         console.error("Subcourse object missing course_id or tea_name:", subcourse);
+         return;
+     }
+    console.log("Opening timeline modal for subcourse:", subcourse.id, "Week:", currentWeekNumber.value);
+    selectedSubcourseForTimeline.value = subcourse;
+    timelineModalKey.value++; // Increment key to ensure modal internals refresh if needed
+    showTimelineModal.value = true;
+};
+
+const closeTimelineModal = () => {
+    showTimelineModal.value = false;
+    selectedSubcourseForTimeline.value = null;
+    // Reset other related states if necessary
+};
+
+const handleTimelineLogSaved = () => {
+    // Optional: Add feedback to the user on the dashboard
+    console.log("Timeline log was saved (event received in Dashboard).");
+    // Maybe refresh some dashboard data if needed, though the modal updates itself.
+};
+
+// --- Methods for FINAL Student Log (Finish Step) ---
+const handleRequestFinishLog = (subcourse) => {
+    console.log("Request received to open final log form for:", subcourse.id);
+    closeTimelineModal(); // Close the timeline modal first
+    openFinishLogModal(subcourse); // Open the original log modal
+};
+
+const openFinishLogModal = async (subcourse) => { // Renamed from openLogModal
+    if (!authStore.isStudent || !authStore.user?.userId) return; // Redundant check, but safe
+
+    console.log("Opening FINAL log modal for subcourse:", subcourse.id);
+    selectedSubcourseForFinishLog.value = subcourse; // Use renamed state
+    isLoadingFinishLogDefaults.value = true; // Use renamed state
+    finishLogDefaultError.value = null; // Use renamed state
+    finishLogDefaultData.value = null; // Use renamed state
+    showFinishLogModal.value = true; // Use renamed state
 
     try {
+        // Use the *original* dataService call for the final log
         const response = await dataService.getDefaultStudentLog(subcourse.id, authStore.user.userId);
-        logDefaultData.value = response.data?.data || response.data; // Adjust based on API response
-         // Handle cases where backend might return null or empty object if no log exists yet
-        if (!logDefaultData.value) {
-            // If backend returns nothing for a new log, create a basic structure
-            // based on the subcourse and user info.
-            logDefaultData.value = {
-                id: null, // Indicate it's new
-                stu_id: authStore.user.userId,
-                stu_name: authStore.user.realname,
-                subcourse_id: subcourse.id,
-                room_id: subcourse.room_id, // Assuming subcourse has room_id
-                lab_name: subcourse.room_name, // Assuming subcourse has room_name
-                seat: null,
-                note: '',
-                tea_note: '',
-                tea_name: subcourse.tea_name, // Assuming subcourse has tea_name
-                fin_time: null,
-                confirm: 0,
+        finishLogDefaultData.value = response.data?.data || response.data; // Adjust based on API
+        if (!finishLogDefaultData.value) {
+            // Create default structure if none exists
+            finishLogDefaultData.value = {
+                id: null, stu_id: authStore.user.userId, stu_name: authStore.user.realname,
+                subcourse_id: subcourse.id, room_id: subcourse.room_id, lab_name: subcourse.room_name,
+                seat: null, note: '', tea_note: '', tea_name: subcourse.tea_name,
+                fin_time: null, confirm: 0,
             };
-            console.log("No existing default log found, created initial structure:", logDefaultData.value);
-        } else {
-             console.log("Fetched default log data:", logDefaultData.value);
         }
-        logFormKey.value++; // Increment key to force re-render StudentLogForm with new data
+        finishLogFormKey.value++; // Use renamed state
     } catch (err) {
-        console.error("Failed to fetch default student log:", err);
-        logDefaultError.value = err.response?.data?.error || err.message || 'Unknown error';
-        // Keep modal open but show error message inside
-        // toast.error(`Failed to load log data: ${logDefaultError.value}`);
+        console.error("Failed to fetch default student log for final step:", err);
+        finishLogDefaultError.value = err.response?.data?.error || err.message || 'Unknown error'; // Use renamed state
     } finally {
-        isLoadingDefaults.value = false;
+        isLoadingFinishLogDefaults.value = false; // Use renamed state
     }
 };
 
-const closeLogModal = () => {
-    showLogModal.value = false;
-    selectedSubcourseForLog.value = null;
-    logDefaultData.value = null;
-    logDefaultError.value = null;
-    isSavingLog.value = false; // Reset saving state
+const closeFinishLogModal = () => { // Renamed from closeLogModal
+    showFinishLogModal.value = false; // Use renamed state
+    selectedSubcourseForFinishLog.value = null; // Use renamed state
+    finishLogDefaultData.value = null; // Use renamed state
+    finishLogDefaultError.value = null; // Use renamed state
+    isSavingFinishLog.value = false; // Use renamed state
 };
 
-const handleLogSave = async (logData) => {
-    console.log("Attempting to save log:", logData);
-    isSavingLog.value = true;
-    logDefaultError.value = null; // Clear previous save errors shown in modal
+const handleFinishLogSave = async (logData) => { // Renamed from handleLogSave
+    console.log("Attempting to save FINAL log:", logData);
+    isSavingFinishLog.value = true; // Use renamed state
+    finishLogDefaultError.value = null; // Use renamed state
 
     try {
         let response;
         let successMessage = '';
+        // Use the *original* dataService calls for create/update StudentLog
         if (logData.id) {
-            // Update existing log
             response = await dataService.updateStudentLog(logData.id, logData);
-            successMessage = "Log updated successfully!";
-            console.log("Log update response:", response);
+            successMessage = "Final log updated successfully!";
         } else {
-            // Create new log
             response = await dataService.createStudentLog(logData);
-             // Update local data with the ID returned from backend if needed immediately
-             // logDefaultData.value = response.data; // Or update specific fields like ID
-            successMessage = "Log saved successfully!";
-            console.log("Log create response:", response);
+            successMessage = "Final log saved successfully!";
         }
-        // toast.success(successMessage);
-        alert(successMessage); // Simple feedback
-        closeLogModal();
-        // Optionally refetch myCourses if the dashboard needs to reflect log status somehow
-        // await fetchMyCourses();
+        alert(successMessage);
+        closeFinishLogModal(); // Use renamed state
     } catch (err) {
-        console.error("Failed to save student log:", err);
+        console.error("Failed to save final student log:", err);
         const errorMsg = err.response?.data?.error || err.message || 'Unknown error during save';
-        logDefaultError.value = errorMsg; // Show error within the modal
-        alert(`Error saving log: ${errorMsg}`); // Also show alert
-        // toast.error(`Error saving log: ${errorMsg}`);
+        finishLogDefaultError.value = errorMsg; // Use renamed state
+        alert(`Error saving final log: ${errorMsg}`);
     } finally {
-        isSavingLog.value = false;
+        isSavingFinishLog.value = false; // Use renamed state
     }
 };
 
-watch(() => authStore.isAuthenticated, (isAuth, wasAuth) => {
-    console.log(`Auth state changed: ${wasAuth} -> ${isAuth}`); // Add log
+// --- Watchers and Lifecycle ---
+watch(() => authStore.isAuthenticated, (isAuth) => {
+    console.log(`Auth state changed: ${isAuth}`);
     if (isAuth) {
-        // User is authenticated (either initially or just logged in)
-        if (authStore.isTeacher | authStore.isStudent)
+        if (authStore.isTeacher || authStore.isStudent) {
             fetchMyCourses();
+        }
+        // Fetch semester info if not already loaded/loading (handled by store persistence/init)
+        if (!semesterStore.currentSemester && !semesterStore.isSemesterLoading) {
+             semesterStore.fetchCurrentSemester();
+        }
     } else {
-        // User is not authenticated (either initially or just logged out)
-        myCourses.value = []; // Clear data
+        myCourses.value = [];
         myCoursesError.value = null;
-        isLoadingMyCourses.value = false; // Stop loading if logout happens mid-fetch
-        console.log("User logged out, cleared courses."); // Add log
+        isLoadingMyCourses.value = false;
+        // Optionally reset semester info if needed, but store might handle it
+        console.log("User logged out, cleared courses.");
     }
-}, {
-    immediate: true // <<< Run the handler immediately on component mount
-});
+}, { immediate: true });
+
+// Fetch semester info on mount if not already present
+onMounted(() => {
+     if (!semesterStore.currentSemester && !semesterStore.isSemesterLoading && authStore.isAuthenticated) {
+         semesterStore.fetchCurrentSemester();
+     }
+})
 
 </script>
 

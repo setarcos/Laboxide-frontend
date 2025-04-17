@@ -83,3 +83,14 @@ export const createSubSchedule = (subScheduleData) => api.post('/teacher/subsche
 export const updateSubSchedule = (subScheduleId, subScheduleData) => api.put(`/teacher/subschedule/${subScheduleId}`, subScheduleData)
 export const deleteSubSchedule = (subScheduleId) => api.delete(`/teacher/subschedule/{subScheduleId}`)
 
+// --- Timeline Functions ---
+export const createTimeline = (formData) => api.post('/member/timeline', formData,
+{
+    headers: {
+        'Content-Type': 'multipart/form-data'
+    }
+})
+export const listTimelinesByStudent = (subcourseId, studentId) => api.get(`/member/timeline/student/${subcourseId}/${studentId}`);
+export const deleteTimeline = (timelineId) => api.delete(`/member/timeline/${timelineId}`);
+export const downloadTimelineFile = (timelineId) => api.get(`/timeline/file/${timelineId}`);
+
