@@ -111,6 +111,7 @@ const submitForm = async () => {
   formData.append('schedule_id', props.scheduleId);
   formData.append('subcourse_id', props.subcourseId);
   formData.append('notetype', noteType.value);
+  formData.append('subschedule', '-');
   if (noteType.value === 0) { formData.append('note', noteContent.value.trim()); }
   else if (fileToUpload.value) { formData.append('file', fileToUpload.value, fileToUpload.value.name); }
   formData.append('timestamp', '2000-01-01 08:08:08');

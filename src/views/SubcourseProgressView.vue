@@ -114,7 +114,7 @@
                         <div class="flex justify-between items-start">
                           <div>
                             <span class="font-semibold mr-2">
-                              {{ getSubScheduleStepTitle(entry.subsch_id) }}:
+                              {{ entry.subschedule || 'General Note' }}:
                             </span>
                             <!-- Note/File Display -->
                             <span v-if="entry.notetype === 0">{{ entry.note }}</span>
@@ -283,20 +283,20 @@ const availableWeeks = computed(() => {
 });
 
 const studentProgressData = computed(() => {
-  return students.value.map(student => {
-    const weeklyTimelines = (timelineEntries.value[student.stu_id] || []).sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp)); // Sort chronologically
-    const loggedSubScheduleIds = new Set(weeklyTimelines.map(entry => entry.subsch_id));
+  const validStepTitles = new Set(subSchedulesForWeek.value.map(sub => sub.title));
 
-    // Ensure we only count steps that *exist* in the current week's subschedules
+  return students.value.map(student => {
+    const weeklyTimelines = (timelineEntries.value[student.stu_id] || []).sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+    // Count logged entries whose 'subschedule' title is in the valid set for the week
     let loggedStepsCount = 0;
-    if (subSchedulesForWeek.value.length > 0) {
-      const validSubScheduleIds = new Set(subSchedulesForWeek.value.map(sub => sub.id));
-      loggedSubScheduleIds.forEach(loggedId => {
-        if (validSubScheduleIds.has(loggedId)) {
-          loggedStepsCount++;
-        }
-      });
-    }
+    const loggedTitles = new Set(); // Use a set to count unique titles logged
+    weeklyTimelines.forEach(entry => {
+      if (entry.subschedule && validStepTitles.has(entry.subschedule)) {
+        loggedTitles.add(entry.subschedule);
+      }
+    });
+    loggedStepsCount = loggedTitles.size; // Count unique valid titles logged
 
     const total = totalStepsForWeek.value;
     const progressPercent = total > 0 ? Math.round((loggedStepsCount / total) * 100) : 0;
@@ -305,7 +305,7 @@ const studentProgressData = computed(() => {
       student,
       loggedStepsCount,
       progressPercent,
-      weeklyTimelines,
+      weeklyTimelines, // Keep sorted list for display
     };
   });
 });
@@ -408,12 +408,6 @@ const toggleAllTimelines = () => {
   expandedStudentId.value = null; // Clear individual expansion when toggling all
 };
 
-const getSubScheduleStepTitle = (subsch_id) => {
-  if (!subsch_id) return "General Note";
-  const step = subSchedulesForWeek.value.find(s => s.id === subsch_id);
-  return step ? `Step ${step.step}: ${step.title}` : `Step ID ${subsch_id}`;
-};
-
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return '';
 
@@ -459,8 +453,8 @@ const confirmDeleteTimeline = (entry) => {
 
 const getTimelineEntryDescription = (entry) => {
   if (!entry) return '';
-  const prefix = getSubScheduleStepTitle(entry.subsch_id);
-  const content = entry.notetype === 0 ? entry.note.substring(0, 30) + '...' : entry.note;
+  const prefix = entry.subschedule || 'General Note'; // Use title directly
+  const content = entry.notetype === 0 ? (entry.note?.substring(0, 30) + '...') : entry.note;
   return `${prefix} - ${content}`;
 };
 
