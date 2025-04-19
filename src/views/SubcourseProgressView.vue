@@ -119,13 +119,13 @@
                             <!-- Note/File Display -->
                             <span v-if="entry.notetype === 0">{{ entry.note }}</span>
                             <a v-else-if="entry.notetype === 1"
-                              href="#"
-                              @click.prevent="downloadFile(entry.id, entry.note)"
-                              class="link link-hover text-info break-all"
-                              :title="`Download ${entry.note}`"
+                                href="#"
+                                @click.prevent="handleFileLinkClick(entry)"
+                                class="link link-hover text-info break-all"
+                                :title="`Download or Preview ${entry.note}`"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                              {{ entry.note }}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                {{ entry.note }}
                             </a>
                           </div>
                           <div class="text-right flex-shrink-0 ml-2 whitespace-nowrap">
@@ -193,6 +193,32 @@
       @close="showDeleteConfirm = false; entryToDelete = null;"
     />
 
+    <dialog id="image_preview_modal" class="modal" :open="showImagePreviewModal">
+      <div class="modal-box w-11/12 max-w-3xl p-6">
+        <h3 class="font-bold text-lg mb-4 break-all">Image Preview: {{ previewImageFilename }}</h3>
+        <div v-if="isLoading.preview" class="text-center py-10">
+          <span class="loading loading-lg loading-spinner text-info"></span>
+          <p>Loading image preview...</p>
+        </div>
+        <div v-else-if="error.preview" class="alert alert-error shadow-sm my-4">
+          <div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>{{ error.preview }}</span>
+          </div>
+        </div>
+        <div v-else-if="previewImageUrl" class="w-full max-h-[70vh] overflow-auto flex justify-center items-center bg-base-300 rounded">
+          <img :src="previewImageUrl" alt="Image Preview" class="max-w-full max-h-full object-contain" />
+        </div>
+        <div v-else class="text-center text-warning p-4">
+          Could not load image preview.
+        </div>
+
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeImagePreviewModal">✕</button>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button @click="closeImagePreviewModal">close</button>
+      </form>
+    </dialog>
   </div>
 </template>
 
@@ -248,6 +274,11 @@ const teacherLogModalKey = ref(Date.now());
 // Delete confirmation state
 const showDeleteConfirm = ref(false);
 const entryToDelete = ref(null);
+
+// Image preview modal
+const showImagePreviewModal = ref(false);
+const previewImageUrl = ref(null);
+const previewImageFilename = ref(null);
 
 // --- Computed Properties ---
 const currentWeekNumberFromStore = computed(() => {
@@ -443,7 +474,6 @@ const handleTeacherLogSave = async (/* Maybe receive feedback? */) => {
   // Refresh weekly data to show the new log entry
   await fetchWeeklyData();
   // TODO: Add success notification (e.g., toast)
-  alert("Log entry saved successfully!");
 };
 
 const confirmDeleteTimeline = (entry) => {
@@ -479,23 +509,112 @@ const deleteTimelineEntry = async () => {
     entryToDelete.value = null;
   }
 };
+// Helper function to check if a filename suggests an image
+const isImageFile = (filename) => {
+    if (!filename || typeof filename !== 'string') return false;
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', '.webp'];
+    const lowerFilename = filename.toLowerCase();
+    return imageExtensions.some(ext => lowerFilename.endsWith(ext));
+};
 
+// Helper function for actual file download (using the original API call)
 const downloadFile = async (timelineId, filename) => {
   try {
+    console.log("Attempting to download file for timeline ID:", timelineId);
     const response = await dataService.downloadTimelineFile(timelineId);
-    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+    // It's crucial that your API returns the file content as a Blob
+    if (!(response.data instanceof Blob)) {
+         console.error("API did not return a Blob for download:", response);
+         alert('Failed to download file: Invalid response format.');
+         return;
+    }
+
+    const blob = response.data;
+    const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', filename); // Use the original filename
+    // Use the provided filename, or a generic one if not available
+    link.setAttribute('download', filename || `download_${timelineId}`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    window.URL.revokeObjectURL(url); // Clean up the Blob URL
+    console.log("File download triggered successfully.");
+
   } catch (error) {
     console.error('Error downloading file:', error);
+    // TODO: Add error notification
     alert('Failed to download file.');
   }
 };
+
+const handleFileLinkClick = async (entry) => {
+  if (entry.notetype !== 1) {
+    console.warn("handleFileLinkClick called on non-file entry:", entry);
+    return;
+  }
+
+  const filename = entry.note || ''; // Use 'note' field as filename
+  const timelineId = entry.id;
+
+  if (isImageFile(filename)) {
+    console.log(`Attempting image preview for file: ${filename} (ID: ${timelineId})`);
+    // --- Open Preview Modal and Load Image ---
+    showImagePreviewModal.value = true;
+    previewImageFilename.value = filename; // Set filename for modal title
+    isLoading.preview = true;
+    error.preview = null;
+    previewImageUrl.value = null; // Clear previous URL
+
+    try {
+      // Fetch the file content - expect a Blob response
+      const response = await dataService.downloadTimelineFile(timelineId);
+
+      if (response.data instanceof Blob && response.data.type.startsWith('image/')) {
+        const url = URL.createObjectURL(response.data);
+        previewImageUrl.value = url;
+        console.log("Image preview Blob URL created.");
+      } else {
+        // If fetch was successful but the response wasn't an image Blob
+        console.warn(`Fetched file for ID ${timelineId} is not an image Blob (type: ${response.data?.type}). Falling back to download.`);
+        error.preview = "File is not a supported image format for preview. Attempting download instead...";
+        // Close preview modal before triggering download
+        closeImagePreviewModal(false); // Close without revoking URL yet, as we are about to download
+        // Trigger download for this file
+        downloadFile(timelineId, filename);
+      }
+    } catch (previewErr) {
+      // Handle errors during fetch or Blob URL creation
+      console.error("Error loading image preview:", previewErr);
+      error.preview = `Failed to load image for preview: ${previewErr.message || 'Unknown error'}`;
+      previewImageUrl.value = null; // Ensure no broken image is shown
+    } finally {
+      isLoading.preview = false; // Turn off loading regardless of outcome
+    }
+
+  } else {
+    console.log(`File is not an image: ${filename} (ID: ${timelineId}). Proceeding with download.`);
+    // --- Not an image, proceed with standard download ---
+    downloadFile(timelineId, filename);
+  }
+};
+
+const closeImagePreviewModal = () => {
+  console.log(`Closing image preview modal.`);
+  showImagePreviewModal.value = false;
+  // Revoke the previous Blob URL if it exists to free up memory
+  if (previewImageUrl.value) {
+    URL.revokeObjectURL(previewImageUrl.value);
+    console.log("Revoked Blob URL:", previewImageUrl.value);
+  }
+  // Reset state
+  previewImageUrl.value = null;
+  previewImageFilename.value = null;
+  isLoading.preview = false; // Reset loading/error states too
+  error.preview = null;
+};
+
 
 // --- Watchers ---
 watch(selectedWeek, (newWeek, oldWeek) => {

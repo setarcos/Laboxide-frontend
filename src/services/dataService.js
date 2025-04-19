@@ -92,5 +92,5 @@ export const createTimeline = (formData) => api.post('/member/timeline', formDat
 })
 export const listTimelinesByStudent = (subcourseId, studentId) => api.get(`/member/timeline/student/${subcourseId}/${studentId}`);
 export const deleteTimeline = (timelineId) => api.delete(`/member/timeline/${timelineId}`);
-export const downloadTimelineFile = (timelineId) => api.get(`/member/timeline/file/${timelineId}`);
+export const downloadTimelineFile = (timelineId) => api.get(`/member/timeline/file/${timelineId}`, { responseType: 'blob' });
 export const listTimelinesBySchedule = (subcourse_id, schedule_id) => api.get(`/teacher/timeline/schedule/${subcourse_id}/${schedule_id}`);
