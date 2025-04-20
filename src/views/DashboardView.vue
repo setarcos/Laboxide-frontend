@@ -400,7 +400,6 @@ const handleFinishLogSave = async (logData) => { // Renamed from handleLogSave
             response = await dataService.createStudentLog(logData);
             successMessage = "Final log saved successfully!";
         }
-        alert(successMessage);
         closeFinishLogModal(); // Use renamed state
     } catch (err) {
         console.error("Failed to save final student log:", err);

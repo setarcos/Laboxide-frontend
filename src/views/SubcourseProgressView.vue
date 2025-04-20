@@ -55,6 +55,15 @@
         </div>
       </div>
 
+      <!-- Recent Logs Loading/Error (Optional - display here or elsewhere) -->
+      <div v-if="isLoading.recentLogs" class="text-center text-sm text-gray-500">
+         Fetching recent final logs... <span class="loading loading-dots loading-xs"></span>
+      </div>
+      <div v-else-if="error.recentLogs" class="alert alert-error shadow-sm my-2 text-sm">
+        Error fetching recent logs: {{ error.recentLogs }}
+      </div>
+
+
       <!-- Students Table -->
       <div v-else-if="students.length > 0" class="overflow-x-auto bg-base-100 rounded-box shadow-md mt-6">
         <table class="table table-zebra w-full table-sm">
@@ -87,13 +96,22 @@
                   </div>
                 </td>
                 <td>
-                  <div class="flex gap-1">
+                  <div class="flex gap-1 items-center">
                     <button
                       class="btn btn-xs btn-outline btn-info"
                       @click="openTeacherLogModal(studentData.student)"
-                      title="Add Log Entry for Student"
+                      title="Add general log entry for student"
                     >
                       Add Log
+                    </button>
+                    <!-- Confirmation Button for Final Log -->
+                    <button
+                      v-if="studentData.unconfirmedFinalLog"
+                      class="btn btn-xs btn-outline btn-success"
+                      @click="openConfirmModalForLog(studentData.unconfirmedFinalLog)"
+                      title="Confirm student's final log submission"
+                    >
+                      Confirm Final Log
                     </button>
                   </div>
                 </td>
@@ -138,7 +156,7 @@
                               @click="confirmDeleteTimeline(entry)"
                               title="Delete this log entry"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 3 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             </button>
                           </div>
                         </div>
@@ -157,7 +175,7 @@
       </div>
     </div>
 
-    <!-- Teacher Log Modal -->
+    <!-- Teacher Log Modal (for general notes) -->
     <dialog id="teacher_log_modal" class="modal" :open="showTeacherLogModal">
       <div class="modal-box w-11/12 max-w-lg">
         <h3 class="font-bold text-lg mb-4">
@@ -183,7 +201,7 @@
       </form>
     </dialog>
 
-    <!-- Confirm Delete Modal -->
+    <!-- Confirm Delete Modal (for timeline entries) -->
     <ConfirmDialog
       :show="showDeleteConfirm"
       dialogId="timeline_delete_confirm_modal"
@@ -192,6 +210,55 @@
       @confirm="deleteTimelineEntry"
       @close="showDeleteConfirm = false; entryToDelete = null;"
     />
+
+    <!-- Confirm Final Log Modal -->
+    <dialog id="confirm_final_log_modal" class="modal" :open="showConfirmModalForLog">
+      <div class="modal-box w-11/12 max-w-lg">
+        <h3 class="font-bold text-lg mb-4">
+          Confirm Final Log for {{ currentLogToConfirm?.stu_name }}
+        </h3>
+        <div v-if="currentLogToConfirm">
+            <p class="mb-3">Student's Note:</p>
+            <div class="p-3 bg-base-300 rounded-box mb-4 max-h-40 overflow-y-auto text-sm">
+                {{ currentLogToConfirm.note || 'No student note provided.' }}
+            </div>
+
+            <div class="form-control mb-4">
+                <label class="label">
+                    <span class="label-text">Teacher's Confirmation Note (Optional):</span>
+                </label>
+                <textarea
+                    class="textarea textarea-bordered h-24"
+                    v-model="teacherConfirmationNote"
+                    placeholder="Add any notes about the confirmation..."
+                ></textarea>
+            </div>
+
+            <div class="modal-action">
+                <button
+                    class="btn btn-success"
+                    @click="handleConfirmLog"
+                    :disabled="isLoading.confirmLog"
+                >
+                  <span v-if="isLoading.confirmLog" class="loading loading-spinner loading-sm"></span>
+                  Confirm Log
+                </button>
+                <button class="btn" @click="closeConfirmModalForLog" :disabled="isLoading.confirmLog">Cancel</button>
+            </div>
+             <div v-if="error.confirmLog" class="text-error text-sm mt-2">
+                Error: {{ error.confirmLog }}
+            </div>
+        </div>
+        <div v-else class="text-center text-warning p-4">
+          Cannot confirm log: Log information is missing.
+        </div>
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeConfirmModalForLog">✕</button>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button @click="closeConfirmModalForLog">close</button>
+      </form>
+    </dialog>
+
 
     <dialog id="image_preview_modal" class="modal" :open="showImagePreviewModal">
       <div class="modal-box w-11/12 max-w-3xl p-6">
@@ -252,26 +319,38 @@ const selectedSchedule = ref(null); // Schedule item for selectedWeek
 const subSchedulesForWeek = ref([]); // Steps for selectedWeek
 const timelineEntries = ref({}); // { stu_id: [entry1, entry2,...] } for selected week
 
+// New state for recent student logs and confirmation
+const recentStudentLogs = ref([]); // Array of StudentLog objects from getRecentLog API
+const showConfirmModalForLog = ref(false);
+const currentLogToConfirm = ref(null); // The specific StudentLog object being confirmed
+const teacherConfirmationNote = ref('');
+
 const isLoading = reactive({
   initial: true, // Loading students, schedules
   weekly: false, // Loading subschedules, timelines for the selected week
-  timelines: {} // Per-student timeline loading: { stu_id: boolean } - might not be needed if fetching all at once
+  timelines: {}, // Per-student timeline loading: { stu_id: boolean } - might not be needed if fetching all at once
+  recentLogs: false, // Loading recent student logs
+  confirmLog: false, // Confirming a specific student log
+  preview: false, // Loading image preview
 });
 const error = reactive({
   initial: null,
   weekly: null,
-  timelines: {} // Per-student timeline errors: { stu_id: string }
+  timelines: {}, // Per-student timeline errors: { stu_id: string }
+  recentLogs: null, // Error fetching recent student logs
+  confirmLog: null, // Error confirming student log
+  preview: null, // Error loading image preview
 });
 
 const expandedStudentId = ref(null); // Track individually expanded student
 const showAllTimelines = ref(false); // Track expand all state
 
-// Teacher log modal state
+// Teacher log modal state (for general notes)
 const showTeacherLogModal = ref(false);
 const studentForTeacherLog = ref(null);
 const teacherLogModalKey = ref(Date.now());
 
-// Delete confirmation state
+// Delete confirmation state (for timeline entries)
 const showDeleteConfirm = ref(false);
 const entryToDelete = ref(null);
 
@@ -332,11 +411,17 @@ const studentProgressData = computed(() => {
     const total = totalStepsForWeek.value;
     const progressPercent = total > 0 ? Math.round((loggedStepsCount / total) * 100) : 0;
 
+    // Find if this student has a recent, unconfirmed final log
+    const unconfirmedFinalLog = recentStudentLogs.value.find(
+      log => log.stu_id === student.stu_id && log.confirm === 0
+    );
+
     return {
       student,
       loggedStepsCount,
       progressPercent,
       weeklyTimelines, // Keep sorted list for display
+      unconfirmedFinalLog, // Add the unconfirmed log if found
     };
   });
 });
@@ -361,62 +446,82 @@ const fetchInitialData = async () => {
       const schedulesRes = await dataService.getSchedules(parentCourseId); // Use fetched parent ID
       schedules.value = schedulesRes.data || [];
     } else if (students.value.length > 0) {
+      // Only throw error if there are students but no course ID, as empty subcourse is possible
       throw new Error("Could not determine the parent course ID to fetch schedules.");
     }
 
-    await fetchWeeklyData();
-    // Set initial week if not already set by watcher
+    // Set initial week based on store once it loads, or fallback
+    // We do NOT await fetchWeeklyData here anymore. It will be called after initial load finishes.
     if (selectedWeek.value === null && currentWeekNumberFromStore.value) {
       selectedWeek.value = currentWeekNumberFromStore.value;
     } else if (selectedWeek.value === null && schedules.value.length > 0) {
       selectedWeek.value = schedules.value[0]?.week || 1; // Fallback to first week
     } else if (selectedWeek.value === null) {
-      selectedWeek.value = 1; // Absolute fallback
+      selectedWeek.value = 1; // Absolute fallback if no students/schedules and no current week
     }
 
   } catch (err) {
     console.error("Error loading initial data:", err);
     error.initial = err.response?.data?.error || err.message || 'Unknown error';
+    // Keep students/schedules/subcourse null or empty on error
+    students.value = [];
+    schedules.value = [];
+    subcourseDetails.value = null;
   } finally {
     isLoading.initial = false;
+    // Fetch recent logs after initial student/subcourse data is loaded.
+    // This does not need to be awaited, can run in parallel.
+     fetchRecentLogs();
   }
 };
 
 const fetchWeeklyData = async () => {
-  console.log(selectedWeek.value);
-  if (selectedWeek.value === null) return; // Don't fetch if no week or initial load ongoing
+  console.log("Fetching weekly data for week:", selectedWeek.value);
+  // Prevent fetching if selectedWeek is still null OR initial load is still running
+  // (The check in onMounted handles the initial call after initial load)
+  if (selectedWeek.value === null || isLoading.initial) {
+       console.log("Skipping weekly fetch: selectedWeek is null or initial load is pending.");
+       return;
+  }
 
   isLoading.weekly = true;
   error.weekly = null;
   selectedSchedule.value = null;
   subSchedulesForWeek.value = [];
-  timelineEntries.value = {}; // Reset timelines
+  timelineEntries.value = {}; // Reset timelines for the new week
 
   try {
     // Find the main schedule for the selected week
-    selectedSchedule.value = schedules.value.find(s => s.week === selectedWeek.value);
+    const scheduleForWeek = schedules.value.find(s => s.week === selectedWeek.value);
 
-    if (!selectedSchedule.value) {
-      throw new Error(`No schedule found for Week ${selectedWeek.value}.`);
+    if (!scheduleForWeek) {
+       // This is not necessarily an error if a course has gaps in weeks
+       console.warn(`No schedule found for Week ${selectedWeek.value}.`);
+       error.weekly = `No schedule details available for Week ${selectedWeek.value}. Progress tracking might be unavailable.`;
+       subSchedulesForWeek.value = []; // Ensure steps are empty
+       timelineEntries.value = {}; // Ensure timelines are empty
+       selectedSchedule.value = null; // Ensure selectedSchedule is null if no schedule found
+    } else {
+        selectedSchedule.value = scheduleForWeek;
+        // Fetch sub-schedules (steps) for this week
+        const subSchedulesRes = await dataService.getSubSchedules(selectedSchedule.value.id);
+        subSchedulesForWeek.value = (subSchedulesRes.data || []).sort((a, b) => a.step - b.step);
+
+        // Fetch all timeline entries for this subcourse AND this week's schedule_id
+        const timelineRes = await dataService.listTimelinesBySchedule(props.id, selectedSchedule.value.id);
+        const allWeeklyEntries = timelineRes.data || [];
+
+        // Group entries by student ID
+        const groupedEntries = {};
+        allWeeklyEntries.forEach(entry => {
+          if (!groupedEntries[entry.stu_id]) {
+            groupedEntries[entry.stu_id] = [];
+          }
+          groupedEntries[entry.stu_id].push(entry);
+        });
+        timelineEntries.value = groupedEntries;
+        error.weekly = null; // Clear any previous weekly error if fetch succeeds
     }
-
-    // Fetch sub-schedules (steps) for this week
-    const subSchedulesRes = await dataService.getSubSchedules(selectedSchedule.value.id);
-    subSchedulesForWeek.value = (subSchedulesRes.data || []).sort((a, b) => a.step - b.step);
-
-    // Fetch all timeline entries for this subcourse AND this week's schedule_id
-    const timelineRes = await dataService.listTimelinesBySchedule(props.id, selectedSchedule.value.id);
-    const allWeeklyEntries = timelineRes.data || [];
-
-    // Group entries by student ID
-    const groupedEntries = {};
-    allWeeklyEntries.forEach(entry => {
-      if (!groupedEntries[entry.stu_id]) {
-        groupedEntries[entry.stu_id] = [];
-      }
-      groupedEntries[entry.stu_id].push(entry);
-    });
-    timelineEntries.value = groupedEntries;
 
   } catch (err) {
     console.error(`Error loading data for week ${selectedWeek.value}:`, err);
@@ -424,8 +529,28 @@ const fetchWeeklyData = async () => {
     // Clear data related to the failed week
     subSchedulesForWeek.value = [];
     timelineEntries.value = {};
+    selectedSchedule.value = null; // Ensure selectedSchedule is null on error
   } finally {
     isLoading.weekly = false;
+  }
+};
+
+const fetchRecentLogs = async () => {
+  isLoading.recentLogs = true;
+  error.recentLogs = null;
+  recentStudentLogs.value = []; // Clear previous recent logs
+  try {
+    // Fetch recent logs for the entire subcourse
+    const res = await dataService.getRecentLog(props.id);
+    // The backend returns ALL recent logs within the time window.
+    // Filter to only include unconfirmed logs here as per requirement.
+    recentStudentLogs.value = (res.data || []).filter(log => log.confirm === 0);
+    console.log("Fetched recent unconfirmed logs:", recentStudentLogs.value);
+  } catch (err) {
+    console.error("Error fetching recent student logs:", err);
+    error.recentLogs = err.response?.data?.error || err.message || 'Unknown error';
+  } finally {
+    isLoading.recentLogs = false;
   }
 };
 
@@ -446,7 +571,16 @@ const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
     if (isNaN(date.getTime())) return timestamp;
 
-    return `${String(date.getFullYear())}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    // Use localeCompare and options for more robust formatting
+    return new Date(timestamp).toLocaleString('en-CA', { // 'en-CA' gives YYYY-MM-DD, adjust locale as needed
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false, // Use 24-hour format
+      timeZone: 'UTC' // Or specify the expected time zone
+    });
   } catch (error) {
     console.error('Error formatting timestamp:', error);
     return timestamp;
@@ -476,6 +610,57 @@ const handleTeacherLogSave = async (/* Maybe receive feedback? */) => {
   // TODO: Add success notification (e.g., toast)
 };
 
+// --- Confirm Final Log Methods ---
+const openConfirmModalForLog = (log) => {
+    error.confirmLog = null; // Clear previous error
+    isLoading.confirmLog = false; // Reset loading
+    currentLogToConfirm.value = log;
+    teacherConfirmationNote.value = ''; // Reset note
+    showConfirmModalForLog.value = true;
+};
+
+const closeConfirmModalForLog = () => {
+    showConfirmModalForLog.value = false;
+    currentLogToConfirm.value = null;
+    teacherConfirmationNote.value = '';
+    error.confirmLog = null;
+    isLoading.confirmLog = false;
+};
+
+const handleConfirmLog = async () => {
+    if (!currentLogToConfirm.value) {
+        error.confirmLog = "No log selected for confirmation.";
+        return;
+    }
+
+    isLoading.confirmLog = true;
+    error.confirmLog = null;
+
+    try {
+        // Prepare data for the API call
+        const logId = currentLogToConfirm.value.id;
+        const data = { tea_note: teacherConfirmationNote.value };
+
+        // Call the data service
+        await dataService.confirmStudentLog(logId, data);
+
+        // Confirmation successful
+        closeConfirmModalForLog();
+        // Refresh the list of recent logs to remove the confirmed one
+        await fetchRecentLogs();
+        // Optional: Show a success message
+        // alert(`Final log for ${currentLogToConfirm.value.stu_name} confirmed.`); // Or use a toast
+
+    } catch (err) {
+        console.error("Failed to confirm student log:", err);
+        error.confirmLog = err.response?.data?.error || err.message || 'Unknown error during confirmation.';
+        // Keep modal open to show the error
+    } finally {
+        isLoading.confirmLog = false;
+    }
+};
+
+// --- Timeline Delete Methods ---
 const confirmDeleteTimeline = (entry) => {
   entryToDelete.value = entry;
   showDeleteConfirm.value = true;
@@ -483,37 +668,43 @@ const confirmDeleteTimeline = (entry) => {
 
 const getTimelineEntryDescription = (entry) => {
   if (!entry) return '';
-  const prefix = entry.subschedule || 'General Note'; // Use title directly
-  const content = entry.notetype === 0 ? (entry.note?.substring(0, 30) + '...') : entry.note;
-  return `${prefix} - ${content}`;
+  // Use subschedule title if available, otherwise indicate note/file
+  const prefix = entry.subschedule ? `Step "${entry.subschedule}" log` : (entry.notetype === 1 ? 'File log' : 'General Note');
+  const content = entry.note?.substring(0, 50); // Take first 50 chars of the note/filename
+  const ellipsis = entry.note?.length > 50 ? '...' : '';
+  return `${prefix}: "${content}${ellipsis}"`;
 };
 
 const deleteTimelineEntry = async () => {
   if (!entryToDelete.value) return;
 
-  isLoading.weekly = true; // Indicate activity
+  // Use a specific loading state if possible, or block main interaction
+  // For simplicity, let's use a general loading indicator or disable controls if needed
+  isLoading.weekly = true; // Reusing weekly loader for simplicity during this operation
+  showDeleteConfirm.value = false; // Close the confirm dialog immediately
+  const entryIdToDelete = entryToDelete.value.id; // Store ID before clearing entryToDelete
+  entryToDelete.value = null; // Clear entryToDelete immediately
+
   try {
-    await dataService.deleteTimeline(entryToDelete.value.id);
-    showDeleteConfirm.value = false;
-    entryToDelete.value = null;
-    // Refresh weekly data
+    await dataService.deleteTimeline(entryIdToDelete);
+    // Refresh weekly data to remove the deleted entry
     await fetchWeeklyData();
+    // TODO: Add success notification
   } catch (err) {
     console.error("Failed to delete timeline entry:", err);
     alert(`Delete failed: ${err.response?.data?.error || err.message}`);
-    // Keep confirm dialog open? Or close? For now, it closes via @close handler
   } finally {
     isLoading.weekly = false;
-    // Ensure states are reset even if delete failed but confirm closed
-    showDeleteConfirm.value = false;
-    entryToDelete.value = null;
   }
 };
+
+// --- Image Preview Methods ---
 // Helper function to check if a filename suggests an image
 const isImageFile = (filename) => {
     if (!filename || typeof filename !== 'string') return false;
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', '.webp'];
     const lowerFilename = filename.toLowerCase();
+    // Check if the filename ends with any of the image extensions
     return imageExtensions.some(ext => lowerFilename.endsWith(ext));
 };
 
@@ -521,6 +712,8 @@ const isImageFile = (filename) => {
 const downloadFile = async (timelineId, filename) => {
   try {
     console.log("Attempting to download file for timeline ID:", timelineId);
+    // Assuming downloadTimelineFile returns a Promise resolving to a response object
+    // where response.data is the Blob and response.headers might contain content-disposition
     const response = await dataService.downloadTimelineFile(timelineId);
 
     // It's crucial that your API returns the file content as a Blob
@@ -534,8 +727,19 @@ const downloadFile = async (timelineId, filename) => {
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    // Use the provided filename, or a generic one if not available
-    link.setAttribute('download', filename || `download_${timelineId}`);
+
+    // Attempt to get filename from headers first, fallback to provided filename
+    const contentDisposition = response.headers['content-disposition'];
+    let downloadFilename = filename || `download_${timelineId}`;
+     if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+        if (filenameMatch && filenameMatch[1]) {
+            downloadFilename = filenameMatch[1];
+        }
+     }
+
+
+    link.setAttribute('download', downloadFilename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -555,9 +759,10 @@ const handleFileLinkClick = async (entry) => {
     return;
   }
 
-  const filename = entry.note || ''; // Use 'note' field as filename
+  const filename = entry.note || ''; // Use 'note' field as filename from timeline entry
   const timelineId = entry.id;
 
+  // Check if the file *might* be an image based on extension
   if (isImageFile(filename)) {
     console.log(`Attempting image preview for file: ${filename} (ID: ${timelineId})`);
     // --- Open Preview Modal and Load Image ---
@@ -571,6 +776,7 @@ const handleFileLinkClick = async (entry) => {
       // Fetch the file content - expect a Blob response
       const response = await dataService.downloadTimelineFile(timelineId);
 
+      // Verify it's a Blob and an image type
       if (response.data instanceof Blob && response.data.type.startsWith('image/')) {
         const url = URL.createObjectURL(response.data);
         previewImageUrl.value = url;
@@ -578,27 +784,53 @@ const handleFileLinkClick = async (entry) => {
       } else {
         // If fetch was successful but the response wasn't an image Blob
         console.warn(`Fetched file for ID ${timelineId} is not an image Blob (type: ${response.data?.type}). Falling back to download.`);
-        error.preview = "File is not a supported image format for preview. Attempting download instead...";
-        // Close preview modal before triggering download
-        closeImagePreviewModal(false); // Close without revoking URL yet, as we are about to download
-        // Trigger download for this file
-        downloadFile(timelineId, filename);
+        // error.preview = "File is not a supported image format for preview. Attempting download instead...";
+        // Don't set preview error, just close modal and download
+        closeImagePreviewModal();
+        // Trigger download for this file using the retrieved Blob if available, or refetch
+        // If response.data is the Blob, we can use it directly for download
+        if (response.data instanceof Blob) {
+             downloadFileFromBlob(response.data, filename);
+        } else {
+            // If API didn't return a Blob for some reason, re-trigger the download flow
+             downloadFile(timelineId, filename);
+        }
+
       }
     } catch (previewErr) {
       // Handle errors during fetch or Blob URL creation
       console.error("Error loading image preview:", previewErr);
-      error.preview = `Failed to load image for preview: ${previewErr.message || 'Unknown error'}`;
+      error.preview = `Failed to load image for preview: ${previewErr.response?.data?.error || previewErr.message || 'Unknown error'}`;
       previewImageUrl.value = null; // Ensure no broken image is shown
     } finally {
       isLoading.preview = false; // Turn off loading regardless of outcome
     }
 
   } else {
-    console.log(`File is not an image: ${filename} (ID: ${timelineId}). Proceeding with download.`);
+    console.log(`File is not an image: ${filename} (ID: ${timelineId}). Proceeding with standard download.`);
     // --- Not an image, proceed with standard download ---
     downloadFile(timelineId, filename);
   }
 };
+
+// Helper to trigger download using an existing Blob (used if preview fetch failed type check)
+const downloadFileFromBlob = (blob, filename) => {
+    try {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename || 'download');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        console.log("File download triggered from existing blob.");
+    } catch (error) {
+        console.error("Error triggering download from blob:", error);
+        alert("Failed to download file from preview data.");
+    }
+};
+
 
 const closeImagePreviewModal = () => {
   console.log(`Closing image preview modal.`);
@@ -618,29 +850,60 @@ const closeImagePreviewModal = () => {
 
 // --- Watchers ---
 watch(selectedWeek, (newWeek, oldWeek) => {
+  // Trigger fetchWeeklyData when selectedWeek changes,
+  // but *only if* initial load is finished (!isLoading.initial).
+  // The *initial* fetch after load is handled below in onMounted.
   if (newWeek !== null && newWeek !== oldWeek && !isLoading.initial) {
-    fetchWeeklyData();
+      console.log(`selectedWeek changed from ${oldWeek} to ${newWeek}. Triggering weekly data fetch.`);
+      fetchWeeklyData();
+  } else if (newWeek === null && oldWeek !== null) {
+      // Handle case where week might be unset, clear data
+      console.log("selectedWeek unset. Clearing weekly data.");
+      selectedSchedule.value = null;
+      subSchedulesForWeek.value = [];
+      timelineEntries.value = {};
+      error.weekly = null; // Clear weekly error if any
   }
 });
 
 // Set initial week based on store once it loads
+// This might set selectedWeek before fetchInitialData finishes, or afterwards.
+// The fetchWeeklyData call in onMounted is the primary trigger for the *first* fetch.
 watch(currentWeekNumberFromStore, (newStoreWeek) => {
   if (selectedWeek.value === null && newStoreWeek !== null) {
+    console.log("Current week from store loaded:", newStoreWeek, "Setting selectedWeek.");
     selectedWeek.value = newStoreWeek;
-    // fetchWeeklyData will be triggered by the selectedWeek watcher
+    // Note: The fetchWeeklyData trigger for this initial setting
+    // will be handled by the explicit call in onMounted after initial data fetch.
   }
-}, { immediate: true }); // Check immediately
+}, { immediate: true }); // Check immediately on component creation
 
 // --- Lifecycle ---
 onMounted(async () => {
-  // Ensure semester store has data if needed for initial week
+  // Ensure semester store has data if needed for initial week calculation
   if (!semesterStore.currentSemester && !semesterStore.isSemesterLoading) {
-    await semesterStore.fetchCurrentSemester(); // Assuming this is async
+    await semesterStore.fetchCurrentSemester();
   }
-  await fetchInitialData();
-  // fetchWeeklyData will be triggered by the watcher once selectedWeek is set
-});
 
+  // 1. Fetch initial data (students, subcourse details, ALL schedules)
+  await fetchInitialData();
+
+  // 2. AFTER initial data is loaded and selectedWeek is set,
+  //    trigger the fetch for the *first* week's detailed data.
+  //    The selectedWeek watcher handles subsequent changes from the dropdown.
+  if (selectedWeek.value !== null) {
+      console.log("Initial data fetch complete. Triggering first weekly data fetch for week:", selectedWeek.value);
+      await fetchWeeklyData(); // Await this to ensure data is there before table renders fully
+  } else if (students.value.length > 0) {
+       // Edge case: students loaded but no schedules and no current week could be determined.
+       // selectedWeek remains null or 1 default, but fetchWeeklyData didn't run because selectedSchedule couldn't be found.
+       // The error.weekly message should explain this.
+       console.warn("No selected week determined after initial fetch. Weekly data will not load.");
+  }
+
+  // fetchRecentLogs is already called in the finally block of fetchInitialData,
+  // which is fine for parallel loading.
+});
 </script>
 
 <style scoped>

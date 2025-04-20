@@ -75,7 +75,8 @@ export const getDefaultStudentLog = (subcourseId, stuId) =>
   })
 export const createStudentLog = (logData) => api.post('/stu/student_log', logData)
 export const updateStudentLog = (logId, logData) => api.put(`/stu/student_log/${logId}`, logData)
-
+export const confirmStudentLog = (logId, data) => api.put(`/teacher/student_log/confirm/${logId}`, data)
+export const getRecentLog = (subcourseId) => api.get(`/teacher/student_log/recent/${subcourseId}`)
 
 // --- SubSchedule Functions ---
 export const getSubSchedules = (scheduleId) => api.get(`/member/subschedules/${scheduleId}`)
