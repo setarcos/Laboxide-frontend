@@ -83,13 +83,16 @@
                 <td>{{ studentData.student.stu_name }}</td>
                 <td>{{ studentData.student.seat || '-' }}</td>
                 <td>
+                  <!-- Tooltip shows progress count -->
                   <div
                     class="tooltip cursor-pointer"
                     :data-tip="`${studentData.loggedStepsCount} / ${totalStepsForWeek} steps logged`"
                     @click="toggleStudentTimeline(studentData.student.stu_id)"
                   >
+                    <!-- Progress bar - color is dynamic -->
                     <progress
-                      class="progress progress-primary w-full"
+                      class="progress w-full"
+                      :class="{ 'progress-success': studentData.hasConfirmedFinalLog, 'progress-primary': !studentData.hasConfirmedFinalLog }"
                       :value="studentData.progressPercent"
                       max="100"
                     ></progress>
@@ -104,7 +107,7 @@
                     >
                       Add Log
                     </button>
-                    <!-- Confirmation Button for Final Log -->
+                    <!-- Confirmation Button for Final Log (only if unconfirmed log exists) -->
                     <button
                       v-if="studentData.unconfirmedFinalLog"
                       class="btn btn-xs btn-outline btn-success"
@@ -270,7 +273,7 @@
         <div v-else-if="error.preview" class="alert alert-error shadow-sm my-4">
           <div>
             <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span>{{ error.preview }}</span>
+            <span>Error loading preview: {{ error.preview }}</span>
           </div>
         </div>
         <div v-else-if="previewImageUrl" class="w-full max-h-[70vh] overflow-auto flex justify-center items-center bg-base-300 rounded">
@@ -320,7 +323,7 @@ const subSchedulesForWeek = ref([]); // Steps for selectedWeek
 const timelineEntries = ref({}); // { stu_id: [entry1, entry2,...] } for selected week
 
 // New state for recent student logs and confirmation
-const recentStudentLogs = ref([]); // Array of StudentLog objects from getRecentLog API
+const allRecentStudentLogs = ref([]); // Array of ALL recent StudentLog objects from getRecentLog API (unfiltered by confirm status)
 const showConfirmModalForLog = ref(false);
 const currentLogToConfirm = ref(null); // The specific StudentLog object being confirmed
 const teacherConfirmationNote = ref('');
@@ -373,7 +376,10 @@ const currentWeekNumberFromStore = computed(() => {
     if (now < startDate || now > endDate) return null;
     const diffTime = Math.abs(now - startDate); const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return Math.floor(diffDays / 7) + 1;
-  } catch (e) { return null; }
+  } catch (e) {
+    console.error("Error calculating current week from store:", e);
+    return null;
+  }
 });
 
 const courseId = computed(() => subcourseDetails.value?.course_id);
@@ -389,7 +395,9 @@ const availableWeeks = computed(() => {
   const current = currentWeekNumberFromStore.value || 1;
   const range = 16; // Default semester length guess
   const start = Math.max(1, current - Math.floor(range / 2));
-  return Array.from({ length: range }, (_, i) => start + i);
+  // Ensure we don't go below week 1
+  const end = start + range - 1;
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 });
 
 const studentProgressData = computed(() => {
@@ -400,7 +408,7 @@ const studentProgressData = computed(() => {
 
     // Count logged entries whose 'subschedule' title is in the valid set for the week
     let loggedStepsCount = 0;
-    const loggedTitles = new Set(); // Use a set to count unique titles logged
+    const loggedTitles = new Set(); // Use a set to count unique valid titles logged
     weeklyTimelines.forEach(entry => {
       if (entry.subschedule && validStepTitles.has(entry.subschedule)) {
         loggedTitles.add(entry.subschedule);
@@ -411,17 +419,26 @@ const studentProgressData = computed(() => {
     const total = totalStepsForWeek.value;
     const progressPercent = total > 0 ? Math.round((loggedStepsCount / total) * 100) : 0;
 
-    // Find if this student has a recent, unconfirmed final log
-    const unconfirmedFinalLog = recentStudentLogs.value.find(
-      log => log.stu_id === student.stu_id && log.confirm === 0
+    // Find if this student has ANY recent final log
+    const recentLogForStudent = allRecentStudentLogs.value.find(
+      log => log.stu_id === student.stu_id
     );
+
+    // Determine if the log is unconfirmed (for the button)
+    const unconfirmedFinalLog = recentLogForStudent && recentLogForStudent.confirm === 0 ? recentLogForStudent : null;
+
+    // Determine if the log is confirmed (for the bar color)
+    const hasConfirmedFinalLog = recentLogForStudent ? recentLogForStudent.confirm === 1 : false;
+    // Note: This check relies on the backend's "recent" time window.
+    // A log confirmed outside this window won't make the bar green based on *this* API.
 
     return {
       student,
       loggedStepsCount,
       progressPercent,
       weeklyTimelines, // Keep sorted list for display
-      unconfirmedFinalLog, // Add the unconfirmed log if found
+      unconfirmedFinalLog, // Add the unconfirmed log if found (for button)
+      hasConfirmedFinalLog, // Add status if a recent log is confirmed (for bar color)
     };
   });
 });
@@ -455,7 +472,7 @@ const fetchInitialData = async () => {
     if (selectedWeek.value === null && currentWeekNumberFromStore.value) {
       selectedWeek.value = currentWeekNumberFromStore.value;
     } else if (selectedWeek.value === null && schedules.value.length > 0) {
-      selectedWeek.value = schedules.value[0]?.week || 1; // Fallback to first week
+      selectedWeek.value = schedules.value.map(s => s.week).sort((a,b) => a-b)[0] || 1; // Fallback to first week if schedules exist
     } else if (selectedWeek.value === null) {
       selectedWeek.value = 1; // Absolute fallback if no students/schedules and no current week
     }
@@ -467,6 +484,7 @@ const fetchInitialData = async () => {
     students.value = [];
     schedules.value = [];
     subcourseDetails.value = null;
+    selectedWeek.value = 1; // Ensure selectedWeek has a value even on error
   } finally {
     isLoading.initial = false;
     // Fetch recent logs after initial student/subcourse data is loaded.
@@ -508,6 +526,9 @@ const fetchWeeklyData = async () => {
         subSchedulesForWeek.value = (subSchedulesRes.data || []).sort((a, b) => a.step - b.step);
 
         // Fetch all timeline entries for this subcourse AND this week's schedule_id
+        // Note: Backend listTimelinesBySchedule might not filter by schedule_id
+        // If it fetches ALL timelines for subcourse, need to filter by entry.schedule_id === selectedSchedule.value.id
+        // Assuming it DOES filter by schedule_id based on the service function name
         const timelineRes = await dataService.listTimelinesBySchedule(props.id, selectedSchedule.value.id);
         const allWeeklyEntries = timelineRes.data || [];
 
@@ -538,14 +559,13 @@ const fetchWeeklyData = async () => {
 const fetchRecentLogs = async () => {
   isLoading.recentLogs = true;
   error.recentLogs = null;
-  recentStudentLogs.value = []; // Clear previous recent logs
+  allRecentStudentLogs.value = []; // Clear previous recent logs
   try {
-    // Fetch recent logs for the entire subcourse
+    // Fetch ALL recent logs for the entire subcourse (backend filters by time)
     const res = await dataService.getRecentLog(props.id);
-    // The backend returns ALL recent logs within the time window.
-    // Filter to only include unconfirmed logs here as per requirement.
-    recentStudentLogs.value = (res.data || []).filter(log => log.confirm === 0);
-    console.log("Fetched recent unconfirmed logs:", recentStudentLogs.value);
+    // Store the full result; filtering by confirm status happens in the computed property
+    allRecentStudentLogs.value = res.data || [];
+    console.log("Fetched all recent logs (filtered by backend time window):", allRecentStudentLogs.value);
   } catch (err) {
     console.error("Error fetching recent student logs:", err);
     error.recentLogs = err.response?.data?.error || err.message || 'Unknown error';
@@ -579,7 +599,7 @@ const formatTimestamp = (timestamp) => {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false, // Use 24-hour format
-      timeZone: 'UTC' // Or specify the expected time zone
+      // timeZone: 'UTC' // Or specify the expected time zone
     });
   } catch (error) {
     console.error('Error formatting timestamp:', error);
@@ -606,6 +626,7 @@ const handleTeacherLogSave = async (/* Maybe receive feedback? */) => {
   // formData was handled by the child component
   closeTeacherLogModal();
   // Refresh weekly data to show the new log entry
+  // Note: This refresh might cause the table to scroll depending on browser behavior
   await fetchWeeklyData();
   // TODO: Add success notification (e.g., toast)
 };
@@ -639,15 +660,19 @@ const handleConfirmLog = async () => {
     try {
         // Prepare data for the API call
         const logId = currentLogToConfirm.value.id;
-        const data = { tea_note: teacherConfirmationNote.value };
+        const data = { tea_note: teacherConfirmationNote.value }; // API expects { tea_note: string }
 
         // Call the data service
+        // Assuming confirmStudentLog expects (logId, data)
         await dataService.confirmStudentLog(logId, data);
 
         // Confirmation successful
         closeConfirmModalForLog();
-        // Refresh the list of recent logs to remove the confirmed one
+        // Refresh the list of *all* recent logs to update the confirmed status
         await fetchRecentLogs();
+        // The computed property studentProgressData will automatically react
+        // to the change in allRecentStudentLogs.value and update the bar color
+        // and remove the button.
         // Optional: Show a success message
         // alert(`Final log for ${currentLogToConfirm.value.stu_name} confirmed.`); // Or use a toast
 
@@ -678,8 +703,6 @@ const getTimelineEntryDescription = (entry) => {
 const deleteTimelineEntry = async () => {
   if (!entryToDelete.value) return;
 
-  // Use a specific loading state if possible, or block main interaction
-  // For simplicity, let's use a general loading indicator or disable controls if needed
   isLoading.weekly = true; // Reusing weekly loader for simplicity during this operation
   showDeleteConfirm.value = false; // Close the confirm dialog immediately
   const entryIdToDelete = entryToDelete.value.id; // Store ID before clearing entryToDelete
@@ -864,19 +887,23 @@ watch(selectedWeek, (newWeek, oldWeek) => {
       timelineEntries.value = {};
       error.weekly = null; // Clear weekly error if any
   }
-});
+}, { immediate: false }); // Immediate is false here because initial fetch is handled in onMounted
+
 
 // Set initial week based on store once it loads
 // This might set selectedWeek before fetchInitialData finishes, or afterwards.
 // The fetchWeeklyData call in onMounted is the primary trigger for the *first* fetch.
 watch(currentWeekNumberFromStore, (newStoreWeek) => {
+  // Only set the selected week based on the store if it hasn't been set yet
+  // or if the component is still in its initial loading phase.
+  // The goal is to set the *initial* week preference.
   if (selectedWeek.value === null && newStoreWeek !== null) {
     console.log("Current week from store loaded:", newStoreWeek, "Setting selectedWeek.");
     selectedWeek.value = newStoreWeek;
-    // Note: The fetchWeeklyData trigger for this initial setting
-    // will be handled by the explicit call in onMounted after initial data fetch.
+    // No need to trigger fetchWeeklyData here; onMounted will do it after initial data.
   }
 }, { immediate: true }); // Check immediately on component creation
+
 
 // --- Lifecycle ---
 onMounted(async () => {
@@ -886,24 +913,30 @@ onMounted(async () => {
   }
 
   // 1. Fetch initial data (students, subcourse details, ALL schedules)
+  //    This will also set the initial value of selectedWeek.value
   await fetchInitialData();
 
-  // 2. AFTER initial data is loaded and selectedWeek is set,
+  // 2. AFTER initial data is loaded and selectedWeek is set (in fetchInitialData),
   //    trigger the fetch for the *first* week's detailed data.
   //    The selectedWeek watcher handles subsequent changes from the dropdown.
   if (selectedWeek.value !== null) {
       console.log("Initial data fetch complete. Triggering first weekly data fetch for week:", selectedWeek.value);
-      await fetchWeeklyData(); // Await this to ensure data is there before table renders fully
+      // Await this to ensure data is there before table renders fully for the first time
+      await fetchWeeklyData();
   } else if (students.value.length > 0) {
        // Edge case: students loaded but no schedules and no current week could be determined.
-       // selectedWeek remains null or 1 default, but fetchWeeklyData didn't run because selectedSchedule couldn't be found.
+       // selectedWeek remains 1 default, but fetchWeeklyData didn't find a schedule.
        // The error.weekly message should explain this.
-       console.warn("No selected week determined after initial fetch. Weekly data will not load.");
+       console.warn("No selected week determined after initial fetch or no schedule found for week 1. Weekly data will not load.");
+       // In this case, error.weekly would already be set by fetchWeeklyData if it ran and failed to find a schedule.
   }
 
   // fetchRecentLogs is already called in the finally block of fetchInitialData,
-  // which is fine for parallel loading.
+  // which is fine for parallel loading and ensures the button/color status
+  // can be determined as soon as possible.
 });
+
+
 </script>
 
 <style scoped>

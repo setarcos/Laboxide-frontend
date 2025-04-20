@@ -227,7 +227,6 @@ const isStepLogged = (stepTitle) => {
 };
 
 const handleFileChange = (event) => {
-  // ... (file change logic remains the same) ...
   fileError.value = null;
   const file = event.target.files[0];
   if (file) {
@@ -244,7 +243,6 @@ const handleFileChange = (event) => {
 };
 
 const resetFormFields = () => {
-  // ... (reset logic remains the same) ...
   noteContent.value = '';
   fileToUpload.value = null;
   fileError.value = null;
@@ -269,7 +267,7 @@ const submitTimelineEntry = async () => {
       try {
         await dataService.deleteTimeline(entryToDeleteId);
         console.log(`Successfully deleted previous entry ID: ${entryToDeleteId}`);
-      } catch (deleteErr) { /* ... error handling remains the same ... */ return; }
+      } catch (deleteErr) { return; }
     } else {
       console.log(`No previous entry found for step "${selectedStepTitle.value}". Proceeding with creation.`);
     }
@@ -294,7 +292,7 @@ const submitTimelineEntry = async () => {
     emit('log-saved');
     emit('close'); // Close modal on success
 
-  } catch (err) { /* ... error handling remains the same ... */ }
+  } catch (err) { /* error handling */ }
   finally { isSaving.value = false; }
 };
 
