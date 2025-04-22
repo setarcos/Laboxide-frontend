@@ -430,15 +430,12 @@ const handleSave = async (formData) => {
             await dataService.createSubcourse(formData);
              message = 'Group added successfully!';
         }
-        // toast.success(message);
-        // alert(message); // Simple alert for now
         closeModal();
         await fetchSubcourses(); // Refresh list
     } catch (err) {
         console.error("Failed to save subcourse:", err);
         const errorMsg = `Failed to save: ${err.response?.data?.error || err.message}`;
         alert(errorMsg);
-        // toast.error(errorMsg);
         error.value = errorMsg; // Can display this elsewhere if needed
     } finally {
         isSaving.value = false;
@@ -450,15 +447,12 @@ const handleDelete = async () => {
 
     try {
         await dataService.deleteSubcourse(currentItem.value.id);
-        // toast.success(message);
         closeModal();
         await fetchSubcourses(); // Refresh list
     } catch (err) {
         console.error("Failed to delete subcourse:", err);
         const errorMsg = `Failed to delete: ${err.response?.data?.error || err.message}`;
         alert(errorMsg);
-        // toast.error(errorMsg);
-        error.value = errorMsg;
         closeModal();
     }
 };

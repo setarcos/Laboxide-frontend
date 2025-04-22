@@ -264,7 +264,7 @@ const handleRemoveStudent = async () => {
     } catch (err) {
         console.error(`Failed to remove student ${studentIdToRemove}:`, err);
         removeError.value = err.response?.data || err;
-        alert(`Failed to remove student: ${removeError.value?.message || 'Unknown error'}`);
+        alert(`Failed to remove student: ${removeError.value?.error || 'Unknown error'}`);
         closeRemoveConfirm();
     } finally {
         isRemovingStudent.value = false;
@@ -315,8 +315,6 @@ const handleSaveSeat = async () => {
     } catch (err) {
         console.error(`Failed to update seat for student ${studentToEditSeat.value.stu_name}:`, err);
         seatSaveError.value = err.response?.data?.error
-                              || err.response?.data?.message
-                              || err.message
                               || "An unknown error occurred";
          alert(`Failed to update seat: ${seatSaveError.value}`);
     } finally {
