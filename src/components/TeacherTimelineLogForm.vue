@@ -114,7 +114,6 @@ const submitForm = async () => {
   formData.append('subschedule', '-');
   if (noteType.value === 0) { formData.append('note', noteContent.value.trim()); }
   else if (fileToUpload.value) { formData.append('file', fileToUpload.value, fileToUpload.value.name); }
-  formData.append('timestamp', '2000-01-01 08:08:08');
 
   try {
     await dataService.createTimeline(formData);

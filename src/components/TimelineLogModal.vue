@@ -377,8 +377,6 @@ const submitTimelineEntry = async () => {
     formData.append('subschedule', logTitleToSave);
     formData.append('subcourse_id', props.subcourse.id);
     formData.append('notetype', noteType.value);
-    //formData.append('timestamp', new Date().toISOString()); // Use current timestamp
-    formData.append('timestamp', '2000-01-01 08:08:00');
 
     if (noteType.value === 0) {
       formData.append('note', noteContent.value.trim());
