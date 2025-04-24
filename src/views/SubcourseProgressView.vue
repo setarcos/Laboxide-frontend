@@ -417,7 +417,7 @@ const studentProgressData = computed(() => {
     loggedStepsCount = loggedTitles.size; // Count unique valid titles logged
 
     const total = totalStepsForWeek.value;
-    const progressPercent = total > 0 ? Math.round((loggedStepsCount / total) * 100) : 0;
+    const progressPercent = total > 0 ? Math.round((loggedStepsCount / total) * 100) : 100;
 
     // Find if this student has ANY recent final log
     const recentLogForStudent = allRecentStudentLogs.value.find(
