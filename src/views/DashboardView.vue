@@ -83,11 +83,10 @@
                     <button v-if="authStore.isStudent"
                         class="btn btn-xs btn-outline btn-primary"
                         @click="handleLogButtonClick(course)"
-                        :disabled="!currentWeekNumber || hasConfirmedLog(course.id) || isCheckingLogPrerequisitesFor(course.id)"
+                        :disabled="!currentWeekNumber || hasConfirmedLog(course.id)"
                         :title="getLogButtonTitle(course.id)"
                     >
-                         <span v-if="isCheckingLogPrerequisitesFor(course.id)" class="loading loading-dots loading-xs"></span>
-                         <span v-else>{{ hasConfirmedLog(course.id) ? 'Log Confirmed' : 'Log Progress' }}</span>
+                       <span>{{ hasConfirmedLog(course.id) ? 'Log Confirmed' : 'Log Progress' }}</span>
                     </button>
                     <div v-if="authStore.isTeacher" class="flex gap-1">
                          <router-link
@@ -220,8 +219,6 @@ const finishLogDefaultData = ref(null); // This will hold the single StudentLog 
 const finishLogDefaultError = ref(null);
 const isSavingFinishLog = ref(false);
 const finishLogFormKey = ref(0);
-const isCheckingLogPrerequisites = ref(false);
-const checkingLogForSubcourseId = ref(null); // Track which button shows loading
 
 // --- Current Week Calculation ---
 const currentWeekNumber = computed(() => {
@@ -370,18 +367,8 @@ const getLogButtonTitle = (subcourseId) => {
     const teacherNote = log?.tea_note ? `\nTeacher Note: ${log.tea_note}` : '';
     return `Your final log for this course has been confirmed by a teacher.${teacherNote}`;
   }
-  // Check if prerequisite checks are running for this specific button
-  if (isCheckingLogPrerequisitesFor(subcourseId)) {
-    return "Checking course schedule...";
-  }
   return "Log your progress steps for the current week or submit the final log.";
 };
-
-// --- Computed helper for checking specific button loading state ---
-const isCheckingLogPrerequisitesFor = (subcourseId) => {
-  return checkingLogForSubcourseId.value === subcourseId && isCheckingLogPrerequisites.value;
-};
-
 
 // Computed property for the semester greeting message
 const semesterGreeting = computed(() => {
@@ -437,7 +424,7 @@ const semesterGreeting = computed(() => {
 
 const handleLogButtonClick = async (subcourse) => {
   // Prevent action if already confirmed or if check is already running for this button
-  if (hasConfirmedLog(subcourse.id) || isCheckingLogPrerequisitesFor(subcourse.id)) {
+  if (hasConfirmedLog(subcourse.id)) {
     console.log("Log already confirmed or check running, ignoring button click.");
     // Optional: provide feedback if needed
     return;
@@ -456,47 +443,7 @@ const handleLogButtonClick = async (subcourse) => {
     console.error("Subcourse object missing course_id or tea_name:", subcourse);
     return;
   }
-
-  console.log(`Log button clicked for subcourse: ${subcourse.id}, Week: ${currentWeekNumber.value}`);
-  isCheckingLogPrerequisites.value = true;
-  checkingLogForSubcourseId.value = subcourse.id; // Set loading indicator target
-
-  try {
-    // 1. Fetch schedules for the parent course
-    const schedulesResponse = await dataService.getSchedules(subcourse.course_id);
-    const allSchedules = schedulesResponse.data || [];
-
-    // 2. Find the schedule for the current week
-    const scheduleForCurrentWeek = allSchedules.find(s => s.week === currentWeekNumber.value);
-
-    if (!scheduleForCurrentWeek) {
-      // Case 1: No schedule definition found for this week at all.
-      console.log(`No schedule found for Week ${currentWeekNumber.value}. Opening final log.`);
-      openFinishLogModal(subcourse); // Treat as "no steps" -> go to final log
-    } else {
-      // 3. Fetch sub-schedules (steps) for this week's schedule
-      const subSchedulesResponse = await dataService.getSubSchedules(scheduleForCurrentWeek.id);
-      const subSchedules = subSchedulesResponse.data || [];
-
-      if (subSchedules.length === 0) {
-        // Case 2: Schedule exists, but has no steps defined.
-        console.log(`Schedule found for Week ${currentWeekNumber.value}, but no sub-schedules defined. Opening final log.`);
-        openFinishLogModal(subcourse); // Go directly to final log
-      } else {
-        // Case 3: Schedule and steps exist. Open the timeline modal.
-        console.log(`Sub-schedules found for Week ${currentWeekNumber.value}. Opening timeline log.`);
-        openTimelineModal(subcourse); // Proceed as before
-      }
-    }
-  } catch (err) {
-    console.error("Error checking log prerequisites:", err);
-    alert(`Failed to check schedule data: ${err.response?.data?.error || err.message}. Please try again.`);
-    // Decide if you want to open a default modal or just show error
-    // For now, just show error and do nothing else.
-  } finally {
-    isCheckingLogPrerequisites.value = false;
-    checkingLogForSubcourseId.value = null;
-  }
+  openTimelineModal(subcourse);
 };
 
 // --- Methods for Timeline Log ---
@@ -625,8 +572,6 @@ const handleFinishLogSave = async (logData) => {
       // Fetch just the one log for the subcourse we just saved for
       await fetchStudentFinalLogStatusesForMyCourses([selectedSubcourseForFinishLog.value.id]);
     }
-    // Optional: Show a success notification
-    alert("Final log saved successfully!");
 
   } catch (err) {
     console.error("Failed to save final student log:", err);
@@ -659,8 +604,6 @@ watch(() => authStore.isAuthenticated, async (isAuth) => {
     studentFinalLogBySubcourse.value = {}; // Clear log statuses state
     isLoadingFinalLogStatuses.value = false; // Clear log loading state
     finalLogStatusesError.value = null; // Clear log error state
-    isCheckingLogPrerequisites.value = false; // Clear checking state
-    checkingLogForSubcourseId.value = null; // Clear checking state target
     // Optionally reset semester info if needed, but store might handle it
     console.log("User logged out, cleared courses and logs.");
   }
