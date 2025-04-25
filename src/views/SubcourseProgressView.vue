@@ -104,18 +104,32 @@
                       class="btn btn-xs btn-outline btn-info"
                       @click="openTeacherLogModal(studentData.student)"
                       title="Add general log entry for student"
+                      :disabled="!selectedSchedule?.id"
                     >
                       Add Log
                     </button>
-                    <!-- Confirmation Button for Final Log (only if unconfirmed log exists) -->
+                    <!-- Button to Confirm an existing UNCONFIRMED Final Log -->
                     <button
                       v-if="studentData.unconfirmedFinalLog"
                       class="btn btn-xs btn-outline btn-success"
                       @click="openConfirmModalForLog(studentData.unconfirmedFinalLog)"
                       title="Confirm student's final log submission"
+                      :disabled="isLoading.confirmLog || isLoading.forceLog"
                     >
                       Confirm Final Log
                     </button>
+
+                    <!-- Button to FORCE a new, CONFIRMED Final Log -->
+                    <button
+                       v-else-if="!studentData.recentLogForStudent && selectedSchedule?.id"
+                       class="btn btn-xs btn-outline btn-warning"
+                       @click="confirmForceLog(studentData.student)"
+                       title="Force a 'Final Log' entry for this student for the current week"
+                       :disabled="isLoading.forceLog === studentData.student.stu_id || isLoading.weekly || isLoading.confirmLog"
+                     >
+                       <span v-if="isLoading.forceLog === studentData.student.stu_id" class="loading loading-spinner loading-sm mr-1"></span>
+                       Force Log
+                     </button>
                   </div>
                 </td>
               </tr>
@@ -158,6 +172,7 @@
                               class="btn btn-xs btn-ghost btn-circle text-error p-0 align-middle"
                               @click="confirmDeleteTimeline(entry)"
                               title="Delete this log entry"
+                              :disabled="isLoading.weekly"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 3 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             </button>
@@ -214,7 +229,7 @@
       @close="showDeleteConfirm = false; entryToDelete = null;"
     />
 
-    <!-- Confirm Final Log Modal -->
+    <!-- Confirm Final Log Modal (for student-submitted logs) -->
     <dialog id="confirm_final_log_modal" class="modal" :open="showConfirmModalForLog">
       <div class="modal-box w-11/12 max-w-lg">
         <h3 class="font-bold text-lg mb-4">
@@ -243,7 +258,7 @@
                     @click="handleConfirmLog"
                     :disabled="isLoading.confirmLog"
                 >
-                  <span v-if="isLoading.confirmLog" class="loading loading-spinner loading-sm"></span>
+                  <span v-if="isLoading.confirmLog" class="loading loading-spinner loading-sm mr-2"></span>
                   Confirm Log
                 </button>
                 <button class="btn" @click="closeConfirmModalForLog" :disabled="isLoading.confirmLog">Cancel</button>
@@ -262,6 +277,16 @@
       </form>
     </dialog>
 
+    <!-- Confirm Force Log Modal -->
+    <ConfirmDialog
+      :show="showForceConfirm"
+      dialogId="force_log_confirm_modal"
+      title="Force Final Log"
+      :message="`Are you sure you want to force a 'Final Log' entry for ${studentToForceLog?.stu_name || 'this student'} for Week ${selectedWeek}? This action cannot be undone and will mark their progress for this week as complete.`"
+      confirmButtonText="Force Log"
+      @confirm="handleForceLog"
+      @close="cancelForceLog"
+    />
 
     <dialog id="image_preview_modal" class="modal" :open="showImagePreviewModal">
       <div class="modal-box w-11/12 max-w-3xl p-6">
@@ -328,12 +353,17 @@ const showConfirmModalForLog = ref(false);
 const currentLogToConfirm = ref(null); // The specific StudentLog object being confirmed
 const teacherConfirmationNote = ref('');
 
+// New state for force log confirmation
+const showForceConfirm = ref(false);
+const studentToForceLog = ref(null); // The student object for the force action
+
 const isLoading = reactive({
   initial: true, // Loading students, schedules
   weekly: false, // Loading subschedules, timelines for the selected week
   timelines: {}, // Per-student timeline loading: { stu_id: boolean } - might not be needed if fetching all at once
   recentLogs: false, // Loading recent student logs
   confirmLog: false, // Confirming a specific student log
+  forceLog: null, // Forcing a specific student log: null or the stu_id being forced
   preview: false, // Loading image preview
 });
 const error = reactive({
@@ -342,6 +372,7 @@ const error = reactive({
   timelines: {}, // Per-student timeline errors: { stu_id: string }
   recentLogs: null, // Error fetching recent student logs
   confirmLog: null, // Error confirming student log
+  forceLog: null, // Error forcing student log
   preview: null, // Error loading image preview
 });
 
@@ -419,18 +450,21 @@ const studentProgressData = computed(() => {
     const total = totalStepsForWeek.value;
     const progressPercent = total > 0 ? Math.round((loggedStepsCount / total) * 100) : 100;
 
-    // Find if this student has ANY recent final log
+    // Find if this student has ANY recent final log (confirmed or unconfirmed)
     const recentLogForStudent = allRecentStudentLogs.value.find(
       log => log.stu_id === student.stu_id
     );
 
-    // Determine if the log is unconfirmed (for the button)
+    // Determine if the log is unconfirmed (for the Confirm button)
     const unconfirmedFinalLog = recentLogForStudent && recentLogForStudent.confirm === 0 ? recentLogForStudent : null;
 
     // Determine if the log is confirmed (for the bar color)
     const hasConfirmedFinalLog = recentLogForStudent ? recentLogForStudent.confirm === 1 : false;
     // Note: This check relies on the backend's "recent" time window.
     // A log confirmed outside this window won't make the bar green based on *this* API.
+
+    // Determine if *no* recent log (confirmed or unconfirmed) exists for the student
+    const noRecentLog = !recentLogForStudent;
 
     return {
       student,
@@ -439,6 +473,8 @@ const studentProgressData = computed(() => {
       weeklyTimelines, // Keep sorted list for display
       unconfirmedFinalLog, // Add the unconfirmed log if found (for button)
       hasConfirmedFinalLog, // Add status if a recent log is confirmed (for bar color)
+      recentLogForStudent, // Add the raw recent log (or null) to easily check for *any* recent log
+      noRecentLog, // Explicit flag if no recent log exists
     };
   });
 });
@@ -663,16 +699,13 @@ const handleConfirmLog = async () => {
         const data = { tea_note: teacherConfirmationNote.value }; // API expects { tea_note: string }
 
         // Call the data service
-        // Assuming confirmStudentLog expects (logId, data)
         await dataService.confirmStudentLog(logId, data);
 
         // Confirmation successful
         closeConfirmModalForLog();
         // Refresh the list of *all* recent logs to update the confirmed status
+        // and potentially remove the unconfirmed log/button
         await fetchRecentLogs();
-        // The computed property studentProgressData will automatically react
-        // to the change in allRecentStudentLogs.value and update the bar color
-        // and remove the button.
         // Optional: Show a success message
         // alert(`Final log for ${currentLogToConfirm.value.stu_name} confirmed.`); // Or use a toast
 
@@ -684,6 +717,59 @@ const handleConfirmLog = async () => {
         isLoading.confirmLog = false;
     }
 };
+
+// --- Force Final Log Methods ---
+const confirmForceLog = (student) => {
+    if (!selectedSchedule.value) {
+       alert("Cannot force log: No schedule loaded for the selected week.");
+       return;
+    }
+    error.forceLog = null; // Clear previous error
+    studentToForceLog.value = student;
+    showForceConfirm.value = true;
+};
+
+const cancelForceLog = () => {
+    showForceConfirm.value = false;
+    studentToForceLog.value = null;
+    error.forceLog = null; // Clear error on cancel
+};
+
+const handleForceLog = async () => {
+    if (!studentToForceLog.value || !selectedSchedule.value) {
+        console.warn("Attempted to force log without a selected student or schedule.");
+        // Ensure confirm dialog is closed and state reset
+        cancelForceLog();
+        return;
+    }
+
+    // Close the confirm dialog immediately
+    showForceConfirm.value = false;
+
+    isLoading.forceLog = studentToForceLog.value.stu_id; // Set loading state for this specific student
+    error.forceLog = null; // Clear previous error
+
+    try {
+        // Call the new force API
+        await dataService.forceStudentLog(props.id, studentToForceLog.value.stu_id);
+
+        // Force successful!
+        // Refresh recent logs to update UI (hide Force button, potentially change bar color)
+        await fetchRecentLogs();
+
+        // TODO: Add success notification (e.g., toast) - "Forced final log for [student name]"
+
+    } catch (err) {
+        console.error(`Failed to force log for student ${studentToForceLog.value.stu_id}:`, err);
+        error.forceLog = err.response?.data?.error || err.message || 'Unknown error forcing log.';
+        // Display error - maybe alert or a specific error message area
+        alert(`Failed to force log for ${studentToForceLog.value.stu_name}: ${error.forceLog}`);
+    } finally {
+        isLoading.forceLog = null; // Reset loading state
+        studentToForceLog.value = null; // Clear student reference
+    }
+};
+
 
 // --- Timeline Delete Methods ---
 const confirmDeleteTimeline = (entry) => {
@@ -807,7 +893,6 @@ const handleFileLinkClick = async (entry) => {
       } else {
         // If fetch was successful but the response wasn't an image Blob
         console.warn(`Fetched file for ID ${timelineId} is not an image Blob (type: ${response.data?.type}). Falling back to download.`);
-        // error.preview = "File is not a supported image format for preview. Attempting download instead...";
         // Don't set preview error, just close modal and download
         closeImagePreviewModal();
         // Trigger download for this file using the retrieved Blob if available, or refetch
