@@ -19,23 +19,23 @@ const authStore = useAuthStore() // Needs pinia instance registered first
 const semesterStore = useSemesterStore()
 
 try {
-    // We await this so the initial loading state is handled correctly
-    // and navigation guards have the auth status ready
-    await authStore.checkAuth()
+  // We await this so the initial loading state is handled correctly
+  // and navigation guards have the auth status ready
+  await authStore.checkAuth()
 } catch (error) {
-    console.error("Initial auth check failed:", error)
-    // App will still load, but user will be in logged-out state
+  console.error("Initial auth check failed:", error)
+  // App will still load, but user will be in logged-out state
 } finally {
-    authStore.isLoading = false; // Ensure loading is set to false
+  authStore.isLoading = false; // Ensure loading is set to false
 }
 // --- End Authentication Check ---
 
 try {
-    await semesterStore.fetchCurrentSemester()
+  await semesterStore.fetchCurrentSemester()
 } catch (error) {
-    console.error("Load semester info failed:", error)
+  console.error("Load semester info failed:", error)
 } finally {
-    semesterStore.isSemesterLoading = false;
+  semesterStore.isSemesterLoading = false;
 }
 
 app.use(router) // Use router after Pinia setup and initial auth check

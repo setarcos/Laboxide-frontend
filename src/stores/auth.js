@@ -23,9 +23,9 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await api.get('/greet')
       if (response.data && !response.data.error) {
         user.value = {
-            userId: response.data.user_id,
-            realname: response.data.realname,
-            permissions: response.data.permissions,
+          userId: response.data.user_id,
+          realname: response.data.realname,
+          permissions: response.data.permissions,
         };
         isAuthenticated.value = true
       } else {
@@ -37,10 +37,10 @@ export const useAuthStore = defineStore('auth', () => {
       // Handle network errors or unexpected backend responses
       resetAuth();
       console.error('Error checking authentication:', error)
-       // Re-throw if needed elsewhere, but reset state here
-       throw error; // Allow main.js to catch if needed
+      // Re-throw if needed elsewhere, but reset state here
+      throw error; // Allow main.js to catch if needed
     } finally {
-     // isLoading.value = false; // Set loading false here OR in main.js after await
+      // isLoading.value = false; // Set loading false here OR in main.js after await
     }
   }
 
@@ -55,8 +55,8 @@ export const useAuthStore = defineStore('auth', () => {
       // Optionally redirect after logout
       // router.push('/login'); // If you have a login route
       // Or simply let the UI update based on isAuthenticated
-       // In this setup, the router guard will likely redirect from protected pages
-       window.location.reload(); // Force reload to ensure clean state and trigger guards
+      // In this setup, the router guard will likely redirect from protected pages
+      window.location.reload(); // Force reload to ensure clean state and trigger guards
     }
   }
 
@@ -65,7 +65,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated.value = false
   }
 
-   // Helper function to check permissions more broadly
+  // Helper function to check permissions more broadly
   function hasPermission(requiredPermission) {
     // Allows checking for multiple permissions using bitwise OR
     // e.g., hasPermission(PERMISSION_ADMIN | PERMISSION_TEACHER)
