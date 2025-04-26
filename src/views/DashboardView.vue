@@ -186,7 +186,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth'
 import { useSemesterStore } from '@/stores/semester'
 import * as dataService from '@/services/dataService';
-import { getWeekdayName } from '@/utils/weekday';
+import { getWeekdayName, calculateCurrentWeek } from '@/utils/weekday';
 import StudentLogForm from '@/components/StudentLogForm.vue';
 import TimelineLogModal from '@/components/TimelineLogModal.vue';
 
@@ -225,31 +225,7 @@ const currentWeekNumber = computed(() => {
   if (semesterStore.isSemesterLoading || semesterStore.semesterError || !semesterStore.currentSemester) {
     return null;
   }
-  const semester = semesterStore.currentSemester;
-  const startDateStr = semester.start;
-  const endDateStr = semester.end;
-
-  if (!startDateStr || !endDateStr) return null;
-
-  try {
-    const now = new Date();
-    const startDate = new Date(startDateStr);
-    const endDate = new Date(endDateStr);
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return null;
-
-    now.setHours(0, 0, 0, 0);
-    startDate.setHours(0, 0, 0, 0);
-    endDate.setHours(0, 0, 0, 0);
-
-    if (now < startDate || now > endDate) return null; // Not within semester dates
-
-    const diffTime = Math.abs(now - startDate);
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // Use floor for completed days
-    return Math.floor(diffDays / 7) + 1; // Add 1 because week 1 starts at day 0
-  } catch (e) {
-    console.error("Error calculating current week:", e);
-    return null;
-  }
+  return calculateCurrentWeek(semesterStore.currentSemester);
 });
 
 // --- Fetch My Courses Logic ---

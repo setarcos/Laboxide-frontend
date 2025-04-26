@@ -29,10 +29,10 @@
             <span class="label-text font-semibold">Select Week:</span>
           </label>
           <select class="select select-bordered select-sm" v-model.number="selectedWeek" :disabled="isLoading.weekly">
-            <option v-if="semesterStore.isSemesterLoading || !currentWeekNumberFromStore" disabled value="">Loading weeks...</option>
+            <option v-if="semesterStore.isSemesterLoading || !currentWeekNumber" disabled value="">Loading weeks...</option>
             <!-- Generate options dynamically based on typical semester length or fetched schedules -->
             <option v-for="weekNum in availableWeeks" :key="weekNum" :value="weekNum">
-              Week {{ weekNum }} {{ weekNum === currentWeekNumberFromStore ? '(Current)' : '' }}
+              Week {{ weekNum }} {{ weekNum === currentWeekNumber ? '(Current)' : '' }}
             </option>
           </select>
         </div>
@@ -323,7 +323,7 @@ import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useSemesterStore } from '@/stores/semester';
 import * as dataService from '@/services/dataService';
-import { getWeekdayName } from '@/utils/weekday';
+import { getWeekdayName, calculateCurrentWeek } from '@/utils/weekday';
 import TeacherTimelineLogForm from '@/components/TeacherTimelineLogForm.vue'; // Needs to be created
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 
@@ -394,23 +394,10 @@ const previewImageUrl = ref(null);
 const previewImageFilename = ref(null);
 
 // --- Computed Properties ---
-const currentWeekNumberFromStore = computed(() => {
+const currentWeekNumber = computed(() => {
   // Reuse logic from DashboardView if available, or recalculate
   if (semesterStore.isSemesterLoading || semesterStore.semesterError || !semesterStore.currentSemester) return null;
-  const semester = semesterStore.currentSemester;
-  const startDateStr = semester.start; const endDateStr = semester.end;
-  if (!startDateStr || !endDateStr) return null;
-  try {
-    const now = new Date(); const startDate = new Date(startDateStr); const endDate = new Date(endDateStr);
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return null;
-    now.setHours(0, 0, 0, 0); startDate.setHours(0, 0, 0, 0); endDate.setHours(0, 0, 0, 0);
-    if (now < startDate || now > endDate) return null;
-    const diffTime = Math.abs(now - startDate); const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    return Math.floor(diffDays / 7) + 1;
-  } catch (e) {
-    console.error("Error calculating current week from store:", e);
-    return null;
-  }
+  return calculateCurrentWeek(semesterStore.currentSemester);
 });
 
 const courseId = computed(() => subcourseDetails.value?.course_id);
@@ -423,7 +410,7 @@ const availableWeeks = computed(() => {
     return schedules.value.map(s => s.week).sort((a, b) => a - b);
   }
   // Fallback if schedules haven't loaded yet or are empty
-  const current = currentWeekNumberFromStore.value || 1;
+  const current = currentWeekNumber.value || 1;
   const range = 16; // Default semester length guess
   const start = Math.max(1, current - Math.floor(range / 2));
   // Ensure we don't go below week 1
@@ -505,8 +492,8 @@ const fetchInitialData = async () => {
 
     // Set initial week based on store once it loads, or fallback
     // We do NOT await fetchWeeklyData here anymore. It will be called after initial load finishes.
-    if (selectedWeek.value === null && currentWeekNumberFromStore.value) {
-      selectedWeek.value = currentWeekNumberFromStore.value;
+    if (selectedWeek.value === null && currentWeekNumber.value) {
+      selectedWeek.value = currentWeekNumber.value;
     } else if (selectedWeek.value === null && schedules.value.length > 0) {
       selectedWeek.value = schedules.value.map(s => s.week).sort((a,b) => a-b)[0] || 1; // Fallback to first week if schedules exist
     } else if (selectedWeek.value === null) {
@@ -978,7 +965,7 @@ watch(selectedWeek, (newWeek, oldWeek) => {
 // Set initial week based on store once it loads
 // This might set selectedWeek before fetchInitialData finishes, or afterwards.
 // The fetchWeeklyData call in onMounted is the primary trigger for the *first* fetch.
-watch(currentWeekNumberFromStore, (newStoreWeek) => {
+watch(currentWeekNumber, (newStoreWeek) => {
   // Only set the selected week based on the store if it hasn't been set yet
   // or if the component is still in its initial loading phase.
   // The goal is to set the *initial* week preference.
