@@ -568,10 +568,6 @@ watch(() => authStore.isAuthenticated, async (isAuth) => {
     if (authStore.isTeacher || authStore.isStudent) {
       await fetchMyCourses(); // Wait for courses to fetch
     }
-    // Fetch semester info if not already loaded/loading (handled by store persistence/init)
-    if (!semesterStore.currentSemester && !semesterStore.isSemesterLoading) {
-      semesterStore.fetchCurrentSemester(); // No need to await this here
-    }
   } else {
     // Clear data on logout
     myCourses.value = [];
@@ -584,13 +580,6 @@ watch(() => authStore.isAuthenticated, async (isAuth) => {
     console.log("User logged out, cleared courses and logs.");
   }
 }, { immediate: true }); // Run immediately on component mount and auth state change
-
-// Fetch semester info on mount if not already present
-onMounted(() => {
-  // Initial fetch for courses and semester is handled by the watcher with immediate: true
-  // and the watcher now waits for authStore.fetchUser()
-  // No need to duplicate fetchMyCourses or semesterStore.fetchCurrentSemester here
-});
 
 </script>
 

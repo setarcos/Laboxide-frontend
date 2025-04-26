@@ -979,11 +979,6 @@ watch(currentWeekNumber, (newStoreWeek) => {
 
 // --- Lifecycle ---
 onMounted(async () => {
-  // Ensure semester store has data if needed for initial week calculation
-  if (!semesterStore.currentSemester && !semesterStore.isSemesterLoading) {
-    await semesterStore.fetchCurrentSemester();
-  }
-
   // 1. Fetch initial data (students, subcourse details, ALL schedules)
   //    This will also set the initial value of selectedWeek.value
   await fetchInitialData();
