@@ -60,7 +60,7 @@ const props = defineProps({
   student: { type: Object, required: true },
   subcourseId: { type: [String, Number], required: true },
   scheduleId: { type: Number, required: true }, // ID of the main schedule item for the week
-  teacherName: { type: String, required: true },
+  teacherId: { type: String, required: true },
 });
 
 const emit = defineEmits(['save', 'close']);
@@ -107,7 +107,7 @@ const submitForm = async () => {
 
   const formData = new FormData();
   formData.append('stu_id', props.student.stu_id);
-  formData.append('tea_name', props.teacherName);
+  formData.append('tea_id', props.teacherId);
   formData.append('schedule_id', props.scheduleId);
   formData.append('subcourse_id', props.subcourseId);
   formData.append('notetype', noteType.value);

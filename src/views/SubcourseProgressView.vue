@@ -165,10 +165,10 @@
                           </div>
                           <div class="text-right flex-shrink-0 ml-2 whitespace-nowrap">
                             <span class="text-gray-500 mr-1">({{ formatTimestamp(entry.timestamp) }})</span>
-                            <span class="font-medium mr-1" :class="{'text-success': entry.tea_name === authStore.user?.realname }">{{ entry.tea_name }}</span>
+                            <span class="font-medium mr-1" :class="{'text-success': entry.tea_id === authStore.user?.userId}">{{ entry.tea_id }}</span>
                             <!-- Delete Button -->
                             <button
-                              v-if="entry.tea_name === authStore.user?.realname"
+                              v-if="entry.tea_id === authStore.user?.userId"
                               class="btn btn-xs btn-ghost btn-circle text-error p-0 align-middle"
                               @click="confirmDeleteTimeline(entry)"
                               title="Delete this log entry"
@@ -205,7 +205,7 @@
           :student="studentForTeacherLog"
           :subcourse-id="id"
           :schedule-id="selectedSchedule.id"
-          :teacher-name="authStore.user?.realname || 'Teacher'"
+          :teacher-id="authStore.user?.userId || 'Teacher'"
           @save="handleTeacherLogSave"
           @close="closeTeacherLogModal"
         />

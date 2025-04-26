@@ -370,7 +370,7 @@ const submitTimelineEntry = async () => {
     // --- Proceed with creating the new entry ---
     const formData = new FormData();
     formData.append('stu_id', props.studentId);
-    formData.append('tea_name', '-'); // Placeholder or get from authStore
+    formData.append('tea_id', '-'); // Placeholder or get from authStore
     formData.append('schedule_id', currentScheduleId);
 
     // Use the determined logTitle for the subschedule field
