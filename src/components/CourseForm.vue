@@ -14,9 +14,9 @@
     </div>
     <div>
       <label class="label" for="course-code">
-        <span class="label-text">Course Code</span>
+        <span class="label-text">课程号,学分,学时</span>
       </label>
-      <input id="course-code" type="text" v-model="formData.code" placeholder="e.g., CS101" class="input input-bordered w-full" required :disabled="!authStore.isAdmin"/>
+      <input id="course-code" type="text" v-model="formData.code" placeholder="e.g., 320001,2,4" class="input input-bordered w-full" required :disabled="!authStore.isAdmin"/>
     </div>
      <div>
       <label class="label" for="course-tea_id">
@@ -44,10 +44,13 @@
     </div>
      <div>
       <label class="label" for="course-term">
-        <span class="label-text">Term (Semester ID)</span>
+        <span class="label-text">学期</span>
       </label>
-      <!-- Consider using a dropdown populated from semesters -->
-      <input id="course-term" type="number" v-model.number="formData.term" placeholder="ID of the semester" class="input input-bordered w-full" required :disabled="!authStore.isAdmin"/>
+      <select id="course-term" v-model.number="formData.term" class="select select-bordered w-full" required :disabled="!authStore.isAdmin">
+        <option value="1">春季</option>
+        <option value="2">秋季</option>
+        <option value="3">暑期</option>
+      </select>
     </div>
 
     <div class="flex justify-end gap-2 pt-4">
