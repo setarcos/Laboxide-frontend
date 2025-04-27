@@ -18,6 +18,12 @@
       </label>
       <input id="lab-manager" type="text" v-model="formData.manager" placeholder="Name of the lab manager" class="input input-bordered w-full" required />
     </div>
+    <div>
+      <label class="label" for="lab-tea-id">
+        <span class="label-text">Manager ID</span>
+      </label>
+      <input id="lab-tea-id" type="text" v-model="formData.tea_id" placeholder="ID of the lab manager" class="input input-bordered w-full" required />
+    </div>
 
     <div class="flex justify-end gap-2 pt-4">
       <button type="button" class="btn btn-ghost" @click="$emit('close')">Cancel</button>
@@ -43,6 +49,7 @@ const defaultFormData = {
     room: '',
     name: '',
     manager: '',
+    tea_id: '',
 }
 
 const formData = ref({ ...defaultFormData })
@@ -57,7 +64,7 @@ watch(() => props.initialData, (newData) => {
 }, { immediate: true });
 
 const submitForm = () => {
-    if (formData.value.room && formData.value.name && formData.value.manager) {
+    if (formData.value.room && formData.value.name && formData.value.manager && formData.value.tea_id) {
         const saveData = formData.value;
         emit('save', saveData);
     } else {

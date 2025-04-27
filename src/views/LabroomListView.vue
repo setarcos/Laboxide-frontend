@@ -26,7 +26,6 @@
       <table class="table table-zebra w-full">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Room Code</th>
             <th>Name</th>
             <th>Manager</th>
@@ -38,7 +37,6 @@
             <td colspan="5" class="text-center italic py-4">No lab rooms found.</td>
           </tr>
           <tr v-for="labroom in labrooms" :key="labroom.id">
-            <th>{{ labroom.id }}</th>
             <td>{{ labroom.room }}</td>
             <td>{{ labroom.name }}</td>
             <td>{{ labroom.manager }}</td>
