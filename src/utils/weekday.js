@@ -38,3 +38,27 @@ export function calculateCurrentWeek(semester) {
     return null;
   }
 }
+
+export function formatTimestamp(timestamp) {
+  if (!timestamp) return '';
+
+  try {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return timestamp;
+
+    // Use localeCompare and options for more robust formatting
+    return new Date(timestamp).toLocaleString('en-CA', { // 'en-CA' gives YYYY-MM-DD, adjust locale as needed
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false, // Use 24-hour format
+      // timeZone: 'UTC' // Or specify the expected time zone
+    });
+  } catch (error) {
+    console.error('Error formatting timestamp:', error);
+    return timestamp;
+  }
+};
+

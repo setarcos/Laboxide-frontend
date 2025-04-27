@@ -64,7 +64,22 @@
           </tr>
           <tr v-for="student in students" :key="student.id">
             <td>{{ student.stu_id }}</td>
-            <td>{{ student.stu_name }}</td>
+            <td>
+              <router-link v-if="isTeacher"
+                :to="{
+                  name: 'StudentTimeline', // Define this route name later
+                  params: { subcourseId: props.id, studentId: student.stu_id }, // Pass IDs in params
+                  state: { studentName: student.stu_name, subcourseName: subcourse?.course_name } // Pass extra info via state
+                }"
+                class="link link-hover link-primary"
+                title="View Student Timeline"
+              >
+                {{ student.stu_name }}
+              </router-link>
+              <span v-else>
+                {{ student.stu_name }}
+              </span>
+            </td>
             <td class="text-center">
               <!-- Make seat clickable for teachers -->
               <button

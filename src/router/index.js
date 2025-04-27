@@ -14,6 +14,7 @@ const NotFoundView = () => import('@/views/NotFoundView.vue')
 const CourseDetailView = () => import('@/views/CourseDetailView.vue')
 const SubcourseStudentsView = () => import('@/views/SubcourseStudentsView.vue')
 const SubcourseProgressView = () => import('@/views/SubcourseProgressView.vue')
+const StudentTimelineView = () => import('@/views/StudentTimelineView.vue');
 
 const routes = [
   {
@@ -90,6 +91,13 @@ const routes = [
     component: SubcourseProgressView, // Use imported component
     props: true, // Pass route param 'id' as prop
     meta: { requiresAuth: true, title: '学生进度' } // Protect route
+  },
+  {
+    path: '/timeline/:subcourseId/:studentId/',
+    name: 'StudentTimeline',
+    component: StudentTimelineView,
+    props: true, // Pass route params (subcourseId, studentId) as props
+    meta: { requiresAuth: true, title: '学生时间线' }
   },
 ]
 
