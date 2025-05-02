@@ -359,9 +359,10 @@ const submitTimelineEntry = async () => {
          // Optimistically update the local list to remove the deleted entry
          existingTimelineEntries.value = existingTimelineEntries.value.filter(entry => entry.id !== entryToDeleteId);
       } catch (deleteErr) {
-        // Log the error but proceed with creating the new entry as requested
-        console.error(`Failed to delete previous entry ID ${entryToDeleteId}. Proceeding with creation anyway:`, deleteErr);
-        // It's possible the deletion failed, but we still want to try creating the new log.
+        console.error(`Failed to delete previous entry ID ${entryToDeleteId}. :`, deleteErr);
+        saveError.value = "Failed to delete previous entry.";
+        isSaving.value = false;
+        return;
       }
     } else {
         console.log(`No previous entry found with title "${logTitleToSave}" in week ${props.currentWeek}. Creating a new entry.`);
