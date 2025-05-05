@@ -65,14 +65,14 @@
           <tr v-for="student in students" :key="student.id">
             <td>{{ student.stu_id }}</td>
             <td>
-              <router-link v-if="isTeacher"
+              <router-link v-if="isTeacher || authStore.user.userId === student.stu_id"
                 :to="{
                   name: 'StudentTimeline', // Define this route name later
                   params: { subcourseId: props.id, studentId: student.stu_id }, // Pass IDs in params
                   state: { studentName: student.stu_name, subcourseName: subcourse?.course_name } // Pass extra info via state
                 }"
                 class="link link-hover link-primary"
-                title="View Student Timeline"
+                :title="isTeacher ? 'View Student Timeline' : 'View Your Timeline'"
               >
                 {{ student.stu_name }}
               </router-link>
