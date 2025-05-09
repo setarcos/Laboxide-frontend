@@ -354,47 +354,11 @@ const semesterGreeting = computed(() => {
   }
 
   const semester = semesterStore.currentSemester;
-  // --- IMPORTANT: Adjust field names 'name', 'start_date', 'end_date' ---
-  const semesterName = semester.name;
-  const startDateStr = semester.start;
-  const endDateStr = semester.end;
 
-  if (!semesterName || !startDateStr || !endDateStr) {
-    console.warn("Semester data missing name, start_date, or end_date:", semester);
-    return "Current semester data is incomplete.";
-  }
-
-  try {
-    const now = new Date();
-    const startDate = new Date(startDateStr);
-    const endDate = new Date(endDateStr);
-
-    // Check if dates are valid
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      console.error("Invalid date format in semester data:", startDateStr, endDateStr);
-      return "Could not parse semester dates.";
-    }
-
-    // Set hours to 0 to compare dates only, prevent timezone issues affecting day comparison
-    now.setHours(0, 0, 0, 0);
-    startDate.setHours(0, 0, 0, 0);
-    endDate.setHours(0, 0, 0, 0); // Consider comparing against end of day if needed
-
-    if (now < startDate) {
-      return `The ${semesterName} semester hasn't started yet. Currently on vacation.`;
-    } else if (now > endDate) {
-      return `The ${semesterName} semester has ended. Currently on vacation.`;
-    } else {
-      // Calculate week number (Week 1 starts on startDate)
-      const diffTime = Math.abs(now - startDate);
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // Use floor for completed days
-      const currentWeek = Math.floor(diffDays / 7) + 1; // Add 1 because week 1 starts at day 0
-
-      return `Welcome to Week ${currentWeek} of the ${semesterName} semester!`;
-    }
-  } catch (e) {
-    console.error("Error calculating semester week:", e);
-    return "Could not determine the current week.";
+  if (currentWeekNumber.value) {
+    return `Welcome to Week ${currentWeekNumber.value} of the ${semester.name} semester!`;
+  } else {
+    return "Currently on vacation~!";
   }
 });
 
