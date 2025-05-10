@@ -57,7 +57,7 @@
 
       <!-- Recent Logs Loading/Error (Optional - display here or elsewhere) -->
       <div v-if="isLoading.recentLogs" class="text-center text-sm text-gray-500">
-         Fetching recent final logs... <span class="loading loading-dots loading-xs"></span>
+        Fetching recent final logs... <span class="loading loading-dots loading-xs"></span>
       </div>
       <div v-else-if="error.recentLogs" class="alert alert-error shadow-sm my-2 text-sm">
         Error fetching recent logs: {{ error.recentLogs }}
@@ -121,15 +121,15 @@
 
                     <!-- Button to FORCE a new, CONFIRMED Final Log -->
                     <button
-                       v-else-if="!studentData.recentLogForStudent && selectedSchedule?.id"
-                       class="btn btn-xs btn-outline btn-warning"
-                       @click="confirmForceLog(studentData.student)"
-                       title="Force a 'Final Log' entry for this student for the current week"
-                       :disabled="isLoading.forceLog === studentData.student.stu_id || isLoading.weekly || isLoading.confirmLog"
-                     >
-                       <span v-if="isLoading.forceLog === studentData.student.stu_id" class="loading loading-spinner loading-sm mr-1"></span>
-                       Force Log
-                     </button>
+                      v-else-if="!studentData.recentLogForStudent && selectedSchedule?.id"
+                      class="btn btn-xs btn-outline btn-warning"
+                      @click="confirmForceLog(studentData.student)"
+                      title="Force a 'Final Log' entry for this student for the current week"
+                      :disabled="isLoading.forceLog === studentData.student.stu_id || isLoading.weekly || isLoading.confirmLog"
+                    >
+                      <span v-if="isLoading.forceLog === studentData.student.stu_id" class="loading loading-spinner loading-sm mr-1"></span>
+                      Force Log
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -154,13 +154,13 @@
                             <!-- Note/File Display -->
                             <span v-if="entry.notetype === 0">{{ entry.note }}</span>
                             <a v-else-if="entry.notetype === 1"
-                                href="#"
-                                @click.prevent="handleFileClick(entry)"
-                                class="link link-hover text-info break-all"
-                                :title="`Download or Preview ${entry.note}`"
+                              href="#"
+                              @click.prevent="handleFileClick(entry)"
+                              class="link link-hover text-info break-all"
+                              :title="`Download or Preview ${entry.note}`"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                {{ entry.note }}
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                              {{ entry.note }}
                             </a>
                           </div>
                           <div class="text-right flex-shrink-0 ml-2 whitespace-nowrap">
@@ -236,36 +236,36 @@
           Confirm Final Log for {{ currentLogToConfirm?.stu_name }}
         </h3>
         <div v-if="currentLogToConfirm">
-            <p class="mb-3">Student's Note:</p>
-            <div class="p-3 bg-base-300 rounded-box mb-4 max-h-40 overflow-y-auto text-sm">
-                {{ currentLogToConfirm.note || 'No student note provided.' }}
-            </div>
+          <p class="mb-3">Student's Note:</p>
+          <div class="p-3 bg-base-300 rounded-box mb-4 max-h-40 overflow-y-auto text-sm">
+            {{ currentLogToConfirm.note || 'No student note provided.' }}
+          </div>
 
-            <div class="form-control mb-4">
-                <label class="label">
-                    <span class="label-text">Teacher's Confirmation Note (Optional):</span>
-                </label>
-                <textarea
-                    class="textarea textarea-bordered h-24"
-                    v-model="teacherConfirmationNote"
-                    placeholder="Add any notes about the confirmation..."
-                ></textarea>
-            </div>
+          <div class="form-control mb-4">
+            <label class="label">
+              <span class="label-text">Teacher's Confirmation Note (Optional):</span>
+            </label>
+            <textarea
+              class="textarea textarea-bordered h-24"
+              v-model="teacherConfirmationNote"
+              placeholder="Add any notes about the confirmation..."
+            ></textarea>
+          </div>
 
-            <div class="modal-action">
-                <button
-                    class="btn btn-success"
-                    @click="handleConfirmLog"
-                    :disabled="isLoading.confirmLog"
-                >
-                  <span v-if="isLoading.confirmLog" class="loading loading-spinner loading-sm mr-2"></span>
-                  Confirm Log
-                </button>
-                <button class="btn" @click="closeConfirmModalForLog" :disabled="isLoading.confirmLog">Cancel</button>
-            </div>
-             <div v-if="error.confirmLog" class="text-error text-sm mt-2">
-                Error: {{ error.confirmLog }}
-            </div>
+          <div class="modal-action">
+            <button
+              class="btn btn-success"
+              @click="handleConfirmLog"
+              :disabled="isLoading.confirmLog"
+            >
+              <span v-if="isLoading.confirmLog" class="loading loading-spinner loading-sm mr-2"></span>
+              Confirm Log
+            </button>
+            <button class="btn" @click="closeConfirmModalForLog" :disabled="isLoading.confirmLog">Cancel</button>
+          </div>
+          <div v-if="error.confirmLog" class="text-error text-sm mt-2">
+            Error: {{ error.confirmLog }}
+          </div>
         </div>
         <div v-else class="text-center text-warning p-4">
           Cannot confirm log: Log information is missing.
@@ -532,7 +532,7 @@ const fetchInitialData = async () => {
     isLoading.initial = false;
     // Fetch recent logs after initial student/subcourse data is loaded.
     // This does not need to be awaited, can run in parallel.
-     fetchRecentLogs();
+    fetchRecentLogs();
   }
 };
 
@@ -541,8 +541,8 @@ const fetchWeeklyData = async () => {
   // Prevent fetching if selectedWeek is still null OR initial load is still running
   // (The check in onMounted handles the initial call after initial load)
   if (selectedWeek.value === null || isLoading.initial) {
-       console.log("Skipping weekly fetch: selectedWeek is null or initial load is pending.");
-       return;
+    console.log("Skipping weekly fetch: selectedWeek is null or initial load is pending.");
+    return;
   }
 
   isLoading.weekly = true;
@@ -556,35 +556,35 @@ const fetchWeeklyData = async () => {
     const scheduleForWeek = schedules.value.find(s => s.week === selectedWeek.value);
 
     if (!scheduleForWeek) {
-       // This is not necessarily an error if a course has gaps in weeks
-       console.warn(`No schedule found for Week ${selectedWeek.value}.`);
-       error.weekly = `No schedule details available for Week ${selectedWeek.value}. Progress tracking might be unavailable.`;
-       subSchedulesForWeek.value = []; // Ensure steps are empty
-       timelineEntries.value = {}; // Ensure timelines are empty
-       selectedSchedule.value = null; // Ensure selectedSchedule is null if no schedule found
+      // This is not necessarily an error if a course has gaps in weeks
+      console.warn(`No schedule found for Week ${selectedWeek.value}.`);
+      error.weekly = `No schedule details available for Week ${selectedWeek.value}. Progress tracking might be unavailable.`;
+      subSchedulesForWeek.value = []; // Ensure steps are empty
+      timelineEntries.value = {}; // Ensure timelines are empty
+      selectedSchedule.value = null; // Ensure selectedSchedule is null if no schedule found
     } else {
-        selectedSchedule.value = scheduleForWeek;
-        // Fetch sub-schedules (steps) for this week
-        const subSchedulesRes = await dataService.getSubSchedules(selectedSchedule.value.id);
-        subSchedulesForWeek.value = (subSchedulesRes.data || []).sort((a, b) => a.step - b.step);
+      selectedSchedule.value = scheduleForWeek;
+      // Fetch sub-schedules (steps) for this week
+      const subSchedulesRes = await dataService.getSubSchedules(selectedSchedule.value.id);
+      subSchedulesForWeek.value = (subSchedulesRes.data || []).sort((a, b) => a.step - b.step);
 
-        // Fetch all timeline entries for this subcourse AND this week's schedule_id
-        // Note: Backend listTimelinesBySchedule might not filter by schedule_id
-        // If it fetches ALL timelines for subcourse, need to filter by entry.schedule_id === selectedSchedule.value.id
-        // Assuming it DOES filter by schedule_id based on the service function name
-        const timelineRes = await dataService.listTimelinesBySchedule(props.id, selectedSchedule.value.id);
-        const allWeeklyEntries = timelineRes.data || [];
+      // Fetch all timeline entries for this subcourse AND this week's schedule_id
+      // Note: Backend listTimelinesBySchedule might not filter by schedule_id
+      // If it fetches ALL timelines for subcourse, need to filter by entry.schedule_id === selectedSchedule.value.id
+      // Assuming it DOES filter by schedule_id based on the service function name
+      const timelineRes = await dataService.listTimelinesBySchedule(props.id, selectedSchedule.value.id);
+      const allWeeklyEntries = timelineRes.data || [];
 
-        // Group entries by student ID
-        const groupedEntries = {};
-        allWeeklyEntries.forEach(entry => {
-          if (!groupedEntries[entry.stu_id]) {
-            groupedEntries[entry.stu_id] = [];
-          }
-          groupedEntries[entry.stu_id].push(entry);
-        });
-        timelineEntries.value = groupedEntries;
-        error.weekly = null; // Clear any previous weekly error if fetch succeeds
+      // Group entries by student ID
+      const groupedEntries = {};
+      allWeeklyEntries.forEach(entry => {
+        if (!groupedEntries[entry.stu_id]) {
+          groupedEntries[entry.stu_id] = [];
+        }
+        groupedEntries[entry.stu_id].push(entry);
+      });
+      timelineEntries.value = groupedEntries;
+      error.weekly = null; // Clear any previous weekly error if fetch succeeds
     }
 
   } catch (err) {
@@ -653,105 +653,105 @@ const handleTeacherLogSave = async (/* Maybe receive feedback? */) => {
 
 // --- Confirm Final Log Methods ---
 const openConfirmModalForLog = (log) => {
-    error.confirmLog = null; // Clear previous error
-    isLoading.confirmLog = false; // Reset loading
-    currentLogToConfirm.value = log;
-    teacherConfirmationNote.value = ''; // Reset note
-    showConfirmModalForLog.value = true;
+  error.confirmLog = null; // Clear previous error
+  isLoading.confirmLog = false; // Reset loading
+  currentLogToConfirm.value = log;
+  teacherConfirmationNote.value = ''; // Reset note
+  showConfirmModalForLog.value = true;
 };
 
 const closeConfirmModalForLog = () => {
-    showConfirmModalForLog.value = false;
-    currentLogToConfirm.value = null;
-    teacherConfirmationNote.value = '';
-    error.confirmLog = null;
-    isLoading.confirmLog = false;
+  showConfirmModalForLog.value = false;
+  currentLogToConfirm.value = null;
+  teacherConfirmationNote.value = '';
+  error.confirmLog = null;
+  isLoading.confirmLog = false;
 };
 
 const handleConfirmLog = async () => {
-    if (!currentLogToConfirm.value) {
-        error.confirmLog = "No log selected for confirmation.";
-        return;
-    }
+  if (!currentLogToConfirm.value) {
+    error.confirmLog = "No log selected for confirmation.";
+    return;
+  }
 
-    isLoading.confirmLog = true;
-    error.confirmLog = null;
+  isLoading.confirmLog = true;
+  error.confirmLog = null;
 
-    try {
-        // Prepare data for the API call
-        const logId = currentLogToConfirm.value.id;
-        const data = { tea_note: teacherConfirmationNote.value }; // API expects { tea_note: string }
+  try {
+    // Prepare data for the API call
+    const logId = currentLogToConfirm.value.id;
+    const data = { tea_note: teacherConfirmationNote.value }; // API expects { tea_note: string }
 
-        // Call the data service
-        await dataService.confirmStudentLog(logId, data);
+    // Call the data service
+    await dataService.confirmStudentLog(logId, data);
 
-        // Confirmation successful
-        closeConfirmModalForLog();
-        // Refresh the list of *all* recent logs to update the confirmed status
-        // and potentially remove the unconfirmed log/button
-        await fetchRecentLogs();
-        // Optional: Show a success message
-        // alert(`Final log for ${currentLogToConfirm.value.stu_name} confirmed.`); // Or use a toast
+    // Confirmation successful
+    closeConfirmModalForLog();
+    // Refresh the list of *all* recent logs to update the confirmed status
+    // and potentially remove the unconfirmed log/button
+    await fetchRecentLogs();
+    // Optional: Show a success message
+    // alert(`Final log for ${currentLogToConfirm.value.stu_name} confirmed.`); // Or use a toast
 
-    } catch (err) {
-        console.error("Failed to confirm student log:", err);
-        error.confirmLog = err.response?.data?.error || err.message || 'Unknown error during confirmation.';
-        // Keep modal open to show the error
-    } finally {
-        isLoading.confirmLog = false;
-    }
+  } catch (err) {
+    console.error("Failed to confirm student log:", err);
+    error.confirmLog = err.response?.data?.error || err.message || 'Unknown error during confirmation.';
+    // Keep modal open to show the error
+  } finally {
+    isLoading.confirmLog = false;
+  }
 };
 
 // --- Force Final Log Methods ---
 const confirmForceLog = (student) => {
-    if (!selectedSchedule.value) {
-       alert("Cannot force log: No schedule loaded for the selected week.");
-       return;
-    }
-    error.forceLog = null; // Clear previous error
-    studentToForceLog.value = student;
-    showForceConfirm.value = true;
+  if (!selectedSchedule.value) {
+    alert("Cannot force log: No schedule loaded for the selected week.");
+    return;
+  }
+  error.forceLog = null; // Clear previous error
+  studentToForceLog.value = student;
+  showForceConfirm.value = true;
 };
 
 const cancelForceLog = () => {
-    showForceConfirm.value = false;
-    studentToForceLog.value = null;
-    error.forceLog = null; // Clear error on cancel
+  showForceConfirm.value = false;
+  studentToForceLog.value = null;
+  error.forceLog = null; // Clear error on cancel
 };
 
 const handleForceLog = async () => {
-    if (!studentToForceLog.value || !selectedSchedule.value) {
-        console.warn("Attempted to force log without a selected student or schedule.");
-        // Ensure confirm dialog is closed and state reset
-        cancelForceLog();
-        return;
-    }
+  if (!studentToForceLog.value || !selectedSchedule.value) {
+    console.warn("Attempted to force log without a selected student or schedule.");
+    // Ensure confirm dialog is closed and state reset
+    cancelForceLog();
+    return;
+  }
 
-    // Close the confirm dialog immediately
-    showForceConfirm.value = false;
+  // Close the confirm dialog immediately
+  showForceConfirm.value = false;
 
-    isLoading.forceLog = studentToForceLog.value.stu_id; // Set loading state for this specific student
-    error.forceLog = null; // Clear previous error
+  isLoading.forceLog = studentToForceLog.value.stu_id; // Set loading state for this specific student
+  error.forceLog = null; // Clear previous error
 
-    try {
-        // Call the new force API
-        await dataService.forceStudentLog(props.id, studentToForceLog.value.stu_id);
+  try {
+    // Call the new force API
+    await dataService.forceStudentLog(props.id, studentToForceLog.value.stu_id);
 
-        // Force successful!
-        // Refresh recent logs to update UI (hide Force button, potentially change bar color)
-        await fetchRecentLogs();
+    // Force successful!
+    // Refresh recent logs to update UI (hide Force button, potentially change bar color)
+    await fetchRecentLogs();
 
-        // TODO: Add success notification (e.g., toast) - "Forced final log for [student name]"
+    // TODO: Add success notification (e.g., toast) - "Forced final log for [student name]"
 
-    } catch (err) {
-        console.error(`Failed to force log for student ${studentToForceLog.value.stu_id}:`, err);
-        error.forceLog = err.response?.data?.error || err.message || 'Unknown error forcing log.';
-        // Display error - maybe alert or a specific error message area
-        alert(`Failed to force log for ${studentToForceLog.value.stu_name}: ${error.forceLog}`);
-    } finally {
-        isLoading.forceLog = null; // Reset loading state
-        studentToForceLog.value = null; // Clear student reference
-    }
+  } catch (err) {
+    console.error(`Failed to force log for student ${studentToForceLog.value.stu_id}:`, err);
+    error.forceLog = err.response?.data?.error || err.message || 'Unknown error forcing log.';
+    // Display error - maybe alert or a specific error message area
+    alert(`Failed to force log for ${studentToForceLog.value.stu_name}: ${error.forceLog}`);
+  } finally {
+    isLoading.forceLog = null; // Reset loading state
+    studentToForceLog.value = null; // Clear student reference
+  }
 };
 
 
@@ -797,15 +797,15 @@ watch(selectedWeek, (newWeek, oldWeek) => {
   // but *only if* initial load is finished (!isLoading.initial).
   // The *initial* fetch after load is handled below in onMounted.
   if (newWeek !== null && newWeek !== oldWeek && !isLoading.initial) {
-      console.log(`selectedWeek changed from ${oldWeek} to ${newWeek}. Triggering weekly data fetch.`);
-      fetchWeeklyData();
+    console.log(`selectedWeek changed from ${oldWeek} to ${newWeek}. Triggering weekly data fetch.`);
+    fetchWeeklyData();
   } else if (newWeek === null && oldWeek !== null) {
-      // Handle case where week might be unset, clear data
-      console.log("selectedWeek unset. Clearing weekly data.");
-      selectedSchedule.value = null;
-      subSchedulesForWeek.value = [];
-      timelineEntries.value = {};
-      error.weekly = null; // Clear weekly error if any
+    // Handle case where week might be unset, clear data
+    console.log("selectedWeek unset. Clearing weekly data.");
+    selectedSchedule.value = null;
+    subSchedulesForWeek.value = [];
+    timelineEntries.value = {};
+    error.weekly = null; // Clear weekly error if any
   }
 }, { immediate: false }); // Immediate is false here because initial fetch is handled in onMounted
 
@@ -835,15 +835,15 @@ onMounted(async () => {
   //    trigger the fetch for the *first* week's detailed data.
   //    The selectedWeek watcher handles subsequent changes from the dropdown.
   if (selectedWeek.value !== null) {
-      console.log("Initial data fetch complete. Triggering first weekly data fetch for week:", selectedWeek.value);
-      // Await this to ensure data is there before table renders fully for the first time
-      await fetchWeeklyData();
+    console.log("Initial data fetch complete. Triggering first weekly data fetch for week:", selectedWeek.value);
+    // Await this to ensure data is there before table renders fully for the first time
+    await fetchWeeklyData();
   } else if (students.value.length > 0) {
-       // Edge case: students loaded but no schedules and no current week could be determined.
-       // selectedWeek remains 1 default, but fetchWeeklyData didn't find a schedule.
-       // The error.weekly message should explain this.
-       console.warn("No selected week determined after initial fetch or no schedule found for week 1. Weekly data will not load.");
-       // In this case, error.weekly would already be set by fetchWeeklyData if it ran and failed to find a schedule.
+    // Edge case: students loaded but no schedules and no current week could be determined.
+    // selectedWeek remains 1 default, but fetchWeeklyData didn't find a schedule.
+    // The error.weekly message should explain this.
+    console.warn("No selected week determined after initial fetch or no schedule found for week 1. Weekly data will not load.");
+    // In this case, error.weekly would already be set by fetchWeeklyData if it ran and failed to find a schedule.
   }
 
   // fetchRecentLogs is already called in the finally block of fetchInitialData,

@@ -8,11 +8,11 @@
       Please log in to access more features.
     </p>
 
-        <!-- Semester Greeting -->
+    <!-- Semester Greeting -->
     <p class="mt-2 text-lg text-info font-medium">
-        <span v-if="semesterStore.isSemesterLoading" class="loading loading-dots loading-sm"></span>
-        <span v-else-if="semesterStore.semesterError" class="text-error">⚠️ Could not load semester info.</span>
-        <span v-else>{{ semesterGreeting }}</span>
+      <span v-if="semesterStore.isSemesterLoading" class="loading loading-dots loading-sm"></span>
+      <span v-else-if="semesterStore.semesterError" class="text-error">⚠️ Could not load semester info.</span>
+      <span v-else>{{ semesterGreeting }}</span>
     </p>
 
     <div v-if="authStore.isTeacher | authStore.isStudent" class="divider"></div>
@@ -35,15 +35,14 @@
         </div>
 
         <!-- Loading State for Final Log Statuses -->
-         <div v-if="isLoadingFinalLogStatuses" class="text-center text-sm text-gray-500 my-2">
-           <span class="loading loading-dots loading-xs"></span> Checking final log statuses...
-         </div>
+        <div v-if="isLoadingFinalLogStatuses" class="text-center text-sm text-gray-500 my-2">
+          <span class="loading loading-dots loading-xs"></span> Checking final log statuses...
+        </div>
 
         <!-- Error State for Final Log Statuses -->
         <div v-else-if="finalLogStatusesError" class="alert alert-error shadow-sm my-2 text-sm">
-           Error checking final log statuses: {{ finalLogStatusesError }}
+          Error checking final log statuses: {{ finalLogStatusesError }}
         </div>
-
 
         <!-- Course List Table -->
         <div v-else-if="myCourses.length > 0" class="overflow-x-auto">
@@ -76,27 +75,27 @@
                   >
                     {{ getWeekdayName(course.weekday) }}
                   </router-link>
-                   <span v-else>{{ getWeekdayName(course.weekday) }}</span>
+                  <span v-else>{{ getWeekdayName(course.weekday) }}</span>
                 </td>
                 <td>{{ course.room_name }}</td>
                 <td>
-                    <button v-if="authStore.isStudent"
-                        class="btn btn-xs btn-outline btn-primary"
-                        @click="handleLogButtonClick(course)"
-                        :disabled="!currentWeekNumber || hasConfirmedLog(course.id)"
-                        :title="getLogButtonTitle(course.id)"
+                  <button v-if="authStore.isStudent"
+                    class="btn btn-xs btn-outline btn-primary"
+                    @click="handleLogButtonClick(course)"
+                    :disabled="!currentWeekNumber || hasConfirmedLog(course.id)"
+                    :title="getLogButtonTitle(course.id)"
+                  >
+                    <span>{{ hasConfirmedLog(course.id) ? 'Log Confirmed' : 'Log Progress' }}</span>
+                  </button>
+                  <div v-if="authStore.isTeacher" class="flex gap-1">
+                    <router-link
+                      :to="{ name: 'SubcourseProgress', params: { id: course.id } }"
+                      class="btn btn-xs btn-outline btn-secondary"
+                      title="View Student Progress"
                     >
-                       <span>{{ hasConfirmedLog(course.id) ? 'Log Confirmed' : 'Log Progress' }}</span>
-                    </button>
-                    <div v-if="authStore.isTeacher" class="flex gap-1">
-                         <router-link
-                            :to="{ name: 'SubcourseProgress', params: { id: course.id } }"
-                            class="btn btn-xs btn-outline btn-secondary"
-                            title="View Student Progress"
-                         >
-                            View Progress
-                         </router-link>
-                    </div>
+                      View Progress
+                    </router-link>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -113,69 +112,69 @@
 
     <div class="divider" v-if="isSuper"></div>
     <div class="mt-6 p-4 bg-base-200 rounded-box" v-if="isSuper">
-       <h3 class="text-lg font-semibold mb-2">Quick Actions</h3>
-       <div class="flex flex-wrap gap-2">
-            <router-link v-if="authStore.isAdmin | authStore.isTeacher" :to="{ name: 'Courses'}" class="btn btn-sm btn-outline">Manage Courses</router-link>
-            <router-link v-if="authStore.isAdmin | authStore.isLabManager" :to="{ name: 'Labrooms'}" class="btn btn-sm btn-outline">Manage Lab Rooms</router-link>
-            <router-link v-if="authStore.isAdmin" :to="{ name: 'Users'}" class="btn btn-sm btn-outline">Manage Users</router-link>
-            <router-link v-if="authStore.isAdmin" :to="{ name: 'Semesters'}" class="btn btn-sm btn-outline">Manage Semesters</router-link>
-       </div>
+      <h3 class="text-lg font-semibold mb-2">Quick Actions</h3>
+      <div class="flex flex-wrap gap-2">
+        <router-link v-if="authStore.isAdmin | authStore.isTeacher" :to="{ name: 'Courses'}" class="btn btn-sm btn-outline">Manage Courses</router-link>
+        <router-link v-if="authStore.isAdmin | authStore.isLabManager" :to="{ name: 'Labrooms'}" class="btn btn-sm btn-outline">Manage Lab Rooms</router-link>
+        <router-link v-if="authStore.isAdmin" :to="{ name: 'Users'}" class="btn btn-sm btn-outline">Manage Users</router-link>
+        <router-link v-if="authStore.isAdmin" :to="{ name: 'Semesters'}" class="btn btn-sm btn-outline">Manage Semesters</router-link>
+      </div>
     </div>
 
     <!-- Timeline Log Modal -->
     <dialog id="timeline_log_modal" class="modal" :open="showTimelineModal">
-        <div class="modal-box w-11/12 max-w-3xl">
-             <TimelineLogModal
-                v-if="selectedSubcourseForTimeline && currentWeekNumber && authStore.user"
-                :key="timelineModalKey"
-                :subcourse="selectedSubcourseForTimeline"
-                :student-id="authStore.user.userId"
-                :current-week="currentWeekNumber"
-                @close="closeTimelineModal"
-                @request-finish-log="handleRequestFinishLog"
-                @log-saved="handleTimelineLogSaved"
-             />
-             <div v-else class="p-4 text-center text-error">
-                Missing data required to open the timeline log.
-             </div>
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeTimelineModal">✕</button>
+      <div class="modal-box w-11/12 max-w-3xl">
+        <TimelineLogModal
+          v-if="selectedSubcourseForTimeline && currentWeekNumber && authStore.user"
+          :key="timelineModalKey"
+          :subcourse="selectedSubcourseForTimeline"
+          :student-id="authStore.user.userId"
+          :current-week="currentWeekNumber"
+          @close="closeTimelineModal"
+          @request-finish-log="handleRequestFinishLog"
+          @log-saved="handleTimelineLogSaved"
+        />
+        <div v-else class="p-4 text-center text-error">
+          Missing data required to open the timeline log.
         </div>
-        <form method="dialog" class="modal-backdrop">
-            <button @click="closeTimelineModal">close</button>
-        </form>
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeTimelineModal">✕</button>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button @click="closeTimelineModal">close</button>
+      </form>
     </dialog>
 
     <!-- Student Log Modal (Final Step) -->
     <dialog id="finish_log_modal" class="modal" :open="showFinishLogModal">
-        <div class="modal-box w-11/12 max-w-2xl">
-            <h3 class="font-bold text-lg mb-4">
-                 Final Experiment Log for {{ selectedSubcourseForFinishLog?.course_name }} ({{ getWeekdayName(selectedSubcourseForFinishLog?.weekday) }})
-            </h3>
+      <div class="modal-box w-11/12 max-w-2xl">
+        <h3 class="font-bold text-lg mb-4">
+          Final Experiment Log for {{ selectedSubcourseForFinishLog?.course_name }} ({{ getWeekdayName(selectedSubcourseForFinishLog?.weekday) }})
+        </h3>
 
-            <div v-if="isLoadingFinishLogDefaults" class="text-center p-10">
-                <span class="loading loading-lg loading-spinner text-info"></span>
-                <p>Loading final log data...</p>
-            </div>
-             <div v-else-if="finishLogDefaultError" class="alert alert-error">
-                Could not load final log data: {{ finishLogDefaultError }}
-             </div>
-             <StudentLogForm
-                v-else-if="finishLogDefaultData"
-                :key="finishLogFormKey"
-                :initial-data="finishLogDefaultData"
-                :is-saving="isSavingFinishLog"
-                @save="handleFinishLogSave"
-                @close="closeFinishLogModal"
-             />
-              <div v-else class="text-center p-5 text-warning">
-                 Could not display final log form. Default data unavailable.
-              </div>
-
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeFinishLogModal">✕</button>
+        <div v-if="isLoadingFinishLogDefaults" class="text-center p-10">
+          <span class="loading loading-lg loading-spinner text-info"></span>
+          <p>Loading final log data...</p>
         </div>
-        <form method="dialog" class="modal-backdrop">
-            <button @click="closeFinishLogModal">close</button>
-        </form>
+        <div v-else-if="finishLogDefaultError" class="alert alert-error">
+          Could not load final log data: {{ finishLogDefaultError }}
+        </div>
+        <StudentLogForm
+          v-else-if="finishLogDefaultData"
+          :key="finishLogFormKey"
+          :initial-data="finishLogDefaultData"
+          :is-saving="isSavingFinishLog"
+          @save="handleFinishLogSave"
+          @close="closeFinishLogModal"
+        />
+        <div v-else class="text-center p-5 text-warning">
+          Could not display final log form. Default data unavailable.
+        </div>
+
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeFinishLogModal">✕</button>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button @click="closeFinishLogModal">close</button>
+      </form>
     </dialog>
 
   </div>
