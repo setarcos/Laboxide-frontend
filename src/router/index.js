@@ -15,6 +15,7 @@ const CourseDetailView = () => import('@/views/CourseDetailView.vue')
 const SubcourseStudentsView = () => import('@/views/SubcourseStudentsView.vue')
 const SubcourseProgressView = () => import('@/views/SubcourseProgressView.vue')
 const StudentTimelineView = () => import('@/views/StudentTimelineView.vue');
+const StudentLogsView = () => import('@/views/StudentLogsView.vue');
 
 const routes = [
   {
@@ -98,6 +99,13 @@ const routes = [
     component: StudentTimelineView,
     props: true, // Pass route params (subcourseId, studentId) as props
     meta: { requiresAuth: true, title: '学生时间线' }
+  },
+  {
+    path: '/labrooms/logs/:roomId', // The new route
+    name: 'StudentLogs',
+    component: StudentLogsView,
+    props: true,
+    meta: { requiresAuth: true, title: '学生日志' }
   },
 ]
 
