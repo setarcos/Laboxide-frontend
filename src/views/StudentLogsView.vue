@@ -7,8 +7,7 @@
       </router-link>
     </div>
 
-    <h1 class="text-2xl font-semibold mb-4"> Student Logs for {{ pageTitleRoomName }}
-      Student Logs for Room ID: {{ roomId }}</h1>
+    <h1 class="text-2xl font-semibold mb-4"> Student Logs for {{ fetchedRoomName || `Room ID: ${props.roomId}` }}</h1>
 
     <!-- Time Range Filter -->
     <div class="card bg-base-100 shadow-xl mb-6">
@@ -94,19 +93,19 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 import * as dataService from '@/services/dataService';
 import { formatTimestamp } from '@/utils/weekday';
 
-const route = useRoute();
-const router = useRouter();
-
-const roomId = computed(() => route.params.roomId);
-const passedRoomName = computed(() => route.query.roomName);
-
-const pageTitleRoomName = computed(() => {
-  return passedRoomName.value || `Room ID: ${roomId.value}`;
+const props = defineProps({
+  roomId: {
+    type: [String, Number],
+    required: true
+  }
 });
+
+const fetchedRoomName = ref('');
+const isLoadingRoomDetails = ref(true); // For loading state of room details
+const roomDetailsError = ref(null);
 
 const logs = ref([]);
 const isLoading = ref(false); // For fetch button
@@ -116,7 +115,7 @@ const filterError = ref(''); // For errors related to time range input
 const searchedOnce = ref(false); // To track if a search has been attempted
 
 const now = new Date();
-const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+const oneDayAgo= new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
 // Format to YYYY-MM-DDTHH:MM (for datetime-local input)
 const formatInputDateTime = (date) => {
@@ -128,9 +127,23 @@ const formatInputDateTime = (date) => {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
 
-const startTime = ref(formatInputDateTime(oneHourAgo));
+const startTime = ref(formatInputDateTime(oneDayAgo));
 const endTime = ref(formatInputDateTime(now));
 
+const fetchRoomDetails = async () => {
+  isLoadingRoomDetails.value = true;
+  roomDetailsError.value = null;
+  try {
+    const response = await dataService.getLabroom(props.roomId);
+    fetchedRoomName.value = response.data.name;
+  } catch (err) {
+    console.error("Failed to fetch room details:", err);
+    roomDetailsError.value = err.response?.data || err;
+    fetchedRoomName.value = ''; // Clear on error
+  } finally {
+    isLoadingRoomDetails.value = false;
+  }
+};
 
 const fetchLogs = async () => {
   if (!startTime.value || !endTime.value) {
@@ -155,7 +168,7 @@ const fetchLogs = async () => {
       start_time: startTime.value + ":00",
       end_time: endTime.value + ":00",
     };
-    const response = await dataService.getStudentLogsByRoom(roomId.value, rangeData);
+    const response = await dataService.getStudentLogsByRoom(props.roomId, rangeData);
     logs.value = response.data;
   } catch (err) {
     console.error("Failed to fetch student logs:", err);
@@ -181,6 +194,12 @@ const formatDisplayDateTime = (dateTimeString) => {
   }
 };
 
+onMounted(() => {
+  fetchRoomDetails();
+  if (startTime.value && endTime.value) {
+    fetchLogs();
+  }
+});
 </script>
 
 <style scoped>

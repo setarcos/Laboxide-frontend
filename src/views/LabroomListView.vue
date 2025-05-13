@@ -39,11 +39,7 @@
           <tr v-for="labroom in labrooms" :key="labroom.id">
             <td>{{ labroom.room }}</td>
             <td><router-link
-              :to="{
-                  name: 'StudentLogs',
-                  params: { roomId: labroom.id },
-                  query: { roomName: labroom.name }
-                }"
+              :to="{ name: 'StudentLogs', params: { roomId: labroom.id }, }"
                 class="link link-hover link-primary"
               >
               {{ labroom.name }}
