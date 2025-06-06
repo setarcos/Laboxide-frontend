@@ -1,12 +1,20 @@
 // src/utils/fileops.js
-import { ref } from 'vue';
+import { ref } from "vue";
 
 // Helper function (can be kept internal to the composable)
 export const isImageFile = (filename) => {
-  if (!filename || typeof filename !== 'string') return false;
-  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', '.webp'];
+  if (!filename || typeof filename !== "string") return false;
+  const imageExtensions = [
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".bmp",
+    ".svg",
+    ".webp",
+  ];
   const lowerFilename = filename.toLowerCase();
-  return imageExtensions.some(ext => lowerFilename.endsWith(ext));
+  return imageExtensions.some((ext) => lowerFilename.endsWith(ext));
 };
 
 export function useFileHandling(downloadTimelineFileFunction) {
@@ -21,22 +29,28 @@ export function useFileHandling(downloadTimelineFileFunction) {
 
   const downloadFile = async (timelineId, filename) => {
     try {
-      console.log("[useFileHandling] Attempting to download file for timeline ID:", timelineId);
+      console.log(
+        "[useFileHandling] Attempting to download file for timeline ID:",
+        timelineId,
+      );
       // Use the function passed as an argument
       const response = await downloadTimelineFileFunction(timelineId);
 
       if (!(response.data instanceof Blob)) {
-        console.error("[useFileHandling] API did not return a Blob for download:", response);
-        alert('Failed to download file: Invalid response format.');
+        console.error(
+          "[useFileHandling] API did not return a Blob for download:",
+          response,
+        );
+        alert("Failed to download file: Invalid response format.");
         return;
       }
 
       const blob = response.data;
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
 
-      const contentDisposition = response.headers['content-disposition'];
+      const contentDisposition = response.headers["content-disposition"];
       let downloadFilename = filename || `download_${timelineId}`;
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
@@ -45,38 +59,48 @@ export function useFileHandling(downloadTimelineFileFunction) {
           try {
             downloadFilename = decodeURIComponent(filenameMatch[1]);
           } catch (e) {
-            console.warn("[useFileHandling] Could not decode filename from header, using fallback.", filenameMatch[1], e);
+            console.warn(
+              "[useFileHandling] Could not decode filename from header, using fallback.",
+              filenameMatch[1],
+              e,
+            );
             downloadFilename = filenameMatch[1]; // Use raw name if decoding fails
           }
         }
       }
 
-      link.setAttribute('download', downloadFilename);
+      link.setAttribute("download", downloadFilename);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
       console.log("[useFileHandling] File download triggered successfully.");
-
     } catch (error) {
-      console.error('[useFileHandling] Error downloading file:', error);
-      alert(`Failed to download file: ${error.response?.data?.error || error.message || 'Unknown error'}`);
+      console.error("[useFileHandling] Error downloading file:", error);
+      alert(
+        `Failed to download file: ${error.response?.data?.error || error.message || "Unknown error"}`,
+      );
     }
   };
 
   const downloadFileFromBlob = (blob, filename) => {
     try {
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', filename || 'download');
+      link.setAttribute("download", filename || "download");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      console.log("[useFileHandling] File download triggered from existing blob.");
+      console.log(
+        "[useFileHandling] File download triggered from existing blob.",
+      );
     } catch (error) {
-      console.error("[useFileHandling] Error triggering download from blob:", error);
+      console.error(
+        "[useFileHandling] Error triggering download from blob:",
+        error,
+      );
       alert("Failed to download file from preview data.");
     }
   };
@@ -85,7 +109,10 @@ export function useFileHandling(downloadTimelineFileFunction) {
   const downloadFileFromBlobUrl = async (blobUrl, filename) => {
     if (!blobUrl) return;
     try {
-      console.log("[useFileHandling] Attempting download from Blob URL:", blobUrl);
+      console.log(
+        "[useFileHandling] Attempting download from Blob URL:",
+        blobUrl,
+      );
       const response = await fetch(blobUrl);
       if (!response.ok) {
         throw new Error(`Failed to fetch blob: ${response.statusText}`);
@@ -93,11 +120,13 @@ export function useFileHandling(downloadTimelineFileFunction) {
       const blob = await response.blob();
       downloadFileFromBlob(blob, filename); // Reuse existing blob download logic
     } catch (error) {
-      console.error("[useFileHandling] Error downloading image from Blob URL:", error);
+      console.error(
+        "[useFileHandling] Error downloading image from Blob URL:",
+        error,
+      );
       alert("Failed to download image.");
     }
   };
-
 
   const openPreviewModal = (filename) => {
     // Reset state for the new preview
@@ -123,30 +152,39 @@ export function useFileHandling(downloadTimelineFileFunction) {
     previewError.value = null;
   };
 
-
   const handleFileClick = async (entry) => {
     if (!entry || entry.notetype !== 1 || !entry.id) {
-      console.warn("[useFileHandling] handleFileClick called on non-file or invalid entry:", entry);
+      console.warn(
+        "[useFileHandling] handleFileClick called on non-file or invalid entry:",
+        entry,
+      );
       return;
     }
 
-    const filename = entry.note || 'attached_file';
+    const filename = entry.note || "attached_file";
     const timelineId = entry.id;
 
     if (isImageFile(filename)) {
-      console.log(`[useFileHandling] Attempting image preview for file: ${filename} (ID: ${timelineId})`);
+      console.log(
+        `[useFileHandling] Attempting image preview for file: ${filename} (ID: ${timelineId})`,
+      );
       openPreviewModal(filename); // Open modal and set loading state
 
       try {
         // Fetch the file content using the provided function
         const response = await downloadTimelineFileFunction(timelineId);
 
-        if (response.data instanceof Blob && response.data.type.startsWith('image/')) {
+        if (
+          response.data instanceof Blob &&
+          response.data.type.startsWith("image/")
+        ) {
           const url = URL.createObjectURL(response.data);
           previewImageUrl.value = url; // Set the URL for the <img> tag
           console.log("[useFileHandling] Image preview Blob URL created:", url);
         } else {
-          console.warn(`[useFileHandling] Fetched file for ID ${timelineId} is not an image Blob (type: ${response.data?.type}). Falling back to download.`);
+          console.warn(
+            `[useFileHandling] Fetched file for ID ${timelineId} is not an image Blob (type: ${response.data?.type}). Falling back to download.`,
+          );
           closePreviewModal(); // Close modal before attempting download
           if (response.data instanceof Blob) {
             downloadFileFromBlob(response.data, filename);
@@ -156,13 +194,15 @@ export function useFileHandling(downloadTimelineFileFunction) {
         }
       } catch (err) {
         console.error("[useFileHandling] Error loading image preview:", err);
-        previewError.value = `Failed to load image: ${err.response?.data?.error || err.message || 'Unknown error'}`;
+        previewError.value = `Failed to load image: ${err.response?.data?.error || err.message || "Unknown error"}`;
         previewImageUrl.value = null; // Ensure no broken image link
       } finally {
         isPreviewLoading.value = false; // Turn off loading state
       }
     } else {
-      console.log(`[useFileHandling] File is not an image: ${filename} (ID: ${timelineId}). Proceeding with standard download.`);
+      console.log(
+        `[useFileHandling] File is not an image: ${filename} (ID: ${timelineId}). Proceeding with standard download.`,
+      );
       downloadFile(timelineId, filename);
     }
   };

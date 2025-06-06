@@ -2,8 +2,12 @@
 <template>
   <div class="prose max-w-none">
     <h2>
-      Student Progress: {{ subcourseDetails?.course_name }} ({{ getWeekdayName(subcourseDetails?.weekday) }})
-      <span v-if="subcourseDetails?.room_name">- {{ subcourseDetails.room_name }}</span>
+      Student Progress: {{ subcourseDetails?.course_name }} ({{
+        getWeekdayName(subcourseDetails?.weekday)
+      }})
+      <span v-if="subcourseDetails?.room_name"
+        >- {{ subcourseDetails.room_name }}</span
+      >
     </h2>
 
     <!-- Loading State -->
@@ -15,7 +19,19 @@
     <!-- Error State -->
     <div v-else-if="error.initial" class="alert alert-error shadow-lg">
       <div>
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current flex-shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
         <span>Error loading data: {{ error.initial }}</span>
       </div>
     </div>
@@ -23,49 +39,97 @@
     <!-- Main Content -->
     <div v-else>
       <!-- Week Selector & Expand All -->
-      <div class="flex justify-between items-center mb-4 p-4 bg-base-200 rounded-box shadow">
+      <div
+        class="flex justify-between items-center mb-4 p-4 bg-base-200 rounded-box shadow"
+      >
         <div class="form-control w-40">
           <label class="label pb-1">
             <span class="label-text font-semibold">Select Week:</span>
           </label>
-          <select class="select select-bordered select-sm" v-model.number="selectedWeek" :disabled="isLoading.weekly">
-            <option v-if="semesterStore.isSemesterLoading || !currentWeekNumber" disabled value="">Loading weeks...</option>
+          <select
+            class="select select-bordered select-sm"
+            v-model.number="selectedWeek"
+            :disabled="isLoading.weekly"
+          >
+            <option
+              v-if="semesterStore.isSemesterLoading || !currentWeekNumber"
+              disabled
+              value=""
+            >
+              Loading weeks...
+            </option>
             <!-- Generate options dynamically based on typical semester length or fetched schedules -->
-            <option v-for="weekNum in availableWeeks" :key="weekNum" :value="weekNum">
-              Week {{ weekNum }} {{ weekNum === currentWeekNumber ? '(Current)' : '' }}
+            <option
+              v-for="weekNum in availableWeeks"
+              :key="weekNum"
+              :value="weekNum"
+            >
+              Week {{ weekNum }}
+              {{ weekNum === currentWeekNumber ? "(Current)" : "" }}
             </option>
           </select>
         </div>
         <div>
-          <button class="btn btn-sm btn-ghost" @click="toggleAllTimelines" :disabled="isLoading.weekly || !students.length">
-            {{ showAllTimelines ? 'Collapse All Logs' : 'Expand All Logs' }}
+          <button
+            class="btn btn-sm btn-ghost"
+            @click="toggleAllTimelines"
+            :disabled="isLoading.weekly || !students.length"
+          >
+            {{ showAllTimelines ? "Collapse All Logs" : "Expand All Logs" }}
           </button>
         </div>
       </div>
 
       <!-- Weekly Data Loading/Error -->
-      <div v-if="isLoading.weekly && !isLoading.initial" class="text-center py-6">
+      <div
+        v-if="isLoading.weekly && !isLoading.initial"
+        class="text-center py-6"
+      >
         <span class="loading loading-md loading-spinner text-secondary"></span>
         <p>Loading data for Week {{ selectedWeek }}...</p>
       </div>
-      <div v-else-if="error.weekly && !isLoading.initial" class="alert alert-warning shadow-sm my-4">
+      <div
+        v-else-if="error.weekly && !isLoading.initial"
+        class="alert alert-warning shadow-sm my-4"
+      >
         <div>
-          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="stroke-current flex-shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
           <span>{{ error.weekly }}</span>
         </div>
       </div>
 
       <!-- Recent Logs Loading/Error (Optional - display here or elsewhere) -->
-      <div v-if="isLoading.recentLogs" class="text-center text-sm text-gray-500">
-        Fetching recent final logs... <span class="loading loading-dots loading-xs"></span>
+      <div
+        v-if="isLoading.recentLogs"
+        class="text-center text-sm text-gray-500"
+      >
+        Fetching recent final logs...
+        <span class="loading loading-dots loading-xs"></span>
       </div>
-      <div v-else-if="error.recentLogs" class="alert alert-error shadow-sm my-2 text-sm">
+      <div
+        v-else-if="error.recentLogs"
+        class="alert alert-error shadow-sm my-2 text-sm"
+      >
         Error fetching recent logs: {{ error.recentLogs }}
       </div>
 
-
       <!-- Students Table -->
-      <div v-else-if="students.length > 0" class="overflow-x-auto bg-base-100 rounded-box shadow-md mt-6">
+      <div
+        v-else-if="students.length > 0"
+        class="overflow-x-auto bg-base-100 rounded-box shadow-md mt-6"
+      >
         <table class="table table-zebra w-full table-sm">
           <thead>
             <tr>
@@ -77,11 +141,14 @@
             </tr>
           </thead>
           <tbody>
-            <template v-for="(studentData) in studentProgressData" :key="studentData.student.stu_id">
+            <template
+              v-for="studentData in studentProgressData"
+              :key="studentData.student.stu_id"
+            >
               <tr class="hover">
                 <td>{{ studentData.student.stu_id }}</td>
                 <td>{{ studentData.student.stu_name }}</td>
-                <td>{{ studentData.student.seat || '-' }}</td>
+                <td>{{ studentData.student.seat || "-" }}</td>
                 <td>
                   <!-- Tooltip shows progress count -->
                   <div
@@ -92,7 +159,10 @@
                     <!-- Progress bar - color is dynamic -->
                     <progress
                       class="progress w-full"
-                      :class="{ 'progress-success': studentData.hasConfirmedFinalLog, 'progress-primary': !studentData.hasConfirmedFinalLog }"
+                      :class="{
+                        'progress-success': studentData.hasConfirmedFinalLog,
+                        'progress-primary': !studentData.hasConfirmedFinalLog,
+                      }"
                       :value="studentData.progressPercent"
                       max="100"
                     ></progress>
@@ -112,7 +182,9 @@
                     <button
                       v-if="studentData.unconfirmedFinalLog"
                       class="btn btn-xs btn-outline btn-success"
-                      @click="openConfirmModalForLog(studentData.unconfirmedFinalLog)"
+                      @click="
+                        openConfirmModalForLog(studentData.unconfirmedFinalLog)
+                      "
                       title="Confirm student's final log submission"
                       :disabled="isLoading.confirmLog || isLoading.forceLog"
                     >
@@ -121,51 +193,110 @@
 
                     <!-- Button to FORCE a new, CONFIRMED Final Log -->
                     <button
-                      v-else-if="!studentData.recentLogForStudent && selectedSchedule?.id"
+                      v-else-if="
+                        !studentData.recentLogForStudent && selectedSchedule?.id
+                      "
                       class="btn btn-xs btn-outline btn-warning"
                       @click="confirmForceLog(studentData.student)"
                       title="Force a 'Final Log' entry for this student for the current week"
-                      :disabled="isLoading.forceLog === studentData.student.stu_id || isLoading.weekly || isLoading.confirmLog"
+                      :disabled="
+                        isLoading.forceLog === studentData.student.stu_id ||
+                        isLoading.weekly ||
+                        isLoading.confirmLog
+                      "
                     >
-                      <span v-if="isLoading.forceLog === studentData.student.stu_id" class="loading loading-spinner loading-sm mr-1"></span>
+                      <span
+                        v-if="isLoading.forceLog === studentData.student.stu_id"
+                        class="loading loading-spinner loading-sm mr-1"
+                      ></span>
                       Force Log
                     </button>
                   </div>
                 </td>
               </tr>
               <!-- Expanded Timeline Row -->
-              <tr v-if="expandedStudentId === studentData.student.stu_id || showAllTimelines">
+              <tr
+                v-if="
+                  expandedStudentId === studentData.student.stu_id ||
+                  showAllTimelines
+                "
+              >
                 <td :colspan="5" class="bg-base-200 p-0">
                   <div class="px-4 py-3">
                     <h4 class="text-sm font-semibold mb-2">
-                      Timeline Logs for {{ studentData.student.stu_name }} (Week {{ selectedWeek }}):
-                      <span v-if="isLoading.timelines[studentData.student.stu_id]" class="loading loading-dots loading-xs ml-2"></span>
+                      Timeline Logs for {{ studentData.student.stu_name }} (Week
+                      {{ selectedWeek }}):
+                      <span
+                        v-if="isLoading.timelines[studentData.student.stu_id]"
+                        class="loading loading-dots loading-xs ml-2"
+                      ></span>
                     </h4>
-                    <div v-if="error.timelines[studentData.student.stu_id]" class="text-error text-xs italic">
-                      Error loading logs: {{ error.timelines[studentData.student.stu_id] }}
+                    <div
+                      v-if="error.timelines[studentData.student.stu_id]"
+                      class="text-error text-xs italic"
+                    >
+                      Error loading logs:
+                      {{ error.timelines[studentData.student.stu_id] }}
                     </div>
-                    <ul v-else-if="studentData.weeklyTimelines && studentData.weeklyTimelines.length > 0" class="list-none space-y-2 pl-2">
-                      <li v-for="entry in studentData.weeklyTimelines" :key="entry.id" class="text-xs border-b border-base-300 pb-1 last:border-b-0">
+                    <ul
+                      v-else-if="
+                        studentData.weeklyTimelines &&
+                        studentData.weeklyTimelines.length > 0
+                      "
+                      class="list-none space-y-2 pl-2"
+                    >
+                      <li
+                        v-for="entry in studentData.weeklyTimelines"
+                        :key="entry.id"
+                        class="text-xs border-b border-base-300 pb-1 last:border-b-0"
+                      >
                         <div class="flex justify-between items-start">
                           <div>
                             <span class="font-semibold mr-2">
-                              {{ entry.subschedule || 'General Note' }}:
+                              {{ entry.subschedule || "General Note" }}:
                             </span>
                             <!-- Note/File Display -->
-                            <span v-if="entry.notetype === 0">{{ entry.note }}</span>
-                            <a v-else-if="entry.notetype === 1"
+                            <span v-if="entry.notetype === 0">{{
+                              entry.note
+                            }}</span>
+                            <a
+                              v-else-if="entry.notetype === 1"
                               href="#"
                               @click.prevent="handleFileClick(entry)"
                               class="link link-hover text-info break-all"
                               :title="`Download or Preview ${entry.note}`"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-3 w-3 inline-block mr-1"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                />
+                              </svg>
                               {{ entry.note }}
                             </a>
                           </div>
-                          <div class="text-right flex-shrink-0 ml-2 whitespace-nowrap">
-                            <span class="text-gray-500 mr-1">({{ formatTimestamp(entry.timestamp) }})</span>
-                            <span class="font-medium mr-1" :class="{'text-success': entry.tea_id === authStore.user?.userId}">{{ entry.tea_id }}</span>
+                          <div
+                            class="text-right flex-shrink-0 ml-2 whitespace-nowrap"
+                          >
+                            <span class="text-gray-500 mr-1"
+                              >({{ formatTimestamp(entry.timestamp) }})</span
+                            >
+                            <span
+                              class="font-medium mr-1"
+                              :class="{
+                                'text-success':
+                                  entry.tea_id === authStore.user?.userId,
+                              }"
+                              >{{ entry.tea_id }}</span
+                            >
                             <!-- Delete Button -->
                             <button
                               v-if="entry.tea_id === authStore.user?.userId"
@@ -174,13 +305,28 @@
                               title="Delete this log entry"
                               :disabled="isLoading.weekly"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 3 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-3 w-3"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 3 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                />
+                              </svg>
                             </button>
                           </div>
                         </div>
                       </li>
                     </ul>
-                    <p v-else class="text-xs italic text-base-content/70 pl-2">No timeline entries found for this student this week.</p>
+                    <p v-else class="text-xs italic text-base-content/70 pl-2">
+                      No timeline entries found for this student this week.
+                    </p>
                   </div>
                 </td>
               </tr>
@@ -188,7 +334,10 @@
           </tbody>
         </table>
       </div>
-      <div v-else-if="!isLoading.initial && !isLoading.weekly" class="text-center py-5 italic text-gray-500">
+      <div
+        v-else-if="!isLoading.initial && !isLoading.weekly"
+        class="text-center py-5 italic text-gray-500"
+      >
         No students found for this lab session.
       </div>
     </div>
@@ -197,7 +346,8 @@
     <dialog id="teacher_log_modal" class="modal" :open="showTeacherLogModal">
       <div class="modal-box w-11/12 max-w-lg">
         <h3 class="font-bold text-lg mb-4">
-          Add Log for {{ studentForTeacherLog?.stu_name }} (Week {{ selectedWeek }})
+          Add Log for {{ studentForTeacherLog?.stu_name }} (Week
+          {{ selectedWeek }})
         </h3>
         <TeacherTimelineLogForm
           v-if="studentForTeacherLog && selectedSchedule"
@@ -210,9 +360,15 @@
           @close="closeTeacherLogModal"
         />
         <div v-else class="text-center text-warning p-4">
-          Cannot add log: Missing student or schedule information for the selected week.
+          Cannot add log: Missing student or schedule information for the
+          selected week.
         </div>
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeTeacherLogModal">✕</button>
+        <button
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          @click="closeTeacherLogModal"
+        >
+          ✕
+        </button>
       </div>
       <form method="dialog" class="modal-backdrop">
         <button @click="closeTeacherLogModal">close</button>
@@ -226,24 +382,35 @@
       title="Delete Log Entry"
       :message="`Are you sure you want to delete the log entry: '${getTimelineEntryDescription(entryToDelete)}'?`"
       @confirm="deleteTimelineEntry"
-      @close="showDeleteConfirm = false; entryToDelete = null;"
+      @close="
+        showDeleteConfirm = false;
+        entryToDelete = null;
+      "
     />
 
     <!-- Confirm Final Log Modal (for student-submitted logs) -->
-    <dialog id="confirm_final_log_modal" class="modal" :open="showConfirmModalForLog">
+    <dialog
+      id="confirm_final_log_modal"
+      class="modal"
+      :open="showConfirmModalForLog"
+    >
       <div class="modal-box w-11/12 max-w-lg">
         <h3 class="font-bold text-lg mb-4">
           Confirm Final Log for {{ currentLogToConfirm?.stu_name }}
         </h3>
         <div v-if="currentLogToConfirm">
           <p class="mb-3">Student's Note:</p>
-          <div class="p-3 bg-base-300 rounded-box mb-4 max-h-40 overflow-y-auto text-sm">
-            {{ currentLogToConfirm.note || 'No student note provided.' }}
+          <div
+            class="p-3 bg-base-300 rounded-box mb-4 max-h-40 overflow-y-auto text-sm"
+          >
+            {{ currentLogToConfirm.note || "No student note provided." }}
           </div>
 
           <div class="form-control mb-4">
             <label class="label">
-              <span class="label-text">Teacher's Confirmation Note (Optional):</span>
+              <span class="label-text"
+                >Teacher's Confirmation Note (Optional):</span
+              >
             </label>
             <textarea
               class="textarea textarea-bordered h-24"
@@ -258,10 +425,19 @@
               @click="handleConfirmLog"
               :disabled="isLoading.confirmLog"
             >
-              <span v-if="isLoading.confirmLog" class="loading loading-spinner loading-sm mr-2"></span>
+              <span
+                v-if="isLoading.confirmLog"
+                class="loading loading-spinner loading-sm mr-2"
+              ></span>
               Confirm Log
             </button>
-            <button class="btn" @click="closeConfirmModalForLog" :disabled="isLoading.confirmLog">Cancel</button>
+            <button
+              class="btn"
+              @click="closeConfirmModalForLog"
+              :disabled="isLoading.confirmLog"
+            >
+              Cancel
+            </button>
           </div>
           <div v-if="error.confirmLog" class="text-error text-sm mt-2">
             Error: {{ error.confirmLog }}
@@ -270,7 +446,12 @@
         <div v-else class="text-center text-warning p-4">
           Cannot confirm log: Log information is missing.
         </div>
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeConfirmModalForLog">✕</button>
+        <button
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          @click="closeConfirmModalForLog"
+        >
+          ✕
+        </button>
       </div>
       <form method="dialog" class="modal-backdrop">
         <button @click="closeConfirmModalForLog">close</button>
@@ -287,9 +468,15 @@
       @confirm="handleForceLog"
       @close="cancelForceLog"
     />
-    <dialog id="image_preview_modal" class="modal" :open="isPreviewModalVisible">
+    <dialog
+      id="image_preview_modal"
+      class="modal"
+      :open="isPreviewModalVisible"
+    >
       <div class="modal-box w-11/12 max-w-3xl p-6">
-        <h3 class="font-bold text-lg mb-4 break-all">Image Preview: {{ previewImageFilename }}</h3>
+        <h3 class="font-bold text-lg mb-4 break-all">
+          Image Preview: {{ previewImageFilename }}
+        </h3>
         <!-- Loading State -->
         <div v-if="isPreviewLoading" class="text-center py-10">
           <span class="loading loading-lg loading-spinner text-info"></span>
@@ -298,13 +485,32 @@
         <!-- Error State -->
         <div v-else-if="previewError" class="alert alert-error shadow-sm my-4">
           <div>
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="stroke-current flex-shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
             <span>Error loading preview: {{ previewError }}</span>
           </div>
         </div>
         <!-- Image Display -->
-        <div v-else-if="previewImageUrl" class="w-full max-h-[70vh] overflow-auto flex justify-center items-center bg-base-300 rounded">
-          <img :src="previewImageUrl" alt="Image Preview" class="max-w-full max-h-full object-contain" />
+        <div
+          v-else-if="previewImageUrl"
+          class="w-full max-h-[70vh] overflow-auto flex justify-center items-center bg-base-300 rounded"
+        >
+          <img
+            :src="previewImageUrl"
+            alt="Image Preview"
+            class="max-w-full max-h-full object-contain"
+          />
         </div>
         <!-- Fallback if no image URL -->
         <div v-else class="text-center text-warning p-4">
@@ -312,38 +518,60 @@
         </div>
 
         <!-- Close Button -->
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closePreviewModal" :disabled="isPreviewLoading">✕</button>
+        <button
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          @click="closePreviewModal"
+          :disabled="isPreviewLoading"
+        >
+          ✕
+        </button>
         <div class="modal-action mt-4">
           <button
             v-if="previewImageUrl && !previewError"
             class="btn btn-secondary"
-            @click="downloadFileFromBlobUrl(previewImageUrl, previewImageFilename)"
-            :disabled="isPreviewLoading">
+            @click="
+              downloadFileFromBlobUrl(previewImageUrl, previewImageFilename)
+            "
+            :disabled="isPreviewLoading"
+          >
             Download Image
           </button>
-          <button class="btn btn-ghost" @click="closePreviewModal" :disabled="isPreviewLoading">Close</button>
+          <button
+            class="btn btn-ghost"
+            @click="closePreviewModal"
+            :disabled="isPreviewLoading"
+          >
+            Close
+          </button>
         </div>
       </div>
       <!-- Backdrop -->
       <form method="dialog" class="modal-backdrop">
-        <button @click="closePreviewModal" :disabled="isPreviewLoading">close</button>
+        <button @click="closePreviewModal" :disabled="isPreviewLoading">
+          close
+        </button>
       </form>
     </dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, reactive } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import { useSemesterStore } from '@/stores/semester';
-import * as dataService from '@/services/dataService';
-import { getWeekdayName, calculateCurrentWeek, formatTimestamp } from '@/utils/weekday';
-import TeacherTimelineLogForm from '@/components/TeacherTimelineLogForm.vue'; // Needs to be created
-import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import { useFileHandling } from '@/utils/fileops';
+import { ref, computed, watch, onMounted, reactive } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import { useSemesterStore } from "@/stores/semester";
+import * as dataService from "@/services/dataService";
+import {
+  getWeekdayName,
+  calculateCurrentWeek,
+  formatTimestamp,
+} from "@/utils/weekday";
+import TeacherTimelineLogForm from "@/components/TeacherTimelineLogForm.vue"; // Needs to be created
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import { useFileHandling } from "@/utils/fileops";
 
 const props = defineProps({
-  id: { // Subcourse ID from route
+  id: {
+    // Subcourse ID from route
     type: [String, Number],
     required: true,
   },
@@ -365,7 +593,7 @@ const timelineEntries = ref({}); // { stu_id: [entry1, entry2,...] } for selecte
 const allRecentStudentLogs = ref([]); // Array of ALL recent StudentLog objects from getRecentLog API (unfiltered by confirm status)
 const showConfirmModalForLog = ref(false);
 const currentLogToConfirm = ref(null); // The specific StudentLog object being confirmed
-const teacherConfirmationNote = ref('');
+const teacherConfirmationNote = ref("");
 
 // New state for force log confirmation
 const showForceConfirm = ref(false);
@@ -414,7 +642,12 @@ const {
 // --- Computed Properties ---
 const currentWeekNumber = computed(() => {
   // Reuse logic from DashboardView if available, or recalculate
-  if (semesterStore.isSemesterLoading || semesterStore.semesterError || !semesterStore.currentSemester) return null;
+  if (
+    semesterStore.isSemesterLoading ||
+    semesterStore.semesterError ||
+    !semesterStore.currentSemester
+  )
+    return null;
   return calculateCurrentWeek(semesterStore.currentSemester);
 });
 
@@ -423,7 +656,7 @@ const totalStepsForWeek = computed(() => subSchedulesForWeek.value.length);
 // Generate week options based on fetched schedules or a default range
 const availableWeeks = computed(() => {
   if (schedules.value.length > 0) {
-    return schedules.value.map(s => s.week).sort((a, b) => a - b);
+    return schedules.value.map((s) => s.week).sort((a, b) => a - b);
   }
   // Fallback if schedules haven't loaded yet or are empty
   const current = currentWeekNumber.value || 1;
@@ -435,15 +668,19 @@ const availableWeeks = computed(() => {
 });
 
 const studentProgressData = computed(() => {
-  const validStepTitles = new Set(subSchedulesForWeek.value.map(sub => sub.title));
+  const validStepTitles = new Set(
+    subSchedulesForWeek.value.map((sub) => sub.title),
+  );
 
-  return students.value.map(student => {
-    const weeklyTimelines = (timelineEntries.value[student.stu_id] || []).sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+  return students.value.map((student) => {
+    const weeklyTimelines = (timelineEntries.value[student.stu_id] || []).sort(
+      (a, b) => new Date(a.timestamp) - new Date(b.timestamp),
+    );
 
     // Count logged entries whose 'subschedule' title is in the valid set for the week
     let loggedStepsCount = 0;
     const loggedTitles = new Set(); // Use a set to count unique valid titles logged
-    weeklyTimelines.forEach(entry => {
+    weeklyTimelines.forEach((entry) => {
       if (entry.subschedule && validStepTitles.has(entry.subschedule)) {
         loggedTitles.add(entry.subschedule);
       }
@@ -451,18 +688,24 @@ const studentProgressData = computed(() => {
     loggedStepsCount = loggedTitles.size; // Count unique valid titles logged
 
     const total = totalStepsForWeek.value;
-    const progressPercent = total > 0 ? Math.round((loggedStepsCount / total) * 100) : 100;
+    const progressPercent =
+      total > 0 ? Math.round((loggedStepsCount / total) * 100) : 100;
 
     // Find if this student has ANY recent final log (confirmed or unconfirmed)
     const recentLogForStudent = allRecentStudentLogs.value.find(
-      log => log.stu_id === student.stu_id
+      (log) => log.stu_id === student.stu_id,
     );
 
     // Determine if the log is unconfirmed (for the Confirm button)
-    const unconfirmedFinalLog = recentLogForStudent && recentLogForStudent.confirm === 0 ? recentLogForStudent : null;
+    const unconfirmedFinalLog =
+      recentLogForStudent && recentLogForStudent.confirm === 0
+        ? recentLogForStudent
+        : null;
 
     // Determine if the log is confirmed (for the bar color)
-    const hasConfirmedFinalLog = recentLogForStudent ? recentLogForStudent.confirm === 1 : false;
+    const hasConfirmedFinalLog = recentLogForStudent
+      ? recentLogForStudent.confirm === 1
+      : false;
     // Note: This check relies on the backend's "recent" time window.
     // A log confirmed outside this window won't make the bar green based on *this* API.
 
@@ -495,15 +738,20 @@ const fetchInitialData = async () => {
 
     const parentCourseId = subCourse.data?.course_id;
     if (!parentCourseId && students.value.length > 0) {
-      console.warn("Could not determine parent course ID. Fetching schedules might fail.");
+      console.warn(
+        "Could not determine parent course ID. Fetching schedules might fail.",
+      );
     }
 
-    if (parentCourseId) { // Only fetch if we have a course ID
+    if (parentCourseId) {
+      // Only fetch if we have a course ID
       const schedulesRes = await dataService.getSchedules(parentCourseId); // Use fetched parent ID
       schedules.value = schedulesRes.data || [];
     } else if (students.value.length > 0) {
       // Only throw error if there are students but no course ID, as empty subcourse is possible
-      throw new Error("Could not determine the parent course ID to fetch schedules.");
+      throw new Error(
+        "Could not determine the parent course ID to fetch schedules.",
+      );
     }
 
     // Set initial week based on store once it loads, or fallback
@@ -511,14 +759,14 @@ const fetchInitialData = async () => {
     if (selectedWeek.value === null && currentWeekNumber.value) {
       selectedWeek.value = currentWeekNumber.value;
     } else if (selectedWeek.value === null && schedules.value.length > 0) {
-      selectedWeek.value = schedules.value.map(s => s.week).sort((a,b) => a-b)[0] || 1; // Fallback to first week if schedules exist
+      selectedWeek.value =
+        schedules.value.map((s) => s.week).sort((a, b) => a - b)[0] || 1; // Fallback to first week if schedules exist
     } else if (selectedWeek.value === null) {
       selectedWeek.value = 1; // Absolute fallback if no students/schedules and no current week
     }
-
   } catch (err) {
     console.error("Error loading initial data:", err);
-    error.initial = err.response?.data?.error || err.message || 'Unknown error';
+    error.initial = err.response?.data?.error || err.message || "Unknown error";
     // Keep students/schedules/subcourse null or empty on error
     students.value = [];
     schedules.value = [];
@@ -537,7 +785,9 @@ const fetchWeeklyData = async () => {
   // Prevent fetching if selectedWeek is still null OR initial load is still running
   // (The check in onMounted handles the initial call after initial load)
   if (selectedWeek.value === null || isLoading.initial) {
-    console.log("Skipping weekly fetch: selectedWeek is null or initial load is pending.");
+    console.log(
+      "Skipping weekly fetch: selectedWeek is null or initial load is pending.",
+    );
     return;
   }
 
@@ -549,7 +799,9 @@ const fetchWeeklyData = async () => {
 
   try {
     // Find the main schedule for the selected week
-    const scheduleForWeek = schedules.value.find(s => s.week === selectedWeek.value);
+    const scheduleForWeek = schedules.value.find(
+      (s) => s.week === selectedWeek.value,
+    );
 
     if (!scheduleForWeek) {
       // This is not necessarily an error if a course has gaps in weeks
@@ -561,19 +813,26 @@ const fetchWeeklyData = async () => {
     } else {
       selectedSchedule.value = scheduleForWeek;
       // Fetch sub-schedules (steps) for this week
-      const subSchedulesRes = await dataService.getSubSchedules(selectedSchedule.value.id);
-      subSchedulesForWeek.value = (subSchedulesRes.data || []).sort((a, b) => a.step - b.step);
+      const subSchedulesRes = await dataService.getSubSchedules(
+        selectedSchedule.value.id,
+      );
+      subSchedulesForWeek.value = (subSchedulesRes.data || []).sort(
+        (a, b) => a.step - b.step,
+      );
 
       // Fetch all timeline entries for this subcourse AND this week's schedule_id
       // Note: Backend listTimelinesBySchedule might not filter by schedule_id
       // If it fetches ALL timelines for subcourse, need to filter by entry.schedule_id === selectedSchedule.value.id
       // Assuming it DOES filter by schedule_id based on the service function name
-      const timelineRes = await dataService.listTimelinesBySchedule(props.id, selectedSchedule.value.id);
+      const timelineRes = await dataService.listTimelinesBySchedule(
+        props.id,
+        selectedSchedule.value.id,
+      );
       const allWeeklyEntries = timelineRes.data || [];
 
       // Group entries by student ID
       const groupedEntries = {};
-      allWeeklyEntries.forEach(entry => {
+      allWeeklyEntries.forEach((entry) => {
         if (!groupedEntries[entry.stu_id]) {
           groupedEntries[entry.stu_id] = [];
         }
@@ -582,10 +841,9 @@ const fetchWeeklyData = async () => {
       timelineEntries.value = groupedEntries;
       error.weekly = null; // Clear any previous weekly error if fetch succeeds
     }
-
   } catch (err) {
     console.error(`Error loading data for week ${selectedWeek.value}:`, err);
-    error.weekly = err.response?.data?.error || err.message || 'Unknown error';
+    error.weekly = err.response?.data?.error || err.message || "Unknown error";
     // Clear data related to the failed week
     subSchedulesForWeek.value = [];
     timelineEntries.value = {};
@@ -604,10 +862,14 @@ const fetchRecentLogs = async () => {
     const res = await dataService.getRecentLog(props.id);
     // Store the full result; filtering by confirm status happens in the computed property
     allRecentStudentLogs.value = res.data || [];
-    console.log("Fetched all recent logs (filtered by backend time window):", allRecentStudentLogs.value);
+    console.log(
+      "Fetched all recent logs (filtered by backend time window):",
+      allRecentStudentLogs.value,
+    );
   } catch (err) {
     console.error("Error fetching recent student logs:", err);
-    error.recentLogs = err.response?.data?.error || err.message || 'Unknown error';
+    error.recentLogs =
+      err.response?.data?.error || err.message || "Unknown error";
   } finally {
     isLoading.recentLogs = false;
   }
@@ -615,7 +877,8 @@ const fetchRecentLogs = async () => {
 
 const toggleStudentTimeline = (studentId) => {
   if (showAllTimelines.value) return; // Don't toggle individual if showing all
-  expandedStudentId.value = expandedStudentId.value === studentId ? null : studentId;
+  expandedStudentId.value =
+    expandedStudentId.value === studentId ? null : studentId;
 };
 
 const toggleAllTimelines = () => {
@@ -652,14 +915,14 @@ const openConfirmModalForLog = (log) => {
   error.confirmLog = null; // Clear previous error
   isLoading.confirmLog = false; // Reset loading
   currentLogToConfirm.value = log;
-  teacherConfirmationNote.value = ''; // Reset note
+  teacherConfirmationNote.value = ""; // Reset note
   showConfirmModalForLog.value = true;
 };
 
 const closeConfirmModalForLog = () => {
   showConfirmModalForLog.value = false;
   currentLogToConfirm.value = null;
-  teacherConfirmationNote.value = '';
+  teacherConfirmationNote.value = "";
   error.confirmLog = null;
   isLoading.confirmLog = false;
 };
@@ -688,10 +951,12 @@ const handleConfirmLog = async () => {
     await fetchRecentLogs();
     // Optional: Show a success message
     // alert(`Final log for ${currentLogToConfirm.value.stu_name} confirmed.`); // Or use a toast
-
   } catch (err) {
     console.error("Failed to confirm student log:", err);
-    error.confirmLog = err.response?.data?.error || err.message || 'Unknown error during confirmation.';
+    error.confirmLog =
+      err.response?.data?.error ||
+      err.message ||
+      "Unknown error during confirmation.";
     // Keep modal open to show the error
   } finally {
     isLoading.confirmLog = false;
@@ -717,7 +982,9 @@ const cancelForceLog = () => {
 
 const handleForceLog = async () => {
   if (!studentToForceLog.value || !selectedSchedule.value) {
-    console.warn("Attempted to force log without a selected student or schedule.");
+    console.warn(
+      "Attempted to force log without a selected student or schedule.",
+    );
     // Ensure confirm dialog is closed and state reset
     cancelForceLog();
     return;
@@ -738,18 +1005,22 @@ const handleForceLog = async () => {
     await fetchRecentLogs();
 
     // TODO: Add success notification (e.g., toast) - "Forced final log for [student name]"
-
   } catch (err) {
-    console.error(`Failed to force log for student ${studentToForceLog.value.stu_id}:`, err);
-    error.forceLog = err.response?.data?.error || err.message || 'Unknown error forcing log.';
+    console.error(
+      `Failed to force log for student ${studentToForceLog.value.stu_id}:`,
+      err,
+    );
+    error.forceLog =
+      err.response?.data?.error || err.message || "Unknown error forcing log.";
     // Display error - maybe alert or a specific error message area
-    alert(`Failed to force log for ${studentToForceLog.value.stu_name}: ${error.forceLog}`);
+    alert(
+      `Failed to force log for ${studentToForceLog.value.stu_name}: ${error.forceLog}`,
+    );
   } finally {
     isLoading.forceLog = null; // Reset loading state
     studentToForceLog.value = null; // Clear student reference
   }
 };
-
 
 // --- Timeline Delete Methods ---
 const confirmDeleteTimeline = (entry) => {
@@ -758,11 +1029,15 @@ const confirmDeleteTimeline = (entry) => {
 };
 
 const getTimelineEntryDescription = (entry) => {
-  if (!entry) return '';
+  if (!entry) return "";
   // Use subschedule title if available, otherwise indicate note/file
-  const prefix = entry.subschedule ? `Step "${entry.subschedule}" log` : (entry.notetype === 1 ? 'File log' : 'General Note');
+  const prefix = entry.subschedule
+    ? `Step "${entry.subschedule}" log`
+    : entry.notetype === 1
+      ? "File log"
+      : "General Note";
   const content = entry.note?.substring(0, 50); // Take first 50 chars of the note/filename
-  const ellipsis = entry.note?.length > 50 ? '...' : '';
+  const ellipsis = entry.note?.length > 50 ? "..." : "";
   return `${prefix}: "${content}${ellipsis}"`;
 };
 
@@ -788,38 +1063,50 @@ const deleteTimelineEntry = async () => {
 };
 
 // --- Watchers ---
-watch(selectedWeek, (newWeek, oldWeek) => {
-  // Trigger fetchWeeklyData when selectedWeek changes,
-  // but *only if* initial load is finished (!isLoading.initial).
-  // The *initial* fetch after load is handled below in onMounted.
-  if (newWeek !== null && newWeek !== oldWeek && !isLoading.initial) {
-    console.log(`selectedWeek changed from ${oldWeek} to ${newWeek}. Triggering weekly data fetch.`);
-    fetchWeeklyData();
-  } else if (newWeek === null && oldWeek !== null) {
-    // Handle case where week might be unset, clear data
-    console.log("selectedWeek unset. Clearing weekly data.");
-    selectedSchedule.value = null;
-    subSchedulesForWeek.value = [];
-    timelineEntries.value = {};
-    error.weekly = null; // Clear weekly error if any
-  }
-}, { immediate: false }); // Immediate is false here because initial fetch is handled in onMounted
-
+watch(
+  selectedWeek,
+  (newWeek, oldWeek) => {
+    // Trigger fetchWeeklyData when selectedWeek changes,
+    // but *only if* initial load is finished (!isLoading.initial).
+    // The *initial* fetch after load is handled below in onMounted.
+    if (newWeek !== null && newWeek !== oldWeek && !isLoading.initial) {
+      console.log(
+        `selectedWeek changed from ${oldWeek} to ${newWeek}. Triggering weekly data fetch.`,
+      );
+      fetchWeeklyData();
+    } else if (newWeek === null && oldWeek !== null) {
+      // Handle case where week might be unset, clear data
+      console.log("selectedWeek unset. Clearing weekly data.");
+      selectedSchedule.value = null;
+      subSchedulesForWeek.value = [];
+      timelineEntries.value = {};
+      error.weekly = null; // Clear weekly error if any
+    }
+  },
+  { immediate: false },
+); // Immediate is false here because initial fetch is handled in onMounted
 
 // Set initial week based on store once it loads
 // This might set selectedWeek before fetchInitialData finishes, or afterwards.
 // The fetchWeeklyData call in onMounted is the primary trigger for the *first* fetch.
-watch(currentWeekNumber, (newStoreWeek) => {
-  // Only set the selected week based on the store if it hasn't been set yet
-  // or if the component is still in its initial loading phase.
-  // The goal is to set the *initial* week preference.
-  if (selectedWeek.value === null && newStoreWeek !== null) {
-    console.log("Current week from store loaded:", newStoreWeek, "Setting selectedWeek.");
-    selectedWeek.value = newStoreWeek;
-    // No need to trigger fetchWeeklyData here; onMounted will do it after initial data.
-  }
-}, { immediate: true }); // Check immediately on component creation
-
+watch(
+  currentWeekNumber,
+  (newStoreWeek) => {
+    // Only set the selected week based on the store if it hasn't been set yet
+    // or if the component is still in its initial loading phase.
+    // The goal is to set the *initial* week preference.
+    if (selectedWeek.value === null && newStoreWeek !== null) {
+      console.log(
+        "Current week from store loaded:",
+        newStoreWeek,
+        "Setting selectedWeek.",
+      );
+      selectedWeek.value = newStoreWeek;
+      // No need to trigger fetchWeeklyData here; onMounted will do it after initial data.
+    }
+  },
+  { immediate: true },
+); // Check immediately on component creation
 
 // --- Lifecycle ---
 onMounted(async () => {
@@ -831,14 +1118,19 @@ onMounted(async () => {
   //    trigger the fetch for the *first* week's detailed data.
   //    The selectedWeek watcher handles subsequent changes from the dropdown.
   if (selectedWeek.value !== null) {
-    console.log("Initial data fetch complete. Triggering first weekly data fetch for week:", selectedWeek.value);
+    console.log(
+      "Initial data fetch complete. Triggering first weekly data fetch for week:",
+      selectedWeek.value,
+    );
     // Await this to ensure data is there before table renders fully for the first time
     await fetchWeeklyData();
   } else if (students.value.length > 0) {
     // Edge case: students loaded but no schedules and no current week could be determined.
     // selectedWeek remains 1 default, but fetchWeeklyData didn't find a schedule.
     // The error.weekly message should explain this.
-    console.warn("No selected week determined after initial fetch or no schedule found for week 1. Weekly data will not load.");
+    console.warn(
+      "No selected week determined after initial fetch or no schedule found for week 1. Weekly data will not load.",
+    );
     // In this case, error.weekly would already be set by fetchWeeklyData if it ran and failed to find a schedule.
   }
 
@@ -846,8 +1138,6 @@ onMounted(async () => {
   // which is fine for parallel loading and ensures the button/color status
   // can be determined as soon as possible.
 });
-
-
 </script>
 
 <style scoped>

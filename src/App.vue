@@ -5,16 +5,16 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import DefaultLayout from './layouts/DefaultLayout.vue'
+import { computed } from "vue";
+import DefaultLayout from "./layouts/DefaultLayout.vue";
 // Import other layouts if you create them (e.g., AuthLayout)
 
 // Basic layout switching, defaults to DefaultLayout
 // You could expand this based on route meta fields if needed
 const layout = computed(() => {
   // Example: if (route.meta.layout === 'Auth') return AuthLayout;
-  return DefaultLayout
-})
+  return DefaultLayout;
+});
 </script>
 
 <style>

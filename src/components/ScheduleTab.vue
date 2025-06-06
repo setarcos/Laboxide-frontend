@@ -4,7 +4,20 @@
     <!-- Teacher Controls: Add Button (Main Schedule) -->
     <div v-if="isTeacher" class="text-right mb-4">
       <button class="btn btn-sm btn-primary" @click="openAddModal">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
         Add Schedule Item
       </button>
     </div>
@@ -18,7 +31,19 @@
     <!-- Error State -->
     <div v-else-if="error" class="alert alert-error shadow-lg">
       <div>
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current flex-shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
         <span>Error loading schedule: {{ error.message || error }}</span>
       </div>
     </div>
@@ -28,7 +53,8 @@
       <table class="table table-zebra w-full table-sm">
         <thead>
           <tr>
-            <th class="w-10"></th> <!-- Column for expand toggle -->
+            <th class="w-10"></th>
+            <!-- Column for expand toggle -->
             <th class="w-16 text-center">Week</th>
             <th>Topic / Name</th>
             <th>Requirement / Details</th>
@@ -45,12 +71,26 @@
                 :title="isExpanded(item.id) ? 'Collapse steps' : 'Expand steps'"
                 @click="toggleSubSchedules(item)"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200" :class="{ 'rotate-90': isExpanded(item.id) }" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 transition-transform duration-200"
+                  :class="{ 'rotate-90': isExpanded(item.id) }"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
               </button>
             </td>
             <td class="text-center">{{ item.week }}</td>
             <td>{{ item.name }}</td>
-            <td>{{ item.requirement || '-' }}</td>
+            <td>{{ item.requirement || "-" }}</td>
             <td v-if="isTeacher">
               <div class="flex gap-1 justify-center">
                 <button
@@ -58,14 +98,40 @@
                   title="Edit Main Item"
                   @click="openEditModal(item)"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                    />
+                  </svg>
                 </button>
                 <button
                   class="btn btn-xs btn-ghost btn-circle text-error"
                   title="Delete Main Item"
                   @click="openDeleteModal(item)"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
                 </button>
               </div>
             </td>
@@ -76,48 +142,123 @@
               <div class="px-4 py-3">
                 <!-- Sub-schedule Loading -->
                 <div v-if="item.isLoadingSubs" class="text-center py-2">
-                  <span class="loading loading-sm loading-spinner text-info"></span> Loading steps...
+                  <span
+                    class="loading loading-sm loading-spinner text-info"
+                  ></span>
+                  Loading steps...
                 </div>
                 <!-- Sub-schedule Error -->
-                <div v-else-if="item.subError" class="alert alert-warning alert-sm shadow-sm p-2">
+                <div
+                  v-else-if="item.subError"
+                  class="alert alert-warning alert-sm shadow-sm p-2"
+                >
                   <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-4 w-4" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="stroke-current flex-shrink-0 h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
                     <span>Failed to load steps: {{ item.subError }}</span>
                   </div>
                 </div>
                 <!-- Sub-schedule List -->
                 <div v-else>
                   <h4 class="text-sm font-semibold mb-2 ml-2">Steps:</h4>
-                  <ul v-if="item.subschedules && item.subschedules.length > 0" class="list-none pl-4 space-y-1">
-                    <li v-for="subItem in item.subschedules" :key="subItem.id" class="flex items-center justify-between text-sm hover:bg-base-100 rounded p-1">
+                  <ul
+                    v-if="item.subschedules && item.subschedules.length > 0"
+                    class="list-none pl-4 space-y-1"
+                  >
+                    <li
+                      v-for="subItem in item.subschedules"
+                      :key="subItem.id"
+                      class="flex items-center justify-between text-sm hover:bg-base-100 rounded p-1"
+                    >
                       <span class="flex-grow">
-                        <span class="font-mono bg-base-300 rounded px-1.5 py-0.5 mr-2 text-xs">{{ subItem.step }}</span>
+                        <span
+                          class="font-mono bg-base-300 rounded px-1.5 py-0.5 mr-2 text-xs"
+                          >{{ subItem.step }}</span
+                        >
                         {{ subItem.title }}
                       </span>
-                      <div v-if="isTeacher" class="flex gap-1 flex-shrink-0 ml-2">
+                      <div
+                        v-if="isTeacher"
+                        class="flex gap-1 flex-shrink-0 ml-2"
+                      >
                         <button
                           class="btn btn-xs btn-ghost btn-circle"
                           title="Edit Step"
                           @click="openEditSubModal(subItem, item)"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                            />
+                          </svg>
                         </button>
                         <button
                           class="btn btn-xs btn-ghost btn-circle text-error"
                           title="Delete Step"
                           @click="openDeleteSubModal(subItem, item)"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
                         </button>
                       </div>
                     </li>
                   </ul>
-                  <p v-else class="text-xs italic pl-4 text-base-content/70">No steps defined yet.</p>
+                  <p v-else class="text-xs italic pl-4 text-base-content/70">
+                    No steps defined yet.
+                  </p>
 
                   <!-- Add Sub-schedule Button -->
                   <div v-if="isTeacher" class="text-right mt-2">
-                    <button class="btn btn-sm btn-outline btn-info" @click="openAddSubModal(item)">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                    <button
+                      class="btn btn-sm btn-outline btn-info"
+                      @click="openAddSubModal(item)"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-3 w-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
                       Add Step
                     </button>
                   </div>
@@ -136,9 +277,15 @@
     </div>
 
     <!-- Add/Edit MAIN Schedule Modal -->
-    <dialog id="schedule_modal" class="modal" :open="showAddModal || showEditModal">
+    <dialog
+      id="schedule_modal"
+      class="modal"
+      :open="showAddModal || showEditModal"
+    >
       <div class="modal-box w-11/12 max-w-2xl">
-        <h3 class="font-bold text-lg">{{ isEditing ? 'Edit Schedule Item' : 'Add Schedule Item' }}</h3>
+        <h3 class="font-bold text-lg">
+          {{ isEditing ? "Edit Schedule Item" : "Add Schedule Item" }}
+        </h3>
         <ScheduleForm
           :key="formKey"
           :initial-data="currentItem"
@@ -148,7 +295,12 @@
           @close="closeModal"
           class="py-4"
         />
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeModal">✕</button>
+        <button
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          @click="closeModal"
+        >
+          ✕
+        </button>
       </div>
       <form method="dialog" class="modal-backdrop">
         <button @click="closeModal">close</button>
@@ -166,9 +318,15 @@
     />
 
     <!-- Add/Edit SUB Schedule Modal -->
-    <dialog id="sub_schedule_modal" class="modal" :open="showAddSubModal || showEditSubModal">
+    <dialog
+      id="sub_schedule_modal"
+      class="modal"
+      :open="showAddSubModal || showEditSubModal"
+    >
       <div class="modal-box w-11/12 max-w-lg">
-        <h3 class="font-bold text-lg">{{ isEditingSub ? 'Edit Step' : 'Add New Step' }}</h3>
+        <h3 class="font-bold text-lg">
+          {{ isEditingSub ? "Edit Step" : "Add New Step" }}
+        </h3>
         <SubScheduleForm
           :key="subFormKey"
           :initial-data="currentSubItem"
@@ -178,7 +336,12 @@
           @close="closeSubModal"
           class="py-4"
         />
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeSubModal">✕</button>
+        <button
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          @click="closeSubModal"
+        >
+          ✕
+        </button>
       </div>
       <form method="dialog" class="modal-backdrop">
         <button @click="closeSubModal">close</button>
@@ -194,17 +357,16 @@
       @confirm="handleSubDelete"
       @close="closeSubModal"
     />
-
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import * as dataService from '@/services/dataService';
-import ScheduleForm from '@/components/ScheduleForm.vue';
-import SubScheduleForm from '@/components/SubScheduleForm.vue'; // Import the new form
-import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { ref, computed, watch } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import * as dataService from "@/services/dataService";
+import ScheduleForm from "@/components/ScheduleForm.vue";
+import SubScheduleForm from "@/components/SubScheduleForm.vue"; // Import the new form
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 const props = defineProps({
   courseId: {
@@ -239,12 +401,14 @@ const subFormKey = ref(Date.now()); // Use timestamp for key to force re-render
 // Computed properties
 const isTeacher = computed(() => authStore.isTeacher);
 const isEditing = computed(() => !!currentItem.value && showEditModal.value);
-const isEditingSub = computed(() => !!currentSubItem.value && showEditSubModal.value);
+const isEditingSub = computed(
+  () => !!currentSubItem.value && showEditSubModal.value,
+);
 
 // Sort main schedules by week number
 const sortedSchedules = computed(() => {
   // Ensure each item has subschedule-related properties initialized
-  const itemsWithSubState = schedules.value.map(item => ({
+  const itemsWithSubState = schedules.value.map((item) => ({
     ...item,
     subschedules: item.subschedules || null, // null = not loaded, [] = loaded empty, [...] = loaded data
     isLoadingSubs: item.isLoadingSubs || false,
@@ -255,15 +419,14 @@ const sortedSchedules = computed(() => {
 
 // Dynamic delete confirmation messages
 const deleteConfirmationMessage = computed(() => {
-  if (!currentItem.value) return 'Are you sure?';
+  if (!currentItem.value) return "Are you sure?";
   return `Are you sure you want to delete the schedule item for Week ${currentItem.value.week}: "${currentItem.value.name}"? This will also delete all associated steps.`; // Updated message
 });
 
 const deleteSubConfirmationMessage = computed(() => {
-  if (!currentSubItem.value) return 'Are you sure?';
+  if (!currentSubItem.value) return "Are you sure?";
   return `Are you sure you want to delete step ${currentSubItem.value.step}: "${currentSubItem.value.title}"?`;
 });
-
 
 // --- Fetch Main Schedules Logic ---
 const fetchSchedules = async () => {
@@ -279,7 +442,7 @@ const fetchSchedules = async () => {
   try {
     const response = await dataService.getSchedules(props.courseId);
     // Initialize sub-schedule state for each item
-    schedules.value = (response.data || []).map(item => ({
+    schedules.value = (response.data || []).map((item) => ({
       ...item,
       subschedules: null, // Indicate subs haven't been loaded yet
       isLoadingSubs: false,
@@ -299,7 +462,7 @@ const fetchSubSchedulesFor = async (scheduleItem) => {
   if (!scheduleItem || !scheduleItem.id) return;
 
   // Find the item in the ref to update its state directly
-  const itemRef = schedules.value.find(s => s.id === scheduleItem.id);
+  const itemRef = schedules.value.find((s) => s.id === scheduleItem.id);
   if (!itemRef) return;
 
   itemRef.isLoadingSubs = true;
@@ -308,10 +471,16 @@ const fetchSubSchedulesFor = async (scheduleItem) => {
   try {
     const response = await dataService.getSubSchedules(scheduleItem.id);
     // Sort subschedules by step
-    itemRef.subschedules = (response.data || []).sort((a, b) => a.step - b.step);
+    itemRef.subschedules = (response.data || []).sort(
+      (a, b) => a.step - b.step,
+    );
   } catch (err) {
-    console.error(`Failed to fetch subschedules for item ${scheduleItem.id}:`, err);
-    itemRef.subError = err.response?.data?.error || err.message || 'Unknown error';
+    console.error(
+      `Failed to fetch subschedules for item ${scheduleItem.id}:`,
+      err,
+    );
+    itemRef.subError =
+      err.response?.data?.error || err.message || "Unknown error";
     itemRef.subschedules = []; // Set to empty array on error to stop loading
   } finally {
     itemRef.isLoadingSubs = false;
@@ -326,7 +495,7 @@ const toggleSubSchedules = (scheduleItem) => {
   } else {
     expandedScheduleId.value = targetId; // Expand
     // Fetch subschedules only if they haven't been loaded yet (null state)
-    const itemRef = schedules.value.find(s => s.id === targetId);
+    const itemRef = schedules.value.find((s) => s.id === targetId);
     if (itemRef && itemRef.subschedules === null) {
       fetchSubSchedulesFor(itemRef);
     }
@@ -438,7 +607,9 @@ const handleSubSave = async (subFormData) => {
   isSavingSub.value = true;
 
   // Find the parent item to update later
-  const parentItemRef = schedules.value.find(s => s.id === subFormData.schedule_id);
+  const parentItemRef = schedules.value.find(
+    (s) => s.id === subFormData.schedule_id,
+  );
 
   try {
     if (isEditingSub.value) {
@@ -464,10 +635,15 @@ const handleSubSave = async (subFormData) => {
 };
 
 const handleSubDelete = async () => {
-  if (!isTeacher.value || !currentSubItem.value || !parentScheduleIdForSubModal.value) return;
+  if (
+    !isTeacher.value ||
+    !currentSubItem.value ||
+    !parentScheduleIdForSubModal.value
+  )
+    return;
 
   const parentItemId = parentScheduleIdForSubModal.value; // Capture before closing modal
-  const parentItemRef = schedules.value.find(s => s.id === parentItemId);
+  const parentItemRef = schedules.value.find((s) => s.id === parentItemId);
 
   try {
     await dataService.deleteSubSchedule(currentSubItem.value.id);
@@ -484,17 +660,21 @@ const handleSubDelete = async () => {
 };
 
 // --- Watchers ---
-watch(() => props.courseId, (newCourseId, oldCourseId) => {
-  if (newCourseId && newCourseId !== oldCourseId) {
-    fetchSchedules();
-  }
-}, { immediate: true });
-
+watch(
+  () => props.courseId,
+  (newCourseId, oldCourseId) => {
+    if (newCourseId && newCourseId !== oldCourseId) {
+      fetchSchedules();
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <style scoped>
 /* Add styles if needed */
-.table-sm th, .table-sm td {
+.table-sm th,
+.table-sm td {
   padding: 0.5rem 0.75rem; /* Adjust padding if needed */
 }
 /* Style for the sub-schedule row background */

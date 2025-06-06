@@ -1,11 +1,21 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-
     <!-- Back Button -->
     <div class="mb-6">
       <button @click="goBack" class="btn btn-ghost">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-5 h-5 mr-2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15.75 19.5L8.25 12l7.5-7.5"
+          />
         </svg>
         Back
       </button>
@@ -13,22 +23,30 @@
 
     <!-- Loading State (Subcourse Info) -->
     <div v-if="isLoadingSubcourse" class="text-center py-5">
-      <span class="loading loading-spinner text-info"></span> Loading group details...
+      <span class="loading loading-spinner text-info"></span> Loading group
+      details...
     </div>
     <!-- Error State (Subcourse Info) -->
     <div v-else-if="subcourseError" class="alert alert-warning shadow-sm mb-4">
-      Could not load group details: {{ subcourseError.message || subcourseError }}
+      Could not load group details:
+      {{ subcourseError.message || subcourseError }}
     </div>
     <!-- Subcourse Info Display -->
     <div v-else-if="subcourse" class="mb-6 p-4 bg-base-200 rounded-lg shadow">
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <p class="mb-2"><strong>Course:</strong> {{ subcourse.course_name || 'N/A' }}</p>
+          <p class="mb-2">
+            <strong>Course:</strong> {{ subcourse.course_name || "N/A" }}
+          </p>
           <p class="mb-2"><strong>Teacher:</strong> {{ subcourse.tea_name }}</p>
         </div>
         <div>
-          <p class="mb-2"><strong>Day:</strong> {{ getWeekdayName(subcourse.weekday) }}</p>
-          <p class="mb-2"><strong>Room:</strong> {{ subcourse.room_name || 'N/A' }}</p>
+          <p class="mb-2">
+            <strong>Day:</strong> {{ getWeekdayName(subcourse.weekday) }}
+          </p>
+          <p class="mb-2">
+            <strong>Room:</strong> {{ subcourse.room_name || "N/A" }}
+          </p>
         </div>
       </div>
     </div>
@@ -65,14 +83,20 @@
           <tr v-for="student in students" :key="student.id">
             <td>{{ student.stu_id }}</td>
             <td>
-              <router-link v-if="isTeacher || authStore.user.userId === student.stu_id"
+              <router-link
+                v-if="isTeacher || authStore.user.userId === student.stu_id"
                 :to="{
                   name: 'StudentTimeline', // Define this route name later
                   params: { subcourseId: props.id, studentId: student.stu_id }, // Pass IDs in params
-                  state: { studentName: student.stu_name, subcourseName: subcourse?.course_name } // Pass extra info via state
+                  state: {
+                    studentName: student.stu_name,
+                    subcourseName: subcourse?.course_name,
+                  }, // Pass extra info via state
                 }"
                 class="link link-hover link-primary"
-                :title="isTeacher ? 'View Student Timeline' : 'View Your Timeline'"
+                :title="
+                  isTeacher ? 'View Student Timeline' : 'View Your Timeline'
+                "
               >
                 {{ student.stu_name }}
               </router-link>
@@ -88,11 +112,24 @@
                 class="btn btn-xs btn-ghost"
                 title="Change Seat"
               >
-                {{ student.seat ?? '-' }}
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                {{ student.seat ?? "-" }}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-3 w-3 ml-1 inline-block"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                  />
+                </svg>
               </button>
               <span v-else>
-                {{ student.seat ?? '-' }}
+                {{ student.seat ?? "-" }}
               </span>
             </td>
             <td v-if="isTeacher" class="whitespace-nowrap">
@@ -102,9 +139,26 @@
                   title="Remove Student from Group"
                   @click="openRemoveConfirm(student)"
                   :disabled="isRemovingStudent"
-                  :class="{ 'loading': isRemovingStudent && studentToRemove?.stu_id === student.stu_id }"
+                  :class="{
+                    loading:
+                      isRemovingStudent &&
+                      studentToRemove?.stu_id === student.stu_id,
+                  }"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
                 </button>
                 <!-- Add other actions here if needed -->
               </div>
@@ -126,8 +180,12 @@
     <!-- Change Seat Modal -->
     <dialog id="change_seat_modal" class="modal" :open="showSeatModal">
       <div class="modal-box">
-        <h3 class="font-bold text-lg">Change Seat for {{ studentToEditSeat?.stu_name }}</h3>
-        <p class="py-2 text-sm text-base-content text-opacity-80">Student ID: {{ studentToEditSeat?.stu_id }}</p>
+        <h3 class="font-bold text-lg">
+          Change Seat for {{ studentToEditSeat?.stu_name }}
+        </h3>
+        <p class="py-2 text-sm text-base-content text-opacity-80">
+          Student ID: {{ studentToEditSeat?.stu_id }}
+        </p>
 
         <div class="form-control w-full max-w-xs py-4">
           <label class="label" for="seat_input">
@@ -141,7 +199,8 @@
             class="input input-bordered w-full"
             v-model.number="newSeatValue"
             @keyup.enter="handleSaveSeat"
-            ref="seatInputRef" />
+            ref="seatInputRef"
+          />
           <!-- Display validation errors for seat input -->
           <label class="label" v-if="seatInputError">
             <span class="label-text-alt text-error">{{ seatInputError }}</span>
@@ -150,19 +209,36 @@
 
         <!-- Saving Seat Error Display (from API) -->
         <div v-if="seatSaveError" class="alert alert-error text-sm p-2 my-2">
-          <span>Failed to save seat: {{ seatSaveError.message || seatSaveError }}</span>
+          <span
+            >Failed to save seat:
+            {{ seatSaveError.message || seatSaveError }}</span
+          >
         </div>
 
         <div class="modal-action">
-          <button class="btn btn-primary"
+          <button
+            class="btn btn-primary"
             @click="handleSaveSeat"
             :disabled="isSavingSeat"
-            :class="{ 'loading': isSavingSeat }">
+            :class="{ loading: isSavingSeat }"
+          >
             Save Seat
           </button>
-          <button class="btn btn-ghost" @click="closeSeatModal" :disabled="isSavingSeat">Cancel</button>
+          <button
+            class="btn btn-ghost"
+            @click="closeSeatModal"
+            :disabled="isSavingSeat"
+          >
+            Cancel
+          </button>
         </div>
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeSeatModal" :disabled="isSavingSeat">✕</button>
+        <button
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          @click="closeSeatModal"
+          :disabled="isSavingSeat"
+        >
+          ✕
+        </button>
       </div>
       <form method="dialog" class="modal-backdrop">
         <button @click="closeSeatModal" :disabled="isSavingSeat">close</button>
@@ -172,17 +248,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, nextTick, watch } from 'vue'; // Added watch
-import { useRouter } from 'vue-router';
-import { getWeekdayName } from '@/utils/weekday';
-import * as dataService from '@/services/dataService';
-import { useAuthStore } from '@/stores/auth';
-import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { ref, onMounted, computed, nextTick, watch } from "vue"; // Added watch
+import { useRouter } from "vue-router";
+import { getWeekdayName } from "@/utils/weekday";
+import * as dataService from "@/services/dataService";
+import { useAuthStore } from "@/stores/auth";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 // import { useLabroomStore } from '@/stores/labroom';
 
 // --- Props, Router, Stores ---
 const props = defineProps({
-  id: { type: [String, Number], required: true }
+  id: { type: [String, Number], required: true },
 });
 const router = useRouter();
 const authStore = useAuthStore();
@@ -213,7 +289,7 @@ const seatInputRef = ref(null); // Ref for the input element
 // --- Computed ---
 const isTeacher = computed(() => authStore.isTeacher || authStore.isAdmin);
 const removeConfirmationMessage = computed(() => {
-  if (!studentToRemove.value) return 'Are you sure?';
+  if (!studentToRemove.value) return "Are you sure?";
   return `Remove student '${studentToRemove.value.stu_name}' (ID: ${studentToRemove.value.stu_id})?`;
 });
 
@@ -241,7 +317,9 @@ const fetchStudents = async () => {
   try {
     const response = await dataService.getGroup(props.id);
     const fetchedData = response.data?.data || response.data || [];
-    console.log(`Fetched ${fetchedData.length} students for group ${props.id}.`); // Basic log
+    console.log(
+      `Fetched ${fetchedData.length} students for group ${props.id}.`,
+    ); // Basic log
     // Add more detailed key validation logs here if the "invalid character" error returns
     students.value = fetchedData;
   } catch (err) {
@@ -276,7 +354,9 @@ const handleRemoveStudent = async () => {
   } catch (err) {
     console.error(`Failed to remove student ${studentIdToRemove}:`, err);
     removeError.value = err.response?.data || err;
-    alert(`Failed to remove student: ${removeError.value?.error || 'Unknown error'}`);
+    alert(
+      `Failed to remove student: ${removeError.value?.error || "Unknown error"}`,
+    );
     closeRemoveConfirm();
   } finally {
     isRemovingStudent.value = false;
@@ -286,7 +366,7 @@ const handleRemoveStudent = async () => {
 // Change Seat Logic
 const openSeatModal = (student) => {
   studentToEditSeat.value = student;
-  newSeatValue.value = typeof student.seat === 'number' ? student.seat : null;
+  newSeatValue.value = typeof student.seat === "number" ? student.seat : null;
   seatSaveError.value = null;
   seatInputError.value = null;
   showSeatModal.value = true; // Trigger the watch
@@ -302,13 +382,20 @@ const closeSeatModal = () => {
 };
 
 const handleSaveSeat = async () => {
-  if (!studentToEditSeat.value || !isTeacher.value || isSavingSeat.value) return;
+  if (!studentToEditSeat.value || !isTeacher.value || isSavingSeat.value)
+    return;
   seatSaveError.value = null;
   seatInputError.value = null;
 
-  if (newSeatValue.value === null || newSeatValue.value === undefined || isNaN(newSeatValue.value)) {
+  if (
+    newSeatValue.value === null ||
+    newSeatValue.value === undefined ||
+    isNaN(newSeatValue.value)
+  ) {
     seatInputError.value = "Please enter a valid seat number.";
-    nextTick(() => { seatInputRef.value?.focus(); });
+    nextTick(() => {
+      seatInputRef.value?.focus();
+    });
     return;
   }
 
@@ -325,9 +412,12 @@ const handleSaveSeat = async () => {
     closeSeatModal();
     await fetchStudents();
   } catch (err) {
-    console.error(`Failed to update seat for student ${studentToEditSeat.value.stu_name}:`, err);
-    seatSaveError.value = err.response?.data?.error
-      || "An unknown error occurred";
+    console.error(
+      `Failed to update seat for student ${studentToEditSeat.value.stu_name}:`,
+      err,
+    );
+    seatSaveError.value =
+      err.response?.data?.error || "An unknown error occurred";
     alert(`Failed to update seat: ${seatSaveError.value}`);
   } finally {
     isSavingSeat.value = false;

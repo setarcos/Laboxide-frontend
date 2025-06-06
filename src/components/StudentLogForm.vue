@@ -4,7 +4,10 @@
     <div class="space-y-4">
       <!-- Display Student Info (Read-only, name from store) -->
       <div class="text-sm">
-        <strong>Student:</strong> {{ authStore.user?.realname || formData.stu_name || 'N/A' }} ({{ formData.stu_id || 'N/A' }})
+        <strong>Student:</strong>
+        {{ authStore.user?.realname || formData.stu_name || "N/A" }} ({{
+          formData.stu_id || "N/A"
+        }})
       </div>
 
       <div class="divider text-xs">Editable Log Details</div>
@@ -15,10 +18,27 @@
           <span class="label-text">Lab Room</span>
           <!-- Add <span class="text-error">*</span> if room selection is mandatory -->
         </label>
-        <div v-if="isLoadingRooms" class="text-sm text-gray-500 py-2">Loading rooms...</div>
-        <div v-else-if="roomError" class="alert alert-warning alert-sm shadow-sm py-2">
+        <div v-if="isLoadingRooms" class="text-sm text-gray-500 py-2">
+          Loading rooms...
+        </div>
+        <div
+          v-else-if="roomError"
+          class="alert alert-warning alert-sm shadow-sm py-2"
+        >
           <div>
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-4 w-4" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="stroke-current flex-shrink-0 h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
             <span>{{ roomError }}</span>
           </div>
         </div>
@@ -30,7 +50,9 @@
           :disabled="labRooms.length === 0 && !roomError"
         >
           <option :value="null" disabled>
-            {{ labRooms.length === 0 ? 'No rooms available' : 'Select a lab room' }}
+            {{
+              labRooms.length === 0 ? "No rooms available" : "Select a lab room"
+            }}
           </option>
           <option v-for="room in labRooms" :key="room.id" :value="room.id">
             {{ room.name }}({{ room.room }})
@@ -69,7 +91,9 @@
 
       <div class="form-control">
         <label for="note" class="label">
-          <span class="label-text">Student Note <span class="text-error">*</span></span>
+          <span class="label-text"
+            >Student Note <span class="text-error">*</span></span
+          >
         </label>
         <textarea
           id="note"
@@ -79,7 +103,9 @@
           required
         ></textarea>
         <label class="label">
-          <span class="label-text-alt text-gray-500">Describe work or enter "None". Field is required.</span>
+          <span class="label-text-alt text-gray-500"
+            >Describe work or enter "None". Field is required.</span
+          >
         </label>
       </div>
 
@@ -87,51 +113,62 @@
       <div class="divider text-xs">Post-Lab Checks</div>
       <div class="space-y-2 mt-2">
         <div class="form-control">
-          <label for="check-clean" class="label cursor-pointer justify-start gap-3">
+          <label
+            for="check-clean"
+            class="label cursor-pointer justify-start gap-3"
+          >
             <input
               type="checkbox"
               id="check-clean"
               v-model="isTableCleaned"
               class="checkbox checkbox-primary checkbox-sm"
             />
-            <span class="label-text">Clean the table <span class="text-error">*</span></span>
+            <span class="label-text"
+              >Clean the table <span class="text-error">*</span></span
+            >
           </label>
         </div>
         <div class="form-control">
-          <label for="check-off" class="label cursor-pointer justify-start gap-3">
+          <label
+            for="check-off"
+            class="label cursor-pointer justify-start gap-3"
+          >
             <input
               type="checkbox"
               id="check-off"
               v-model="isEquipmentOff"
               class="checkbox checkbox-primary checkbox-sm"
             />
-            <span class="label-text">Turn off all equipment <span class="text-error">*</span></span>
+            <span class="label-text"
+              >Turn off all equipment <span class="text-error">*</span></span
+            >
           </label>
         </div>
       </div>
       <!-- End Confirmation Checkboxes -->
-
     </div>
 
     <!-- Actions -->
     <div class="modal-action mt-6">
-    <button type="button" class="btn btn-ghost" @click="$emit('close')">Cancel</button>
-    <button
-      type="submit"
-      class="btn btn-primary"
-      :disabled="isSubmitDisabled"
-      :class="{ loading: isSaving }"
-    >
-      {{ isSaving ? 'Saving...' : (formData.id ? 'Update Log' : 'Save Log') }}
-    </button>
-  </div>
+      <button type="button" class="btn btn-ghost" @click="$emit('close')">
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        :disabled="isSubmitDisabled"
+        :class="{ loading: isSaving }"
+      >
+        {{ isSaving ? "Saving..." : formData.id ? "Update Log" : "Save Log" }}
+      </button>
+    </div>
   </form>
 </template>
 
 <script setup>
-import { ref, watch, computed, onMounted } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import * as dataService from '@/services/dataService'; // Assuming getLabrooms is in dataService
+import { ref, watch, computed, onMounted } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import * as dataService from "@/services/dataService"; // Assuming getLabrooms is in dataService
 
 const props = defineProps({
   initialData: {
@@ -144,7 +181,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['save', 'close']);
+const emit = defineEmits(["save", "close"]);
 const authStore = useAuthStore();
 
 // --- State for Checkboxes ---
@@ -159,13 +196,13 @@ const roomError = ref(null);
 
 const defaultLogStructure = {
   id: null,
-  stu_id: '',
-  stu_name: '',
+  stu_id: "",
+  stu_name: "",
   subcourse_id: null,
   room_id: null, // Added room_id, default to null
   seat: null,
-  lab_name: '',
-  note: '',
+  lab_name: "",
+  note: "",
 };
 
 const formData = ref({ ...defaultLogStructure });
@@ -190,7 +227,6 @@ const fetchLabRooms = async () => {
     // if (formData.value.room_id && !labRooms.value.some(room => room.id === formData.value.room_id)) {
     //   formData.value.room_id = null; // Or set to a default if applicable
     // }
-
   } catch (err) {
     console.error("Failed to fetch lab rooms:", err);
     roomError.value = "Could not load lab rooms.";
@@ -206,63 +242,78 @@ onMounted(() => {
 });
 
 // --- Watchers ---
-watch(() => props.initialData, (newData) => {
-  const mergedData = { ...defaultLogStructure, ...newData };
+watch(
+  () => props.initialData,
+  (newData) => {
+    const mergedData = { ...defaultLogStructure, ...newData };
 
-  mergedData.stu_name = authStore.user?.realname || mergedData.stu_name || '';
-  mergedData.stu_id = mergedData.stu_id || authStore.user?.userId || '';
+    mergedData.stu_name = authStore.user?.realname || mergedData.stu_name || "";
+    mergedData.stu_id = mergedData.stu_id || authStore.user?.userId || "";
 
-  if (!mergedData.note || mergedData.note.trim() === '') {
-    mergedData.note = 'None';
-  }
+    if (!mergedData.note || mergedData.note.trim() === "") {
+      mergedData.note = "None";
+    }
 
-  if (mergedData.seat === 0) {
-    mergedData.seat = null;
-  }
+    if (mergedData.seat === 0) {
+      mergedData.seat = null;
+    }
 
-  // `room_id` will be picked from `newData` if present, or `null` from `defaultLogStructure`
-  formData.value = mergedData;
+    // `room_id` will be picked from `newData` if present, or `null` from `defaultLogStructure`
+    formData.value = mergedData;
 
-  isTableCleaned.value = false;
-  isEquipmentOff.value = false;
+    isTableCleaned.value = false;
+    isEquipmentOff.value = false;
 
-  // If lab rooms are already loaded and initialData.room_id is set,
-  // but that room_id is not in the list, you might want to clear it.
-  // This is more robust if done after fetchLabRooms completes or in conjunction.
-  // For simplicity, current behavior is that an invalid initial room_id won't match.
-  if (labRooms.value.length > 0 && formData.value.room_id && !labRooms.value.some(room => room.id === formData.value.room_id)) {
-    console.warn(`Initial room_id ${formData.value.room_id} not found in available rooms. User may need to re-select.`);
-    // formData.value.room_id = null; // Optionally reset if an invalid ID is provided initially
-  }
-
-} , { immediate: true, deep: true });
-
+    // If lab rooms are already loaded and initialData.room_id is set,
+    // but that room_id is not in the list, you might want to clear it.
+    // This is more robust if done after fetchLabRooms completes or in conjunction.
+    // For simplicity, current behavior is that an invalid initial room_id won't match.
+    if (
+      labRooms.value.length > 0 &&
+      formData.value.room_id &&
+      !labRooms.value.some((room) => room.id === formData.value.room_id)
+    ) {
+      console.warn(
+        `Initial room_id ${formData.value.room_id} not found in available rooms. User may need to re-select.`,
+      );
+      // formData.value.room_id = null; // Optionally reset if an invalid ID is provided initially
+    }
+  },
+  { immediate: true, deep: true },
+);
 
 // --- Computed property to control submit button disabled state ---
 const isSubmitDisabled = computed(() => {
   // If room selection is mandatory, add this condition:
   // if (formData.value.room_id === null && labRooms.value.length > 0) return true;
-  return props.isSaving ||
-    !formData.value.note || formData.value.note.trim() === '' ||
+  return (
+    props.isSaving ||
+    !formData.value.note ||
+    formData.value.note.trim() === "" ||
     !isTableCleaned.value ||
-    !isEquipmentOff.value;
+    !isEquipmentOff.value
+  );
 });
 
 // --- Handle form submission ---
 const handleSubmit = () => {
-  if (isSubmitDisabled.value) { // Check computed property first
+  if (isSubmitDisabled.value) {
+    // Check computed property first
     return;
   }
 
   if (!props.isSaving) {
     const dataToSave = {
       ...formData.value,
-      seat: formData.value.seat === null || formData.value.seat === '' ? 0 : Number(formData.value.seat),
-      stu_id: formData.value.stu_id || authStore.user?.userId || '',
-      stu_name: authStore.user?.realname || formData.value.stu_name || '',
+      seat:
+        formData.value.seat === null || formData.value.seat === ""
+          ? 0
+          : Number(formData.value.seat),
+      stu_id: formData.value.stu_id || authStore.user?.userId || "",
+      stu_name: authStore.user?.realname || formData.value.stu_name || "",
       // room_id is already part of formData.value and will be null or an ID
       confirm: props.initialData?.confirm || 0,
-      tea_note: props.initialData?.tea_note || '',
+      tea_note: props.initialData?.tea_note || "",
     };
 
     if (!dataToSave.stu_id) {
@@ -278,7 +329,7 @@ const handleSubmit = () => {
     //   return;
     // }
 
-    emit('save', dataToSave);
+    emit("save", dataToSave);
   }
 };
 </script>

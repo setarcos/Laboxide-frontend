@@ -1,46 +1,77 @@
 <template>
-  <div class="prose max-w-none"> <!-- Use prose for nice typography -->
+  <div class="prose max-w-none">
+    <!-- Use prose for nice typography -->
     <p v-if="authStore.isLoading">Loading user information...</p>
     <p v-else-if="authStore.user">
-      Welcome back, <strong>{{ authStore.user.realname }}</strong>!
+      Welcome back, <strong>{{ authStore.user.realname }}</strong
+      >!
     </p>
-    <p v-else>
-      Please log in to access more features.
-    </p>
+    <p v-else>Please log in to access more features.</p>
 
     <!-- Semester Greeting -->
     <p class="mt-2 text-lg text-info font-medium">
-      <span v-if="semesterStore.isSemesterLoading" class="loading loading-dots loading-sm"></span>
-      <span v-else-if="semesterStore.semesterError" class="text-error">⚠️ Could not load semester info.</span>
+      <span
+        v-if="semesterStore.isSemesterLoading"
+        class="loading loading-dots loading-sm"
+      ></span>
+      <span v-else-if="semesterStore.semesterError" class="text-error"
+        >⚠️ Could not load semester info.</span
+      >
       <span v-else>{{ semesterGreeting }}</span>
     </p>
 
     <div v-if="authStore.isTeacher | authStore.isStudent" class="divider"></div>
     <!-- My Courses Card (Only for authenticated users) -->
-    <div v-if="authStore.isTeacher | authStore.isStudent" class="card bg-base-100 shadow-xl mt-6">
+    <div
+      v-if="authStore.isTeacher | authStore.isStudent"
+      class="card bg-base-100 shadow-xl mt-6"
+    >
       <div class="card-body">
         <h2 class="card-title">My Courses</h2>
 
         <!-- Loading State for Courses -->
         <div v-if="isLoadingMyCourses" class="text-center py-5">
-          <span class="loading loading-spinner text-primary"></span> Loading your courses...
+          <span class="loading loading-spinner text-primary"></span> Loading
+          your courses...
         </div>
 
         <!-- Error State for Courses -->
         <div v-else-if="myCoursesError" class="alert alert-warning shadow-sm">
           <div>
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-            <span>Could not load your courses: {{ myCoursesError.message || myCoursesError }}</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="stroke-current flex-shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <span
+              >Could not load your courses:
+              {{ myCoursesError.message || myCoursesError }}</span
+            >
           </div>
         </div>
 
         <!-- Loading State for Final Log Statuses -->
-        <div v-if="isLoadingFinalLogStatuses" class="text-center text-sm text-gray-500 my-2">
-          <span class="loading loading-dots loading-xs"></span> Checking final log statuses...
+        <div
+          v-if="isLoadingFinalLogStatuses"
+          class="text-center text-sm text-gray-500 my-2"
+        >
+          <span class="loading loading-dots loading-xs"></span> Checking final
+          log statuses...
         </div>
 
         <!-- Error State for Final Log Statuses -->
-        <div v-else-if="finalLogStatusesError" class="alert alert-error shadow-sm my-2 text-sm">
+        <div
+          v-else-if="finalLogStatusesError"
+          class="alert alert-error shadow-sm my-2 text-sm"
+        >
           Error checking final log statuses: {{ finalLogStatusesError }}
         </div>
 
@@ -59,7 +90,10 @@
               <tr v-for="course in myCourses" :key="course.id">
                 <td>
                   <router-link
-                    :to="{ name: 'CourseDetail', params: { id: course.course_id } }"
+                    :to="{
+                      name: 'CourseDetail',
+                      params: { id: course.course_id },
+                    }"
                     class="link link-hover link-primary"
                     :title="`View details for ${course.course_name}`"
                   >
@@ -69,7 +103,10 @@
                 <td>
                   <router-link
                     v-if="authStore.isTeacher"
-                    :to="{ name: 'SubcourseStudents', params: { id: course.id} }"
+                    :to="{
+                      name: 'SubcourseStudents',
+                      params: { id: course.id },
+                    }"
                     class="link link-hover link-primary"
                     title="View Students"
                   >
@@ -79,17 +116,25 @@
                 </td>
                 <td>{{ course.room_name }}</td>
                 <td>
-                  <button v-if="authStore.isStudent"
+                  <button
+                    v-if="authStore.isStudent"
                     class="btn btn-xs btn-outline btn-primary"
                     @click="handleLogButtonClick(course)"
                     :disabled="!currentWeekNumber || hasConfirmedLog(course.id)"
                     :title="getLogButtonTitle(course.id)"
                   >
-                    <span>{{ hasConfirmedLog(course.id) ? 'Log Confirmed' : 'Log Progress' }}</span>
+                    <span>{{
+                      hasConfirmedLog(course.id)
+                        ? "Log Confirmed"
+                        : "Log Progress"
+                    }}</span>
                   </button>
                   <div v-if="authStore.isTeacher" class="flex gap-1">
                     <router-link
-                      :to="{ name: 'SubcourseProgress', params: { id: course.id } }"
+                      :to="{
+                        name: 'SubcourseProgress',
+                        params: { id: course.id },
+                      }"
                       class="btn btn-xs btn-outline btn-secondary"
                       title="View Student Progress"
                     >
@@ -106,7 +151,6 @@
         <div v-else class="text-center py-5 italic text-gray-500">
           You are not currently assigned to any courses.
         </div>
-
       </div>
     </div>
 
@@ -114,10 +158,30 @@
     <div class="mt-6 p-4 bg-base-200 rounded-box" v-if="isSuper">
       <h3 class="text-lg font-semibold mb-2">Quick Actions</h3>
       <div class="flex flex-wrap gap-2">
-        <router-link v-if="authStore.isAdmin | authStore.isTeacher" :to="{ name: 'Courses'}" class="btn btn-sm btn-outline">Manage Courses</router-link>
-        <router-link v-if="authStore.isAdmin | authStore.isLabManager" :to="{ name: 'Labrooms'}" class="btn btn-sm btn-outline">Manage Lab Rooms</router-link>
-        <router-link v-if="authStore.isAdmin" :to="{ name: 'Users'}" class="btn btn-sm btn-outline">Manage Users</router-link>
-        <router-link v-if="authStore.isAdmin" :to="{ name: 'Semesters'}" class="btn btn-sm btn-outline">Manage Semesters</router-link>
+        <router-link
+          v-if="authStore.isAdmin | authStore.isTeacher"
+          :to="{ name: 'Courses' }"
+          class="btn btn-sm btn-outline"
+          >Manage Courses</router-link
+        >
+        <router-link
+          v-if="authStore.isAdmin | authStore.isLabManager"
+          :to="{ name: 'Labrooms' }"
+          class="btn btn-sm btn-outline"
+          >Manage Lab Rooms</router-link
+        >
+        <router-link
+          v-if="authStore.isAdmin"
+          :to="{ name: 'Users' }"
+          class="btn btn-sm btn-outline"
+          >Manage Users</router-link
+        >
+        <router-link
+          v-if="authStore.isAdmin"
+          :to="{ name: 'Semesters' }"
+          class="btn btn-sm btn-outline"
+          >Manage Semesters</router-link
+        >
       </div>
     </div>
 
@@ -125,7 +189,9 @@
     <dialog id="timeline_log_modal" class="modal" :open="showTimelineModal">
       <div class="modal-box w-11/12 max-w-3xl">
         <TimelineLogModal
-          v-if="selectedSubcourseForTimeline && currentWeekNumber && authStore.user"
+          v-if="
+            selectedSubcourseForTimeline && currentWeekNumber && authStore.user
+          "
           :key="timelineModalKey"
           :subcourse="selectedSubcourseForTimeline"
           :student-id="authStore.user.userId"
@@ -137,7 +203,12 @@
         <div v-else class="p-4 text-center text-error">
           Missing data required to open the timeline log.
         </div>
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeTimelineModal">✕</button>
+        <button
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          @click="closeTimelineModal"
+        >
+          ✕
+        </button>
       </div>
       <form method="dialog" class="modal-backdrop">
         <button @click="closeTimelineModal">close</button>
@@ -148,7 +219,10 @@
     <dialog id="finish_log_modal" class="modal" :open="showFinishLogModal">
       <div class="modal-box w-11/12 max-w-2xl">
         <h3 class="font-bold text-lg mb-4">
-          Final Experiment Log for {{ selectedSubcourseForFinishLog?.course_name }} ({{ getWeekdayName(selectedSubcourseForFinishLog?.weekday) }})
+          Final Experiment Log for
+          {{ selectedSubcourseForFinishLog?.course_name }} ({{
+            getWeekdayName(selectedSubcourseForFinishLog?.weekday)
+          }})
         </h3>
 
         <div v-if="isLoadingFinishLogDefaults" class="text-center p-10">
@@ -170,40 +244,45 @@
           Could not display final log form. Default data unavailable.
         </div>
 
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeFinishLogModal">✕</button>
+        <button
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          @click="closeFinishLogModal"
+        >
+          ✕
+        </button>
       </div>
       <form method="dialog" class="modal-backdrop">
         <button @click="closeFinishLogModal">close</button>
       </form>
     </dialog>
-
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
-import { useAuthStore } from '@/stores/auth'
-import { useSemesterStore } from '@/stores/semester'
-import * as dataService from '@/services/dataService';
-import { getWeekdayName, calculateCurrentWeek } from '@/utils/weekday';
-import StudentLogForm from '@/components/StudentLogForm.vue';
-import TimelineLogModal from '@/components/TimelineLogModal.vue';
+import { ref, computed, watch } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import { useSemesterStore } from "@/stores/semester";
+import * as dataService from "@/services/dataService";
+import { getWeekdayName, calculateCurrentWeek } from "@/utils/weekday";
+import StudentLogForm from "@/components/StudentLogForm.vue";
+import TimelineLogModal from "@/components/TimelineLogModal.vue";
 
-const authStore = useAuthStore()
-const semesterStore = useSemesterStore()
+const authStore = useAuthStore();
+const semesterStore = useSemesterStore();
 
 // --- State for My Courses ---
 const myCourses = ref([]);
 const isLoadingMyCourses = ref(false);
 const myCoursesError = ref(null);
-const isSuper = computed(() => (authStore.isTeacher | authStore.isAdmin | authStore.isLabManager))
+const isSuper = computed(
+  () => authStore.isTeacher | authStore.isAdmin | authStore.isLabManager,
+);
 
 // --- State for Student Final Log Statuses ---
 // Store the single log object for the current student, keyed by subcourse_id
 const studentFinalLogBySubcourse = ref({}); // { [subcourseId]: StudentLog | null }
 const isLoadingFinalLogStatuses = ref(false);
 const finalLogStatusesError = ref(null);
-
 
 // --- State for Timeline Log Modal ---
 const showTimelineModal = ref(false);
@@ -221,7 +300,11 @@ const finishLogFormKey = ref(0);
 
 // --- Current Week Calculation ---
 const currentWeekNumber = computed(() => {
-  if (semesterStore.isSemesterLoading || semesterStore.semesterError || !semesterStore.currentSemester) {
+  if (
+    semesterStore.isSemesterLoading ||
+    semesterStore.semesterError ||
+    !semesterStore.currentSemester
+  ) {
     return null;
   }
   return calculateCurrentWeek(semesterStore.currentSemester);
@@ -241,13 +324,18 @@ const fetchMyCourses = async () => {
     myCourses.value = response.data || [];
 
     // After fetching courses, if user is student, fetch their final log status for these courses
-    if (authStore.isStudent && myCourses.value.length > 0 && authStore.user?.userId) {
-      fetchStudentFinalLogStatusesForMyCourses(myCourses.value.map(c => c.id));
+    if (
+      authStore.isStudent &&
+      myCourses.value.length > 0 &&
+      authStore.user?.userId
+    ) {
+      fetchStudentFinalLogStatusesForMyCourses(
+        myCourses.value.map((c) => c.id),
+      );
     } else {
       // If not student or no courses or no user ID, ensure log status state is cleared
       studentFinalLogBySubcourse.value = {};
     }
-
   } catch (err) {
     console.error("Failed to fetch user's courses:", err);
     myCoursesError.value = err.response?.data || err;
@@ -262,7 +350,11 @@ const fetchMyCourses = async () => {
 // This function fetches the *single* final log entry for the current student
 // for each of their assigned subcourses.
 const fetchStudentFinalLogStatusesForMyCourses = async (subcourseIds) => {
-  if (!authStore.isStudent || !authStore.user?.userId || subcourseIds.length === 0) {
+  if (
+    !authStore.isStudent ||
+    !authStore.user?.userId ||
+    subcourseIds.length === 0
+  ) {
     studentFinalLogBySubcourse.value = {}; // Clear if no student, no user ID, or no courses
     return;
   }
@@ -276,14 +368,21 @@ const fetchStudentFinalLogStatusesForMyCourses = async (subcourseIds) => {
 
   try {
     // Create an array of promises, one fetch for getDefaultStudentLog for each subcourse ID
-    const fetchPromises = subcourseIds.map(id =>
-      dataService.getDefaultStudentLog(id, studentId)
-      .then(res => ({ subcourseId: id, log: res.data })) // Return ID with the single log (or null)
-      .catch(err => {
-        console.error(`Failed to fetch student log status for subcourse ${id}:`, err);
-        // Return an error object for this specific ID to track failures
-        return { subcourseId: id, error: err.response?.data?.error || err.message || 'Fetch failed' };
-      })
+    const fetchPromises = subcourseIds.map((id) =>
+      dataService
+        .getDefaultStudentLog(id, studentId)
+        .then((res) => ({ subcourseId: id, log: res.data })) // Return ID with the single log (or null)
+        .catch((err) => {
+          console.error(
+            `Failed to fetch student log status for subcourse ${id}:`,
+            err,
+          );
+          // Return an error object for this specific ID to track failures
+          return {
+            subcourseId: id,
+            error: err.response?.data?.error || err.message || "Fetch failed",
+          };
+        }),
     );
 
     // Wait for all promises to settle (either fulfill or reject)
@@ -291,12 +390,14 @@ const fetchStudentFinalLogStatusesForMyCourses = async (subcourseIds) => {
 
     const successfullyFetchedStatuses = {};
     let hasErrors = false;
-    results.forEach(result => {
+    results.forEach((result) => {
       if (result.error) {
         hasErrors = true;
         // Store an indicator of the error, or just log it.
         // Let's store null/undefined for simplicity and rely on general error message.
-        console.warn(`Student log status fetch failed for subcourse ${result.subcourseId}: ${result.error}`);
+        console.warn(
+          `Student log status fetch failed for subcourse ${result.subcourseId}: ${result.error}`,
+        );
         // Optionally: successfullyFetchedStatuses[result.subcourseId] = { error: result.error };
       } else {
         // Store the single log object (or null if none exists)
@@ -307,15 +408,19 @@ const fetchStudentFinalLogStatusesForMyCourses = async (subcourseIds) => {
     studentFinalLogBySubcourse.value = successfullyFetchedStatuses;
 
     if (hasErrors) {
-      finalLogStatusesError.value = "Could not load final log statuses for some courses.";
+      finalLogStatusesError.value =
+        "Could not load final log statuses for some courses.";
     } else {
       finalLogStatusesError.value = null; // Clear error if all successful
     }
-
   } catch (err) {
     // This catch block would only be hit if Promise.all itself fails in an unexpected way.
-    console.error("Unexpected error during student final log status fetch:", err);
-    finalLogStatusesError.value = err.message || 'An unexpected error occurred during log status check.';
+    console.error(
+      "Unexpected error during student final log status fetch:",
+      err,
+    );
+    finalLogStatusesError.value =
+      err.message || "An unexpected error occurred during log status check.";
     studentFinalLogBySubcourse.value = {}; // Clear data on major error
   } finally {
     isLoadingFinalLogStatuses.value = false;
@@ -339,7 +444,7 @@ const getLogButtonTitle = (subcourseId) => {
   if (hasConfirmedLog(subcourseId)) {
     // Optionally add teacher note to tooltip if available in the log object
     const log = studentFinalLogBySubcourse.value[subcourseId];
-    const teacherNote = log?.tea_note ? `\nTeacher Note: ${log.tea_note}` : '';
+    const teacherNote = log?.tea_note ? `\nTeacher Note: ${log.tea_note}` : "";
     return `Your final log for this course has been confirmed by a teacher.${teacherNote}`;
   }
   return "Log your progress steps for the current week or submit the final log.";
@@ -364,7 +469,9 @@ const semesterGreeting = computed(() => {
 const handleLogButtonClick = async (subcourse) => {
   // Prevent action if already confirmed or if check is already running for this button
   if (hasConfirmedLog(subcourse.id)) {
-    console.log("Log already confirmed or check running, ignoring button click.");
+    console.log(
+      "Log already confirmed or check running, ignoring button click.",
+    );
     // Optional: provide feedback if needed
     return;
   }
@@ -378,7 +485,9 @@ const handleLogButtonClick = async (subcourse) => {
     return;
   }
   if (subcourse.course_id === undefined || subcourse.tea_name === undefined) {
-    alert("Cannot open log: Missing required course information (parent course ID or teacher name).");
+    alert(
+      "Cannot open log: Missing required course information (parent course ID or teacher name).",
+    );
     console.error("Subcourse object missing course_id or tea_name:", subcourse);
     return;
   }
@@ -404,11 +513,18 @@ const openTimelineModal = (subcourse) => {
     return;
   }
   if (subcourse.course_id === undefined || subcourse.tea_name === undefined) {
-    alert("Cannot open log: Missing required course information (parent course ID or teacher name).");
+    alert(
+      "Cannot open log: Missing required course information (parent course ID or teacher name).",
+    );
     console.error("Subcourse object missing course_id or tea_name:", subcourse);
     return;
   }
-  console.log("Opening timeline modal for subcourse:", subcourse.id, "Week:", currentWeekNumber.value);
+  console.log(
+    "Opening timeline modal for subcourse:",
+    subcourse.id,
+    "Week:",
+    currentWeekNumber.value,
+  );
   selectedSubcourseForTimeline.value = subcourse;
   timelineModalKey.value++; // Increment key to ensure modal internals refresh if needed
   showTimelineModal.value = true;
@@ -445,7 +561,8 @@ const handleRequestFinishLog = (subcourse) => {
 };
 
 // Fetches the specific student's final log for the given subcourse
-const openFinishLogModal = async (subcourse) => { // Renamed from openLogModal
+const openFinishLogModal = async (subcourse) => {
+  // Renamed from openLogModal
   if (!authStore.isStudent || !authStore.user?.userId) return; // Redundant check, but safe
 
   console.log("Opening FINAL log modal for subcourse:", subcourse.id);
@@ -457,21 +574,33 @@ const openFinishLogModal = async (subcourse) => { // Renamed from openLogModal
 
   try {
     // Use the *original* dataService call for the final log
-    const response = await dataService.getDefaultStudentLog(subcourse.id, authStore.user.userId);
+    const response = await dataService.getDefaultStudentLog(
+      subcourse.id,
+      authStore.user.userId,
+    );
     finishLogDefaultData.value = response.data?.data || response.data; // Adjust based on API
     if (!finishLogDefaultData.value) {
       // Create default structure if none exists
       finishLogDefaultData.value = {
-        id: null, stu_id: authStore.user.userId, stu_name: authStore.user.realname,
-        subcourse_id: subcourse.id, room_id: subcourse.room_id, lab_name: subcourse.room_name,
-        seat: null, note: '', tea_note: '', tea_name: subcourse.tea_name,
-        fin_time: null, confirm: 0,
+        id: null,
+        stu_id: authStore.user.userId,
+        stu_name: authStore.user.realname,
+        subcourse_id: subcourse.id,
+        room_id: subcourse.room_id,
+        lab_name: subcourse.room_name,
+        seat: null,
+        note: "",
+        tea_note: "",
+        tea_name: subcourse.tea_name,
+        fin_time: null,
+        confirm: 0,
       };
     }
     finishLogFormKey.value++; // Use renamed state
   } catch (err) {
     console.error("Failed to fetch default student log for final step:", err);
-    finishLogDefaultError.value = err.response?.data?.error || err.message || 'Unknown error'; // Use renamed state
+    finishLogDefaultError.value =
+      err.response?.data?.error || err.message || "Unknown error"; // Use renamed state
   } finally {
     isLoadingFinishLogDefaults.value = false; // Use renamed state
   }
@@ -509,12 +638,14 @@ const handleFinishLogSave = async (logData) => {
     // using the student-specific API to update the button status.
     if (selectedSubcourseForFinishLog.value?.id && authStore.user?.userId) {
       // Fetch just the one log for the subcourse we just saved for
-      await fetchStudentFinalLogStatusesForMyCourses([selectedSubcourseForFinishLog.value.id]);
+      await fetchStudentFinalLogStatusesForMyCourses([
+        selectedSubcourseForFinishLog.value.id,
+      ]);
     }
-
   } catch (err) {
     console.error("Failed to save final student log:", err);
-    const errorMsg = err.response?.data?.error || err.message || 'Unknown error during save';
+    const errorMsg =
+      err.response?.data?.error || err.message || "Unknown error during save";
     finishLogDefaultError.value = errorMsg;
     // Decide if you want to show an alert or just the error in the modal
     // alert(`Error saving final log: ${errorMsg}`);
@@ -524,26 +655,28 @@ const handleFinishLogSave = async (logData) => {
 };
 
 // --- Watchers and Lifecycle ---
-watch(() => authStore.isAuthenticated, async (isAuth) => {
-  console.log(`Auth state changed: ${isAuth}`);
-  if (isAuth) {
-
-    if (authStore.isTeacher || authStore.isStudent) {
-      await fetchMyCourses(); // Wait for courses to fetch
+watch(
+  () => authStore.isAuthenticated,
+  async (isAuth) => {
+    console.log(`Auth state changed: ${isAuth}`);
+    if (isAuth) {
+      if (authStore.isTeacher || authStore.isStudent) {
+        await fetchMyCourses(); // Wait for courses to fetch
+      }
+    } else {
+      // Clear data on logout
+      myCourses.value = [];
+      myCoursesError.value = null;
+      isLoadingMyCourses.value = false;
+      studentFinalLogBySubcourse.value = {}; // Clear log statuses state
+      isLoadingFinalLogStatuses.value = false; // Clear log loading state
+      finalLogStatusesError.value = null; // Clear log error state
+      // Optionally reset semester info if needed, but store might handle it
+      console.log("User logged out, cleared courses and logs.");
     }
-  } else {
-    // Clear data on logout
-    myCourses.value = [];
-    myCoursesError.value = null;
-    isLoadingMyCourses.value = false;
-    studentFinalLogBySubcourse.value = {}; // Clear log statuses state
-    isLoadingFinalLogStatuses.value = false; // Clear log loading state
-    finalLogStatusesError.value = null; // Clear log error state
-    // Optionally reset semester info if needed, but store might handle it
-    console.log("User logged out, cleared courses and logs.");
-  }
-}, { immediate: true }); // Run immediately on component mount and auth state change
-
+  },
+  { immediate: true },
+); // Run immediately on component mount and auth state change
 </script>
 
 <style scoped>

@@ -2,23 +2,48 @@
   <div>
     <h1 class="text-2xl font-semibold mb-4">Manage Users</h1>
 
-     <!-- Add Button (Admin only) -->
+    <!-- Add Button (Admin only) -->
     <div class="mb-4 text-right" v-if="authStore.isAdmin">
       <button class="btn btn-primary" @click="openAddModal">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" /></svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-5 h-5"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"
+          />
+        </svg>
         Add User
       </button>
     </div>
 
-     <!-- Loading and Error States -->
+    <!-- Loading and Error States -->
     <div v-if="isLoading" class="text-center py-10">
       <span class="loading loading-lg loading-spinner text-primary"></span>
     </div>
-     <div v-else-if="error" class="alert alert-error shadow-lg">
-       <div>
-         <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-         <span>Error loading users: {{ error.message || error }}</span>
-       </div>
+    <div v-else-if="error" class="alert alert-error shadow-lg">
+      <div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current flex-shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>Error loading users: {{ error.message || error }}</span>
+      </div>
     </div>
 
     <!-- Users Table -->
@@ -34,7 +59,7 @@
           </tr>
         </thead>
         <tbody>
-           <tr v-if="users.length === 0">
+          <tr v-if="users.length === 0">
             <td colspan="5" class="text-center italic py-4">No users found.</td>
           </tr>
           <tr v-for="user in users" :key="user.user_id">
@@ -42,34 +67,78 @@
             <td>{{ user.username }}</td>
             <td>{{ user.permission }}</td>
             <td>
-                <span v-if="hasRole(user.permission, PERMISSION_ADMIN)" class="badge badge-primary badge-outline mr-1">Admin</span>
-                <span v-if="hasRole(user.permission, PERMISSION_TEACHER)" class="badge badge-secondary badge-outline mr-1">Teacher</span>
-                <span v-if="hasRole(user.permission, PERMISSION_LAB_MANAGER)" class="badge badge-accent badge-outline mr-1">Lab Manager</span>
+              <span
+                v-if="hasRole(user.permission, PERMISSION_ADMIN)"
+                class="badge badge-primary badge-outline mr-1"
+                >Admin</span
+              >
+              <span
+                v-if="hasRole(user.permission, PERMISSION_TEACHER)"
+                class="badge badge-secondary badge-outline mr-1"
+                >Teacher</span
+              >
+              <span
+                v-if="hasRole(user.permission, PERMISSION_LAB_MANAGER)"
+                class="badge badge-accent badge-outline mr-1"
+                >Lab Manager</span
+              >
             </td>
             <td>
               <div class="flex gap-1">
-                 <!-- Edit/Delete only for Admin -->
-                 <!-- Prevent deleting/editing the currently logged-in admin? Optional -->
-                 <template v-if="authStore.isAdmin">
-                     <button
-                        class="btn btn-xs btn-ghost btn-circle"
-                        title="Edit"
-                        @click="openEditModal(user)"
-                        :disabled="authStore.user?.userId === user.user_id"
-                      >
-                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                     </button>
-                     <button
-                        class="btn btn-xs btn-ghost btn-circle text-error"
-                        title="Delete"
-                        @click="openDeleteModal(user)"
-                         :disabled="authStore.user?.userId === user.user_id"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                     </button>
-                      <span v-if="authStore.user?.userId === user.user_id" class="text-xs italic text-base-content/50 self-center ml-2">(Current User)</span>
-                 </template>
-                  <span v-else class="text-xs italic text-base-content/50">No actions</span>
+                <!-- Edit/Delete only for Admin -->
+                <!-- Prevent deleting/editing the currently logged-in admin? Optional -->
+                <template v-if="authStore.isAdmin">
+                  <button
+                    class="btn btn-xs btn-ghost btn-circle"
+                    title="Edit"
+                    @click="openEditModal(user)"
+                    :disabled="authStore.user?.userId === user.user_id"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    class="btn btn-xs btn-ghost btn-circle text-error"
+                    title="Delete"
+                    @click="openDeleteModal(user)"
+                    :disabled="authStore.user?.userId === user.user_id"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+                  <span
+                    v-if="authStore.user?.userId === user.user_id"
+                    class="text-xs italic text-base-content/50 self-center ml-2"
+                    >(Current User)</span
+                  >
+                </template>
+                <span v-else class="text-xs italic text-base-content/50"
+                  >No actions</span
+                >
               </div>
             </td>
           </tr>
@@ -78,171 +147,187 @@
     </div>
 
     <!-- Add/Edit Modal -->
-     <dialog id="user_modal" class="modal" :open="showAddModal || showEditModal">
-        <div class="modal-box w-11/12 max-w-lg">
-            <h3 class="font-bold text-lg">{{ isEditing ? 'Edit User' : 'Add New User' }}</h3>
-            <UserForm
-                :initial-data="currentItem"
-                @save="handleSave"
-                @close="closeModal"
-                class="py-4"
-            />
-             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeModal">✕</button>
-        </div>
-        <form method="dialog" class="modal-backdrop">
-            <button @click="closeModal">close</button>
-        </form>
+    <dialog id="user_modal" class="modal" :open="showAddModal || showEditModal">
+      <div class="modal-box w-11/12 max-w-lg">
+        <h3 class="font-bold text-lg">
+          {{ isEditing ? "Edit User" : "Add New User" }}
+        </h3>
+        <UserForm
+          :initial-data="currentItem"
+          @save="handleSave"
+          @close="closeModal"
+          class="py-4"
+        />
+        <button
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          @click="closeModal"
+        >
+          ✕
+        </button>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button @click="closeModal">close</button>
+      </form>
     </dialog>
 
     <!-- Confirm Delete Modal -->
-     <ConfirmDialog
-        :show="showDeleteModal"
-        dialogId="user_delete_confirm_modal"
-        title="Delete User"
-        :message="`Are you sure you want to delete the user '${currentItem?.username}' (ID: ${currentItem?.user_id})? This action is permanent.`"
-        @confirm="handleDelete"
-        @close="closeModal"
-     />
-
+    <ConfirmDialog
+      :show="showDeleteModal"
+      dialogId="user_delete_confirm_modal"
+      title="Delete User"
+      :message="`Are you sure you want to delete the user '${currentItem?.username}' (ID: ${currentItem?.user_id})? This action is permanent.`"
+      @confirm="handleDelete"
+      @close="closeModal"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-import * as dataService from '@/services/dataService'
-import UserForm from '@/components/UserForm.vue'
-import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import { PERMISSION_ADMIN, PERMISSION_TEACHER, PERMISSION_LAB_MANAGER } from '@/utils/permissions'
+import { ref, onMounted, computed } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import * as dataService from "@/services/dataService";
+import UserForm from "@/components/UserForm.vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import {
+  PERMISSION_ADMIN,
+  PERMISSION_TEACHER,
+  PERMISSION_LAB_MANAGER,
+} from "@/utils/permissions";
 
-const authStore = useAuthStore()
+const authStore = useAuthStore();
 
-const users = ref([])
-const isLoading = ref(true)
-const error = ref(null)
+const users = ref([]);
+const isLoading = ref(true);
+const error = ref(null);
 
-const showAddModal = ref(false)
-const showEditModal = ref(false)
-const showDeleteModal = ref(false)
-const currentItem = ref(null)
+const showAddModal = ref(false);
+const showEditModal = ref(false);
+const showDeleteModal = ref(false);
+const currentItem = ref(null);
 
-const isEditing = computed(() => !!currentItem.value && showEditModal.value)
+const isEditing = computed(() => !!currentItem.value && showEditModal.value);
 
 // Helper to check specific roles for display
 const hasRole = (userPermission, rolePermission) => {
-    return (Number(userPermission) & rolePermission) === rolePermission;
-}
+  return (Number(userPermission) & rolePermission) === rolePermission;
+};
 
 const fetchUsers = async () => {
-  isLoading.value = true
-  error.value = null
+  isLoading.value = true;
+  error.value = null;
   try {
-     // Ensure only admins can fetch users
-     if (!authStore.isAdmin) {
-         throw new Error("Permission denied to view users.");
-     }
-    const response = await dataService.getUsers()
-    users.value = response.data
+    // Ensure only admins can fetch users
+    if (!authStore.isAdmin) {
+      throw new Error("Permission denied to view users.");
+    }
+    const response = await dataService.getUsers();
+    users.value = response.data;
   } catch (err) {
-    console.error("Failed to fetch users:", err)
-    error.value = err.response?.data || err
+    console.error("Failed to fetch users:", err);
+    error.value = err.response?.data || err;
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
 
 const openAddModal = () => {
-  currentItem.value = null
-  showAddModal.value = true
-}
+  currentItem.value = null;
+  showAddModal.value = true;
+};
 
 const openEditModal = (user) => {
-  currentItem.value = { ...user }
-  showEditModal.value = true
-}
+  currentItem.value = { ...user };
+  showEditModal.value = true;
+};
 
 const openDeleteModal = (user) => {
   // Basic check: Prevent deleting the currently logged-in user
   if (authStore.user?.userId === user.user_id) {
-      alert("You cannot delete your own account.");
-      return;
+    alert("You cannot delete your own account.");
+    return;
   }
-  currentItem.value = user
-  showDeleteModal.value = true
-}
+  currentItem.value = user;
+  showDeleteModal.value = true;
+};
 
 const closeModal = () => {
-  showAddModal.value = false
-  showEditModal.value = false
-  showDeleteModal.value = false
-  currentItem.value = null
-}
+  showAddModal.value = false;
+  showEditModal.value = false;
+  showDeleteModal.value = false;
+  currentItem.value = null;
+};
 
 const handleSave = async (formData) => {
-    // Double check permission
-   if (!authStore.isAdmin) {
-       console.error("Permission denied for saving user.");
-       error.value = "Permission denied.";
-       closeModal();
-       return;
-   }
+  // Double check permission
+  if (!authStore.isAdmin) {
+    console.error("Permission denied for saving user.");
+    error.value = "Permission denied.";
+    closeModal();
+    return;
+  }
 
   try {
     if (isEditing.value) {
-       // The API uses PUT /admin/user/{id} where id is the user_id
-      await dataService.updateUser(formData)
+      // The API uses PUT /admin/user/{id} where id is the user_id
+      await dataService.updateUser(formData);
     } else {
-      await dataService.createUser(formData)
+      await dataService.createUser(formData);
     }
-    closeModal()
-    await fetchUsers() // Refresh list
-     // TODO: Add success notification
-  } catch (err) {
-    console.error("Failed to save user:", err)
-    error.value = `Failed to save: ${err.response?.data?.error || err.message}`
-     // TODO: Add error notification
-  }
-}
-
-const handleDelete = async () => {
-  if (!currentItem.value || authStore.user?.userId === currentItem.value.user_id) {
-      closeModal() // Close dialog if trying to delete self (already prevented in openDeleteModal)
-      return;
-  }
-
-   // Double check permission
-   if (!authStore.isAdmin) {
-       console.error("Permission denied for deleting user.");
-       error.value = "Permission denied.";
-       closeModal();
-       return;
-   }
-
-  try {
-     // The API uses DELETE /admin/user/{id} where id is the user_id
-    await dataService.deleteUser(currentItem.value.user_id)
-    closeModal()
-    await fetchUsers() // Refresh list
+    closeModal();
+    await fetchUsers(); // Refresh list
     // TODO: Add success notification
   } catch (err) {
-     console.error("Failed to delete user:", err)
-      error.value = `Failed to delete: ${err.response?.data?.error || err.message}`
-     // TODO: Add error notification
-     closeModal()
+    console.error("Failed to save user:", err);
+    error.value = `Failed to save: ${err.response?.data?.error || err.message}`;
+    // TODO: Add error notification
   }
-}
+};
+
+const handleDelete = async () => {
+  if (
+    !currentItem.value ||
+    authStore.user?.userId === currentItem.value.user_id
+  ) {
+    closeModal(); // Close dialog if trying to delete self (already prevented in openDeleteModal)
+    return;
+  }
+
+  // Double check permission
+  if (!authStore.isAdmin) {
+    console.error("Permission denied for deleting user.");
+    error.value = "Permission denied.";
+    closeModal();
+    return;
+  }
+
+  try {
+    // The API uses DELETE /admin/user/{id} where id is the user_id
+    await dataService.deleteUser(currentItem.value.user_id);
+    closeModal();
+    await fetchUsers(); // Refresh list
+    // TODO: Add success notification
+  } catch (err) {
+    console.error("Failed to delete user:", err);
+    error.value = `Failed to delete: ${err.response?.data?.error || err.message}`;
+    // TODO: Add error notification
+    closeModal();
+  }
+};
 
 // Fetch data only if user is admin
 onMounted(() => {
-    if(authStore.isAdmin) {
-        fetchUsers();
-    } else {
-        isLoading.value = false;
-        error.value = "You do not have permission to view this page.";
-    }
+  if (authStore.isAdmin) {
+    fetchUsers();
+  } else {
+    isLoading.value = false;
+    error.value = "You do not have permission to view this page.";
+  }
 });
 </script>
 
 <style scoped>
-.modal { display: grid; place-items: center; }
+.modal {
+  display: grid;
+  place-items: center;
+}
 </style>

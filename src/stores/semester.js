@@ -1,22 +1,25 @@
 // src/stores/semester.js
-import { ref, computed } from 'vue';
-import { defineStore } from 'pinia';
-import * as dataService from '@/services/dataService';
+import { ref, computed } from "vue";
+import { defineStore } from "pinia";
+import * as dataService from "@/services/dataService";
 // No auth store import needed
 
-export const useSemesterStore = defineStore('semester', () => {
+export const useSemesterStore = defineStore("semester", () => {
   // --- Semester State ---
   const currentSemester = ref(null);
   const isSemesterLoading = ref(false);
   const semesterError = ref(null);
 
   // --- Computed Properties ---
-  const getCurrentSemesterId = computed(() => currentSemester.value?.id || null);
-  const hasCurrentSemester = computed(() => !!currentSemester.value && !semesterError.value);
+  const getCurrentSemesterId = computed(
+    () => currentSemester.value?.id || null,
+  );
+  const hasCurrentSemester = computed(
+    () => !!currentSemester.value && !semesterError.value,
+  );
 
   // --- Actions ---
   async function fetchCurrentSemester() {
-
     // Avoid redundant fetching
     if (isSemesterLoading.value || hasCurrentSemester.value) {
       // console.log("Semester already loading or successfully loaded.");
@@ -31,7 +34,8 @@ export const useSemesterStore = defineStore('semester', () => {
       currentSemester.value = response.data;
     } catch (err) {
       console.error("Failed to fetch current semester:", err);
-      semesterError.value = err.response?.data?.error || 'Could not load current semester info.';
+      semesterError.value =
+        err.response?.data?.error || "Could not load current semester info.";
       currentSemester.value = null;
     } finally {
       isSemesterLoading.value = false;
@@ -45,7 +49,6 @@ export const useSemesterStore = defineStore('semester', () => {
     isSemesterLoading.value = false;
   }
 
-
   return {
     // State
     currentSemester,
@@ -58,6 +61,6 @@ export const useSemesterStore = defineStore('semester', () => {
 
     // Actions
     fetchCurrentSemester,
-    clearSemester
+    clearSemester,
   };
 });

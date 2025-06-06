@@ -43,24 +43,36 @@
         placeholder="Describe the activities, required readings, assignments due, etc. for this week."
         v-model="formData.requirement"
       ></textarea>
-       <label class="label">
-            <span class="label-text-alt">Markdown or simple formatting might be supported depending on display.</span>
-       </label>
+      <label class="label">
+        <span class="label-text-alt"
+          >Markdown or simple formatting might be supported depending on
+          display.</span
+        >
+      </label>
     </div>
 
     <!-- Actions -->
     <div class="modal-action mt-6">
-      <button type="button" class="btn btn-ghost" @click="$emit('close')">Cancel</button>
-      <button type="submit" class="btn btn-primary" :disabled="isSaving || !formDataIsValid">
-        <span v-if="isSaving" class="loading loading-spinner loading-xs mr-2"></span>
-        {{ isSaving ? 'Saving...' : 'Save Schedule Item' }}
+      <button type="button" class="btn btn-ghost" @click="$emit('close')">
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        :disabled="isSaving || !formDataIsValid"
+      >
+        <span
+          v-if="isSaving"
+          class="loading loading-spinner loading-xs mr-2"
+        ></span>
+        {{ isSaving ? "Saving..." : "Save Schedule Item" }}
       </button>
     </div>
   </form>
 </template>
 
 <script setup>
-import { reactive, watch, computed } from 'vue';
+import { reactive, watch, computed } from "vue";
 
 const props = defineProps({
   initialData: {
@@ -71,58 +83,62 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  courseId: { // Contextual ID
+  courseId: {
+    // Contextual ID
     type: Number,
     required: true,
   },
 });
 
-const emit = defineEmits(['save', 'close']);
+const emit = defineEmits(["save", "close"]);
 
 // Helper to create initial form data structure
 function createInitialFormData() {
-    const data = props.initialData || {};
-    return {
-        week: data.week ?? null, // Use null for potentially unset numbers
-        name: data.name ?? '',
-        requirement: data.requirement ?? '',
-        // course_id is added during submission
-    };
+  const data = props.initialData || {};
+  return {
+    week: data.week ?? null, // Use null for potentially unset numbers
+    name: data.name ?? "",
+    requirement: data.requirement ?? "",
+    // course_id is added during submission
+  };
 }
 
 // Reactive form data
 const formData = reactive(createInitialFormData());
 
 // Watch for external changes to initialData
-watch(() => props.initialData, () => {
+watch(
+  () => props.initialData,
+  () => {
     Object.assign(formData, createInitialFormData());
-}, { deep: true });
+  },
+  { deep: true },
+);
 
 // Basic form validation
 const formDataIsValid = computed(() => {
-    return formData.week !== null && formData.week >= 1 &&
-           formData.name.trim() !== '';
-           // Requirement is optional based on model? Add check if needed.
+  return (
+    formData.week !== null && formData.week >= 1 && formData.name.trim() !== ""
+  );
+  // Requirement is optional based on model? Add check if needed.
 });
-
 
 // Submit handler
 const submitForm = () => {
-    if (!formDataIsValid.value) {
-        alert('Please fill in required fields (Week, Topic).');
-        return;
-    }
+  if (!formDataIsValid.value) {
+    alert("Please fill in required fields (Week, Topic).");
+    return;
+  }
 
-    const payload = {
-        ...formData, // Spread editable fields
-        course_id: props.courseId, // Add the required course_id
-        id: 0,
-        // Ensure week is a number (v-model.number helps, but good practice)
-        week: Number(formData.week),
-    };
+  const payload = {
+    ...formData, // Spread editable fields
+    course_id: props.courseId, // Add the required course_id
+    id: 0,
+    // Ensure week is a number (v-model.number helps, but good practice)
+    week: Number(formData.week),
+  };
 
-    console.log("Submitting schedule payload:", payload);
-    emit('save', payload);
+  console.log("Submitting schedule payload:", payload);
+  emit("save", payload);
 };
-
 </script>

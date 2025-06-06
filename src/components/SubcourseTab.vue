@@ -1,15 +1,35 @@
 <template>
   <div>
     <!-- Teacher Controls -->
-    <div v-if="isTeacher || authStore.isAdmin" class="flex justify-between items-center mb-4 p-4 bg-base-200 rounded-lg">
+    <div
+      v-if="isTeacher || authStore.isAdmin"
+      class="flex justify-between items-center mb-4 p-4 bg-base-200 rounded-lg"
+    >
       <div class="form-control">
         <label class="label cursor-pointer gap-2">
           <span class="label-text">Show All Semesters</span>
-          <input type="checkbox" class="toggle toggle-primary" v-model="showAllSemesters" />
+          <input
+            type="checkbox"
+            class="toggle toggle-primary"
+            v-model="showAllSemesters"
+          />
         </label>
       </div>
       <button class="btn btn-sm btn-primary" @click="openAddModal">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
         Add Group
       </button>
     </div>
@@ -23,7 +43,19 @@
     <!-- Error Fetching Subcourses State -->
     <div v-else-if="error" class="alert alert-error shadow-lg">
       <div>
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current flex-shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
         <span>Error loading groups: {{ error.message || error }}</span>
       </div>
     </div>
@@ -31,11 +63,18 @@
     <!-- Subcourses Table -->
     <div v-else class="overflow-x-auto bg-base-100 rounded-box shadow-md">
       <!-- Info about student enrollment status -->
-      <div v-if="isStudent && !isLoadingMyEnrollment && myEnrollmentError" class="alert alert-warning text-xs p-2 m-2">
+      <div
+        v-if="isStudent && !isLoadingMyEnrollment && myEnrollmentError"
+        class="alert alert-warning text-xs p-2 m-2"
+      >
         Could not check your current enrollment status: {{ myEnrollmentError }}
       </div>
-      <div v-if="isStudent && isLoadingMyEnrollment" class="text-center text-xs p-2 text-info">
-        <span class="loading loading-spinner loading-xs"></span> Checking your enrollment...
+      <div
+        v-if="isStudent && isLoadingMyEnrollment"
+        class="text-center text-xs p-2 text-info"
+      >
+        <span class="loading loading-spinner loading-xs"></span> Checking your
+        enrollment...
       </div>
 
       <table class="table table-zebra w-full">
@@ -45,7 +84,9 @@
             <th>地点</th>
             <th>教师</th>
             <th>人数上限</th>
-            <th v-if="showAllSemesters && (isTeacher || authStore.isAdmin)">学期</th>
+            <th v-if="showAllSemesters && (isTeacher || authStore.isAdmin)">
+              学期
+            </th>
             <th v-if="authStore.user">操作</th>
           </tr>
         </thead>
@@ -54,36 +95,67 @@
           <tr v-if="subcourses.length === 0">
             <td :colspan="tableColumnCount" class="text-center italic py-4">
               <!-- Adjusted no groups message -->
-              No groups found for {{ (showAllSemesters && (isTeacher || authStore.isAdmin)) ? 'any selected semester' : 'the current semester' }}.
+              No groups found for
+              {{
+                showAllSemesters && (isTeacher || authStore.isAdmin)
+                  ? "any selected semester"
+                  : "the current semester"
+              }}.
             </td>
           </tr>
           <!-- Loop through filtered subcourses -->
           <tr v-for="subcourse in subcourses" :key="subcourse.id">
             <td>{{ getWeekdayName(subcourse.weekday) }}</td>
             <td>
-              <span v-if="isLoadingLabrooms" class="text-xs italic">Loading room...</span>
-              <span v-else-if="labroomError" class="text-xs text-error" :title="labroomError">Room Error</span>
+              <span v-if="isLoadingLabrooms" class="text-xs italic"
+                >Loading room...</span
+              >
+              <span
+                v-else-if="labroomError"
+                class="text-xs text-error"
+                :title="labroomError"
+                >Room Error</span
+              >
               <span v-else>{{ getRoomName(subcourse.room_id) }}</span>
             </td>
             <td>{{ subcourse.tea_name }}</td>
             <td>{{ subcourse.stu_limit }}</td>
 
             <!-- Teacher/Admin Column: Semester ID (if showing all) -->
-            <td v-if="showAllSemesters && (isTeacher || authStore.isAdmin)">{{ subcourse.year_id }}</td>
+            <td v-if="showAllSemesters && (isTeacher || authStore.isAdmin)">
+              {{ subcourse.year_id }}
+            </td>
 
             <!-- Actions Column -->
             <td class="whitespace-nowrap">
               <div class="flex gap-1 items-center" v-if="authStore.user">
-
                 <!-- View Button (Common to Teacher/Admin/Student) -->
                 <router-link
-                  :to="{ name: 'SubcourseStudents', params: { id: subcourse.id } }"
+                  :to="{
+                    name: 'SubcourseStudents',
+                    params: { id: subcourse.id },
+                  }"
                   class="btn btn-xs btn-ghost btn-circle"
                   title="View Students"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
                   </svg>
                 </router-link>
 
@@ -94,14 +166,40 @@
                     title="Edit"
                     @click="openEditModal(subcourse)"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                      />
+                    </svg>
                   </button>
                   <button
                     class="btn btn-xs btn-ghost btn-circle text-error"
                     title="Delete"
                     @click="openDeleteModal(subcourse)"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
                   </button>
                 </template>
 
@@ -114,11 +212,33 @@
                     title="Leave Group"
                     @click="handleLeaveGroup(subcourse.id)"
                     :disabled="isProcessingAction"
-                    :class="{ 'loading': isProcessingAction && processingSubcourseId === subcourse.id }"
+                    :class="{
+                      loading:
+                        isProcessingAction &&
+                        processingSubcourseId === subcourse.id,
+                    }"
                   >
-                    <span v-if="!(isProcessingAction && processingSubcourseId === subcourse.id)">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    <span
+                      v-if="
+                        !(
+                          isProcessingAction &&
+                          processingSubcourseId === subcourse.id
+                        )
+                      "
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        />
                       </svg>
                     </span>
                   </button>
@@ -129,11 +249,33 @@
                     title="Join Group"
                     @click="handleJoinGroup(subcourse.id)"
                     :disabled="isProcessingAction || isLoadingMyEnrollment"
-                    :class="{ 'loading': isProcessingAction && processingSubcourseId === subcourse.id }"
+                    :class="{
+                      loading:
+                        isProcessingAction &&
+                        processingSubcourseId === subcourse.id,
+                    }"
                   >
-                    <span v-if="!(isProcessingAction && processingSubcourseId === subcourse.id)">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <span
+                      v-if="
+                        !(
+                          isProcessingAction &&
+                          processingSubcourseId === subcourse.id
+                        )
+                      "
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                     </span>
                   </button>
@@ -146,16 +288,24 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <dialog id="subcourse_modal" class="modal" :open="showAddModal || showEditModal">
+    <dialog
+      id="subcourse_modal"
+      class="modal"
+      :open="showAddModal || showEditModal"
+    >
       <div class="modal-box w-11/12 max-w-lg">
-        <h3 class="font-bold text-lg">{{ isEditing ? 'Edit Group' : 'Add New Group' }}</h3>
+        <h3 class="font-bold text-lg">
+          {{ isEditing ? "Edit Group" : "Add New Group" }}
+        </h3>
         <SubcourseForm
           v-if="semesterStore.getCurrentSemesterId || currentItem?.semester_id"
           :key="formKey"
           :initial-data="currentItem"
           :is-saving="isSaving"
           :course-id="courseId"
-          :semester-id="currentItem?.semester_id || semesterStore.getCurrentSemesterId"
+          :semester-id="
+            currentItem?.semester_id || semesterStore.getCurrentSemesterId
+          "
           :user-id="authStore.user?.userId || ''"
           :realname="authStore.user?.realname || ''"
           :is-admin="authStore.isAdmin"
@@ -163,8 +313,15 @@
           @close="closeModal"
           class="py-4"
         />
-        <p v-else class="text-error py-4">Cannot determine semester ID for the form.</p>
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeModal">✕</button>
+        <p v-else class="text-error py-4">
+          Cannot determine semester ID for the form.
+        </p>
+        <button
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          @click="closeModal"
+        >
+          ✕
+        </button>
       </div>
       <form method="dialog" class="modal-backdrop">
         <button @click="closeModal">close</button>
@@ -180,18 +337,17 @@
       @confirm="handleDelete"
       @close="closeModal"
     />
-
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted} from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import { useSemesterStore } from '@/stores/semester';
-import { getWeekdayName } from '@/utils/weekday';
-import * as dataService from '@/services/dataService';
-import SubcourseForm from '@/components/SubcourseForm.vue';
-import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { ref, computed, watch, onMounted } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import { useSemesterStore } from "@/stores/semester";
+import { getWeekdayName } from "@/utils/weekday";
+import * as dataService from "@/services/dataService";
+import SubcourseForm from "@/components/SubcourseForm.vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 // Import a notification library if you use one (e.g., vue-toastification)
 // import { useToast } from 'vue-toastification';
 
@@ -247,7 +403,6 @@ const tableColumnCount = computed(() => {
   return count;
 });
 
-
 // Fetch Labrooms (existing)
 const fetchLabrooms = async () => {
   if (labrooms.value.length > 0 || isLoadingLabrooms.value) return;
@@ -265,8 +420,8 @@ const fetchLabrooms = async () => {
 };
 
 const getRoomName = (roomId) => {
-  if (!roomId || labrooms.value.length === 0) return 'N/A';
-  const room = labrooms.value.find(r => r.id === roomId);
+  if (!roomId || labrooms.value.length === 0) return "N/A";
+  const room = labrooms.value.find((r) => r.id === roomId);
   return room ? `${room.name} (${room.room})` : `Unknown Room (ID: ${roomId})`;
 };
 
@@ -282,7 +437,9 @@ const fetchSubcourses = async () => {
     if (!showAllSemesters.value) {
       semesterIdToFetch = semesterStore.getCurrentSemesterId;
       if (!semesterIdToFetch) {
-        console.warn("Current semester ID missing for teacher/admin, showing none for 'current'.");
+        console.warn(
+          "Current semester ID missing for teacher/admin, showing none for 'current'.",
+        );
         isLoading.value = false;
         return; // Don't fetch if specific semester needed but ID unknown
       }
@@ -299,7 +456,9 @@ const fetchSubcourses = async () => {
     }
   }
 
-  console.log(`Fetching subcourses for course ${props.courseId}, Semester: ${semesterIdToFetch ?? 'All'}`);
+  console.log(
+    `Fetching subcourses for course ${props.courseId}, Semester: ${semesterIdToFetch ?? "All"}`,
+  );
 
   const params = { course_id: props.courseId };
   if (semesterIdToFetch) {
@@ -337,27 +496,32 @@ const fetchMyEnrollmentStatus = async () => {
 
     // Find if the student is enrolled in a subcourse BELONGING TO THIS courseId
     const enrollmentForThisCourse = myEnrollments.find(
-      (enrollment) => enrollment.course_id === props.courseId
+      (enrollment) => enrollment.course_id === props.courseId,
     );
 
     if (enrollmentForThisCourse) {
       // Assuming the enrollment object has the subcourse ID, often just 'id' or 'subcourse_id'
-      myEnrolledSubcourseId.value = enrollmentForThisCourse.id
-      console.log(`Student enrolled in subcourse ${myEnrolledSubcourseId.value} for course ${props.courseId}`);
+      myEnrolledSubcourseId.value = enrollmentForThisCourse.id;
+      console.log(
+        `Student enrolled in subcourse ${myEnrolledSubcourseId.value} for course ${props.courseId}`,
+      );
     } else {
-      console.log(`Student not enrolled in any subcourse for course ${props.courseId}`);
+      console.log(
+        `Student not enrolled in any subcourse for course ${props.courseId}`,
+      );
       myEnrolledSubcourseId.value = null;
     }
-
   } catch (err) {
     console.error("Failed to fetch student enrollment status:", err);
-    myEnrollmentError.value = err.response?.data?.error || err.message || 'Could not load enrollment status.';
+    myEnrollmentError.value =
+      err.response?.data?.error ||
+      err.message ||
+      "Could not load enrollment status.";
     myEnrolledSubcourseId.value = null; // Ensure null on error
   } finally {
     isLoadingMyEnrollment.value = false;
   }
 };
-
 
 // --- Modal Operations (existing) ---
 const openAddModal = () => {
@@ -399,7 +563,7 @@ const handleSave = async (formData) => {
   error.value = null;
 
   // Ensure essential IDs are present
-  if(!formData.course_id || !formData.year_id) {
+  if (!formData.course_id || !formData.year_id) {
     console.error("Missing course_id or year_id in form data", formData);
     alert("Internal error: Missing required information to save.");
     // toast.error("Internal error: Missing required information to save.");
@@ -426,7 +590,7 @@ const handleSave = async (formData) => {
 };
 
 const handleDelete = async () => {
-  if (!isTeacher.value && !isAdmin.value || !currentItem.value) return;
+  if ((!isTeacher.value && !isAdmin.value) || !currentItem.value) return;
 
   try {
     await dataService.deleteSubcourse(currentItem.value.id);
@@ -501,15 +665,18 @@ watch(showAllSemesters, (newValue, oldValue) => {
 });
 
 // Refetch subcourses if courseId changes
-watch(() => props.courseId, (newCourseId, oldCourseId) => {
-  if (newCourseId !== oldCourseId && newCourseId) {
-    console.log(`Course ID changed to ${newCourseId}, refetching data.`);
-    fetchSubcourses();
-    if (isStudent.value) {
-      fetchMyEnrollmentStatus(); // Also refresh enrollment status for the new course
+watch(
+  () => props.courseId,
+  (newCourseId, oldCourseId) => {
+    if (newCourseId !== oldCourseId && newCourseId) {
+      console.log(`Course ID changed to ${newCourseId}, refetching data.`);
+      fetchSubcourses();
+      if (isStudent.value) {
+        fetchMyEnrollmentStatus(); // Also refresh enrollment status for the new course
+      }
     }
-  }
-});
+  },
+);
 
 // --- Lifecycle Hook ---
 onMounted(() => {
@@ -521,7 +688,6 @@ onMounted(() => {
     fetchMyEnrollmentStatus();
   }
 });
-
 </script>
 
 <style scoped>
