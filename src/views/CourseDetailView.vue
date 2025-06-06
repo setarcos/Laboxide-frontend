@@ -130,7 +130,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import * as dataService from '@/services/dataService'
 import ScheduleTab from '@/components/ScheduleTab.vue';

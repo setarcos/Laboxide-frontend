@@ -199,7 +199,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, reactive } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import * as dataService from '@/services/dataService';
 import ScheduleForm from '@/components/ScheduleForm.vue';
@@ -235,10 +235,6 @@ const showDeleteSubModal = ref(false);
 const currentSubItem = ref(null); // Holds the sub-schedule item being edited/deleted
 const parentScheduleIdForSubModal = ref(null); // Track which schedule the sub-item belongs to
 const subFormKey = ref(Date.now()); // Use timestamp for key to force re-render
-
-// Reactive map to store sub-schedules (avoids deep reactivity issues if added directly to schedules ref items)
-// key: schedule.id, value: { data: [], isLoading: false, error: null }
-// const subSchedulesMap = reactive({}); // Alternative approach - let's try adding directly to item first
 
 // Computed properties
 const isTeacher = computed(() => authStore.isTeacher);

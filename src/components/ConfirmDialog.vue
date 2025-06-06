@@ -19,39 +19,6 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-
-const props = defineProps({
-  show: {
-    type: Boolean,
-    required: true,
-  },
-  dialogId: {
-    type: String,
-    required: true,
-    default: 'confirm-dialog' // Ensure unique if multiple on page
-  },
-  title: {
-    type: String,
-    default: 'Confirm Action'
-  },
-  message: {
-    type: String,
-    default: 'Are you sure you want to proceed?'
-  },
-  confirmText: {
-    type: String,
-    default: 'Confirm'
-  },
-  cancelText: {
-    type: String,
-    default: 'Cancel'
-  },
-  confirmClass: {
-    type: String,
-    default: 'btn-error' // Default to danger style for confirm
-  }
-})
 
 defineEmits(['confirm', 'close'])
 

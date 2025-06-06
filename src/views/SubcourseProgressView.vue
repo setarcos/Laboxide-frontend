@@ -77,7 +77,7 @@
             </tr>
           </thead>
           <tbody>
-            <template v-for="(studentData, index) in studentProgressData" :key="studentData.student.stu_id">
+            <template v-for="(studentData) in studentProgressData" :key="studentData.student.stu_id">
               <tr class="hover">
                 <td>{{ studentData.student.stu_id }}</td>
                 <td>{{ studentData.student.stu_name }}</td>
@@ -334,14 +334,13 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, reactive } from 'vue';
-import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useSemesterStore } from '@/stores/semester';
 import * as dataService from '@/services/dataService';
 import { getWeekdayName, calculateCurrentWeek, formatTimestamp } from '@/utils/weekday';
 import TeacherTimelineLogForm from '@/components/TeacherTimelineLogForm.vue'; // Needs to be created
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import { isImageFile, useFileHandling } from '@/utils/fileops';
+import { useFileHandling } from '@/utils/fileops';
 
 const props = defineProps({
   id: { // Subcourse ID from route
@@ -350,7 +349,6 @@ const props = defineProps({
   },
 });
 
-const route = useRoute();
 const authStore = useAuthStore();
 const semesterStore = useSemesterStore();
 
@@ -419,8 +417,6 @@ const currentWeekNumber = computed(() => {
   if (semesterStore.isSemesterLoading || semesterStore.semesterError || !semesterStore.currentSemester) return null;
   return calculateCurrentWeek(semesterStore.currentSemester);
 });
-
-const courseId = computed(() => subcourseDetails.value?.course_id);
 
 const totalStepsForWeek = computed(() => subSchedulesForWeek.value.length);
 

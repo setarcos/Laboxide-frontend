@@ -219,9 +219,6 @@ const removeConfirmationMessage = computed(() => {
 
 // --- Methods ---
 
-// Utility (Placeholder - Adapt as needed)
-const getRoomName = (roomId) => `Room ${roomId}`;
-
 // Data Fetching
 const fetchSubcourseDetails = async () => {
   isLoadingSubcourse.value = true;

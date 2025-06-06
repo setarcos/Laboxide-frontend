@@ -408,13 +408,10 @@ const handleSave = async (formData) => {
   }
 
   try {
-    let message = '';
     if (isEditing.value) {
       await dataService.updateSubcourse(currentItem.value.id, formData);
-      message = 'Group updated successfully!';
     } else {
       await dataService.createSubcourse(formData);
-      message = 'Group added successfully!';
     }
     closeModal();
     await fetchSubcourses(); // Refresh list

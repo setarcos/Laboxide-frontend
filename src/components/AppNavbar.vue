@@ -77,7 +77,7 @@
 <script setup>
 import { useAuthStore } from '@/stores/auth'
 // Make sure your path to permissions is correct
-import { PERMISSION_ADMIN, PERMISSION_TEACHER, PERMISSION_LAB_MANAGER } from '@/utils/permissions'
+import { PERMISSION_ADMIN, PERMISSION_LAB_MANAGER } from '@/utils/permissions'
 import { ref, onMounted } from 'vue'
 // Import RouterLink if not globally registered and using exact-active-class
 // import { RouterLink } from 'vue-router'

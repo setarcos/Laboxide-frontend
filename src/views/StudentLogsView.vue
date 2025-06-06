@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import * as dataService from '@/services/dataService';
 import { formatTimestamp } from '@/utils/weekday';
 
@@ -178,19 +178,6 @@ const fetchLogs = async () => {
     isLoading.value = false;
     isLoadingInitial.value = false;
     searchedOnce.value = true;
-  }
-};
-
-const formatDisplayDateTime = (dateTimeString) => {
-  if (!dateTimeString) return 'N/A';
-  try {
-    // Backend NaiveDateTime might come as "YYYY-MM-DDTHH:MM:SS" or with microseconds
-    // We want to display it in a more readable local format
-    const date = new Date(dateTimeString.includes('.') ? dateTimeString.split('.')[0] : dateTimeString); // Handle potential microseconds
-    if (isNaN(date.getTime())) return dateTimeString; // if parsing fails, return original
-    return date.toLocaleString();
-  } catch (e) {
-    return dateTimeString; // Fallback
   }
 };
 

@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth';
 const authStore = useAuthStore();
 
@@ -113,12 +113,5 @@ const submitForm = () => {
         alert('Please fill in all required fields.');
     }
 }
-
-// Reset form when the component is mounted without initial data (for create)
-// onMounted(() => {
-//     if (!props.initialData) {
-//         formData.value = { ...defaultFormData };
-//     }
-// })
 
 </script>

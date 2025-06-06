@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { PERMISSION_ADMIN, PERMISSION_TEACHER, PERMISSION_LAB_MANAGER } from '@/utils/permissions'
+import { PERMISSION_ADMIN, PERMISSION_LAB_MANAGER } from '@/utils/permissions'
 // Import nextTick if you want extra safety, though often not needed for document.title
 // import { nextTick } from 'vue'
 
@@ -147,10 +147,7 @@ router.beforeEach(async (to, from, next) => {
   }
 })
 
-// --- New Navigation Guard (Update Page Title) ---
-const baseTitle = 'Admin Panel'; // Set your default/base title here
-
-router.afterEach((to, from) => {
+router.afterEach((to) => {
   // Optional: Use nextTick to wait for potential DOM updates, though often unnecessary for title
   // nextTick(() => {
     if (to.meta?.title)

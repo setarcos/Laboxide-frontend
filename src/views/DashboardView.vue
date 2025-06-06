@@ -181,7 +181,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth'
 import { useSemesterStore } from '@/stores/semester'
 import * as dataService from '@/services/dataService';

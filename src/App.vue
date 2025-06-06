@@ -6,11 +6,8 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
 import DefaultLayout from './layouts/DefaultLayout.vue'
 // Import other layouts if you create them (e.g., AuthLayout)
-
-const route = useRoute()
 
 // Basic layout switching, defaults to DefaultLayout
 // You could expand this based on route meta fields if needed
