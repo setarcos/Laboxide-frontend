@@ -164,7 +164,7 @@ const updateTitle = (title) => {
 const setActiveTab = (tabName) => {
     activeTab.value = tabName;
     router.replace({ query: { ...route.query, tab: tabName } });
-    if (course) {
+    if (course.value) {
         updateTitle(`${course.value.name} | ${baseTitle}`)
     }
 }
