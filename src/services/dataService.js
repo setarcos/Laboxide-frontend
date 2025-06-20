@@ -1,5 +1,6 @@
 import api from "./api";
 
+export const postToken = (para) => api.post("/auth", para);
 // --- Course ---
 export const getCourses = () => api.get("/course");
 export const getCourse = (id) => api.get(`/course/${id}`);

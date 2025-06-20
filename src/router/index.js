@@ -16,6 +16,8 @@ const SubcourseStudentsView = () => import("@/views/SubcourseStudentsView.vue");
 const SubcourseProgressView = () => import("@/views/SubcourseProgressView.vue");
 const StudentTimelineView = () => import("@/views/StudentTimelineView.vue");
 const StudentLogsView = () => import("@/views/StudentLogsView.vue");
+const LoginView = () => import("@/views/LoginView.vue");
+const AuthView = () => import("@/views/AuthView.vue");
 
 const routes = [
   {
@@ -24,6 +26,18 @@ const routes = [
     component: DashboardView,
     // Add meta.title
     meta: { requiresAuth: false, title: "Dashboard" },
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: LoginView,
+    meta: { requiresAuth: false, title: "Login" },
+  },
+  {
+    path: "/auth",
+    name: "auth",
+    component: AuthView,
+    meta: { requiresAuth: false, title: "Auth" },
   },
   {
     path: "/courses",
@@ -130,7 +144,7 @@ router.beforeEach(async (to, from, next) => {
   // 2. Check if route requires authentication
   if (requiresAuth && !authStore.isAuthenticated) {
     console.log("Redirecting to login (or handling via UI)");
-    next({ name: "Dashboard" }); // Or redirect to a public page if you have one
+    next({ name: "login" });
   }
   // 3. Check if route requires specific permissions
   else if (requiredPermission && authStore.isAuthenticated) {
