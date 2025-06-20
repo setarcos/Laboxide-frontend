@@ -1,0 +1,65 @@
+name: Build and Deploy Vue Project
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: rust
+    container: nodoxide
+    env:
+      VUE_BUILD_DIR: "dist"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        # Use 'npm ci' for cleaner, faster installs in CI if you have a package-lock.json
+        run: npm ci
+
+      - name: Build Vue.js application
+        run: npm run build
+
+      - name: List target directory
+        run: ls -alh ./${{ env.VUE_BUILD_DIR }}
+
+      - name: Prepare SSH Key and Known Hosts
+        run: |
+          echo "Setting up SSH environment..."
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          echo "Adding remote host key to known_hosts..."
+          ssh-keyscan -p ${{ secrets.DEPLOY_PORT || 22 }} -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Clear remote target directory
+        run: |
+          echo "Clearing remote deployment directory: ${{ secrets.DEPLOY_PATH }}"
+          ssh -p ${{ secrets.DEPLOY_PORT || 22 }} \
+              -o StrictHostKeyChecking=accept-new \
+              ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
+              "rm -rf ${{ secrets.DEPLOY_PATH }}/dist"
+          echo "Remote directory cleared and prepared."
+
+      - name: Upload Vue.js build
+        run: |
+          echo "Uploading Vue.js build..."
+          scp -P ${{ secrets.DEPLOY_PORT || 22 }} \
+              -o StrictHostKeyChecking=accept-new \
+              -r ./${{ env.VUE_BUILD_DIR }} \
+              ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}
+          echo "Vue.js build uploaded."
