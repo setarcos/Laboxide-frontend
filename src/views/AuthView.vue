@@ -9,10 +9,12 @@
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { postToken } from "@/services/dataService";
+import { useAuthStore } from "@/stores/auth";
 
 const route = useRoute();
 const router = useRouter();
 const error = ref("");
+const authStore = useAuthStore();
 
 onMounted(async () => {
   const token = route.query.token;
@@ -26,8 +28,8 @@ onMounted(async () => {
 
   try {
     // Send the token to our backend. The Vite proxy handles the URL.
-    postToken({ token: token });
-
+    await postToken({ token: token });
+    await authStore.checkAuth();
     // On success, the backend sets an HttpOnly cookie.
     // We can now redirect to the protected area.
     router.push({ name: "Dashboard" });

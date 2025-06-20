@@ -32,7 +32,8 @@ export const useAuthStore = defineStore("auth", () => {
 
   // Actions
   async function checkAuth() {
-    // isLoading.value = true; // Set loading at the start of the action if called multiple times
+    if (isAuthenticated.value) return;
+    isLoading.value = true; // Set loading at the start of the action if called multiple times
     try {
       const response = await api.get("/greet");
       if (response.data && !response.data.error) {
@@ -54,7 +55,7 @@ export const useAuthStore = defineStore("auth", () => {
       // Re-throw if needed elsewhere, but reset state here
       throw error; // Allow main.js to catch if needed
     } finally {
-      // isLoading.value = false; // Set loading false here OR in main.js after await
+      isLoading.value = false; // Set loading false here OR in main.js after await
     }
   }
 
