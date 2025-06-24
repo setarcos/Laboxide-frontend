@@ -94,6 +94,7 @@
           v-if="modalMode === 'create' || modalMode === 'edit'"
           :initial-data="editingAgenda"
           :booking-slot="newBookingSlot"
+          :submission-error="formError"
           @save="handleSaveAgenda"
           @close="closeAgendaModal"
         />
@@ -215,6 +216,7 @@ const agendas = ref([]);
 const currentDate = ref(new Date());
 const isLoading = ref(false);
 const error = ref(null);
+const formError = ref("");
 
 const modalMode = ref("closed"); // 'closed', 'create', 'view', 'edit'
 const newBookingSlot = ref(null);
@@ -249,7 +251,7 @@ const fetchMeetingRooms = async () => {
       selectedRoomId.value = props.roomId;
     } else if (meetingRooms.value.length > 0 && !props.roomId) {
       router.replace({
-        name: "MeetingRoomBooking",
+        name: "MeetingBookingView",
         params: { roomId: meetingRooms.value[0].id },
       });
     }
@@ -319,7 +321,7 @@ const checkForConflicts = (newAgendaData) => {
 // --- ACTION & MODAL HANDLERS ---
 const onRoomChange = () =>
   router.push({
-    name: "MeetingRoomBooking",
+    name: "MeetingBookingView",
     params: { roomId: selectedRoomId.value },
   });
 const changeWeek = (direction) =>
@@ -329,6 +331,7 @@ const changeWeek = (direction) =>
       : subWeeks(currentDate.value, 1));
 
 const openBookingModal = (slot) => {
+  formError.value = "";
   modalMode.value = "create";
   newBookingSlot.value = slot;
   document.getElementById("agenda_modal").showModal();
@@ -357,10 +360,10 @@ const handleModalClose = () => {
 };
 
 const handleSaveAgenda = async (formData) => {
-  error.value = null;
+  formError.value = "";
   const conflict = checkForConflicts(formData);
   if (conflict) {
-    error.value = `This time conflicts with "${conflict.title}" (${conflict.start_time.slice(0, 5)}-${conflict.end_time.slice(0, 5)}).`;
+    formError.value = `This time conflicts with "${conflict.title}" (${conflict.start_time.slice(0, 5)}-${conflict.end_time.slice(0, 5)}).`;
     return;
   }
 
@@ -383,7 +386,7 @@ const handleSaveAgenda = async (formData) => {
     await fetchAgendas(selectedRoomId.value);
   } catch (err) {
     if (err.response?.status === 409) {
-      error.value = `Conflict detected by server: ${err.response.data.error}`;
+      formError.value = `Conflict detected by server: ${err.response.data.error}`;
     } else {
       error.value = `Failed to save: ${err.response?.data?.error || err.message}`;
     }

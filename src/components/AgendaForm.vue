@@ -81,27 +81,27 @@
 
 <script setup>
 import { ref, watch, computed } from "vue";
+import { differenceInMinutes, parseISO } from "date-fns";
 
 const props = defineProps({
   initialData: {
-    // For editing an existing agenda
     type: Object,
     default: null,
   },
   bookingSlot: {
-    // For creating a new agenda from the calendar
     type: Object,
     default: null,
   },
+  submissionError: { type: String, default: "" },
 });
 const emit = defineEmits(["save", "close"]);
 
 const form = ref({
   title: "",
-  repeat: 0, // 0 for one-time, 1 for weekly
-  date: "", // YYYY-MM-DD
-  startTime: "", // HH:mm
-  endTime: "", // HH:mm
+  repeat: 0,
+  date: "",
+  startTime: "",
+  endTime: "",
 });
 const errorMessage = ref("");
 
@@ -112,28 +112,27 @@ const dateLabel = computed(() =>
 
 const weekDayName = computed(() => {
   if (!form.value.date) return "";
-  // Adding T00:00:00 ensures the date isn't affected by timezones
   const dateObj = new Date(form.value.date + "T00:00:00");
   return dateObj.toLocaleDateString(undefined, { weekday: "long" });
 });
 
-// Watch for prop changes to populate the form
+// --- WATCHER 1: To populate the form when the modal opens ---
 watch(
   () => [props.initialData, props.bookingSlot],
   () => {
-    errorMessage.value = ""; // Clear errors on change
+    errorMessage.value = ""; // Clear any previous errors when data changes
     if (isEditing.value) {
-      // Editing an existing agenda
+      // This logic will now execute correctly
       const data = props.initialData;
       form.value = {
         title: data.title,
         repeat: data.repeat,
-        date: data.date, // Assumes YYYY-MM-DD format from backend
-        startTime: data.start_time.slice(0, 5), // 'HH:mm:ss' -> 'HH:mm'
+        date: data.date,
+        startTime: data.start_time.slice(0, 5),
         endTime: data.end_time.slice(0, 5),
       };
     } else if (props.bookingSlot) {
-      // Creating a new agenda by clicking a slot
+      // This logic will also execute correctly
       form.value = {
         title: "",
         repeat: 0,
@@ -142,7 +141,6 @@ watch(
         endTime: "",
       };
     } else {
-      // Default empty state (should not happen in normal flow)
       form.value = {
         title: "",
         repeat: 0,
@@ -155,10 +153,33 @@ watch(
   { immediate: true, deep: true },
 );
 
+// --- WATCHER 2: To handle incoming submission errors from the parent ---
+watch(
+  () => props.submissionError,
+  (newError) => {
+    errorMessage.value = newError;
+  },
+);
+watch(
+  form,
+  () => {
+    // As the user types, clear the error message. The parent will re-set it on the next failed submit.
+    if (errorMessage.value) {
+      errorMessage.value = "";
+    }
+  },
+  { deep: true },
+);
+
 const submitForm = () => {
+  errorMessage.value = "";
   // --- Validation ---
   if (!form.value.title.trim()) {
     errorMessage.value = "Meeting title is required.";
+    return;
+  }
+  if (!form.value.startTime || !form.value.endTime) {
+    errorMessage.value = "Start and End times are required.";
     return;
   }
   if (form.value.endTime <= form.value.startTime) {
@@ -166,6 +187,14 @@ const submitForm = () => {
     return;
   }
 
+  const start = parseISO(`2000-01-01T${form.value.startTime}`);
+  const end = parseISO(`2000-01-01T${form.value.endTime}`);
+  const durationInMinutes = differenceInMinutes(end, start);
+
+  if (durationInMinutes > 240) {
+    errorMessage.value = "Meeting duration cannot exceed 4 hours.";
+    return;
+  }
   errorMessage.value = "";
 
   // --- Prepare Payload ---
@@ -173,17 +202,9 @@ const submitForm = () => {
     title: form.value.title.trim(),
     repeat: Number(form.value.repeat),
     date: form.value.date,
-    start_time: `${form.value.startTime}:00`, // Add seconds for NaiveTime
+    start_time: `${form.value.startTime}:00`,
     end_time: `${form.value.endTime}:00`,
   };
-
-  // Calculate `week` field if it's a repeating event
-  if (payload.repeat === 1) {
-    // Rust backend expects Mon=1..Sun=7. JS getDay() is Sun=0..Sat=6.
-    const dayOfWeek = new Date(form.value.date + "T00:00:00").getDay();
-    payload.week = dayOfWeek === 0 ? 7 : dayOfWeek; // Convert Sunday from 0 to 7
-  }
-
   emit("save", payload);
 };
 </script>
