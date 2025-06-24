@@ -2,7 +2,7 @@
   <dialog id="lend_modal" class="modal" :open="show">
     <div class="modal-box w-11/12 max-w-md">
       <h3 class="font-bold text-lg">Lend Equipment: {{ equipmentName }}</h3>
-      
+
       <form @submit.prevent="submit" class="py-4 space-y-4">
         <div class="form-control">
           <label class="label">
@@ -44,54 +44,66 @@
         </div>
 
         <div class="modal-action">
-          <button type="button" class="btn btn-ghost" @click="close">Cancel</button>
+          <button type="button" class="btn btn-ghost" @click="close">
+            Cancel
+          </button>
           <button type="submit" class="btn btn-primary">Confirm Lend</button>
         </div>
       </form>
 
-      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="close">✕</button>
+      <button
+        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+        @click="close"
+      >
+        ✕
+      </button>
     </div>
-    <form method="dialog" class="modal-backdrop"><button @click="close">close</button></form>
+    <form method="dialog" class="modal-backdrop">
+      <button @click="close">close</button>
+    </form>
   </dialog>
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick } from "vue";
 
 const props = defineProps({
   show: Boolean,
-  equipmentName: String
+  equipmentName: String,
 });
 
-const emit = defineEmits(['save', 'close']);
+const emit = defineEmits(["save", "close"]);
 
-const user = ref('');
-const telephone = ref('');
-const note = ref('');
+const user = ref("");
+const telephone = ref("");
+const note = ref("");
 const userInput = ref(null);
 
-watch(() => props.show, (newVal) => {
-  if (newVal) {
-    user.value = '';
-    telephone.value = '';
-    note.value = '';
-    nextTick(() => {
+watch(
+  () => props.show,
+  (newVal) => {
+    if (newVal) {
+      user.value = "";
+      telephone.value = "";
+      note.value = "";
+      nextTick(() => {
         userInput.value?.focus();
-    });
-  }
-});
+      });
+    }
+  },
+);
 
 const submit = () => {
   if (user.value.trim() && telephone.value.trim() && note.value.trim()) {
-    emit('save', { 
+    emit("save", {
       user: user.value.trim(),
       telephone: telephone.value.trim(),
-      note: note.value.trim()
+      note: note.value.trim(),
     });
   }
 };
 
 const close = () => {
-  emit('close');
+  emit("close");
 };
 </script>

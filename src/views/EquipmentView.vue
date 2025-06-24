@@ -4,7 +4,20 @@
 
     <div class="mb-4 text-right">
       <button class="btn btn-primary" @click="openAddModal">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
         Add Equipment
       </button>
     </div>
@@ -29,7 +42,9 @@
         </thead>
         <tbody>
           <tr v-if="equipments.length === 0">
-            <td colspan="5" class="text-center italic py-4">You have not added any equipment.</td>
+            <td colspan="5" class="text-center italic py-4">
+              You have not added any equipment.
+            </td>
           </tr>
           <tr v-for="item in equipments" :key="item.id">
             <td class="font-bold">{{ item.name }}</td>
@@ -42,17 +57,80 @@
             </td>
             <td>
               <div class="flex gap-1 items-center">
-                <button v-if="item.status === 0" class="btn btn-xs btn-outline btn-success" @click="openLendModal(item)">Lend</button>
-                <button v-if="item.status === 1" class="btn btn-xs btn-outline btn-info" @click="handleReturn(item)">Return</button>
-                
-                <button class="btn btn-xs btn-ghost btn-circle" title="History" @click="openHistoryModal(item)">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <button
+                  v-if="item.status === 0"
+                  class="btn btn-xs btn-outline btn-success"
+                  @click="openLendModal(item)"
+                >
+                  Lend
                 </button>
-                <button class="btn btn-xs btn-ghost btn-circle" title="Edit" @click="openEditModal(item)">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                <button
+                  v-if="item.status === 1"
+                  class="btn btn-xs btn-outline btn-info"
+                  @click="handleReturn(item)"
+                >
+                  Return
                 </button>
-                <button class="btn btn-xs btn-ghost btn-circle text-error" title="Delete" @click="openDeleteModal(item)">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+
+                <button
+                  class="btn btn-xs btn-ghost btn-circle"
+                  title="History"
+                  @click="openHistoryModal(item)"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </button>
+                <button
+                  class="btn btn-xs btn-ghost btn-circle"
+                  title="Edit"
+                  @click="openEditModal(item)"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                    />
+                  </svg>
+                </button>
+                <button
+                  class="btn btn-xs btn-ghost btn-circle text-error"
+                  title="Delete"
+                  @click="openDeleteModal(item)"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
                 </button>
               </div>
             </td>
@@ -61,19 +139,32 @@
       </table>
     </div>
 
-    <dialog id="equipment_modal" class="modal" :open="showAddModal || showEditModal">
+    <dialog
+      id="equipment_modal"
+      class="modal"
+      :open="showAddModal || showEditModal"
+    >
       <div class="modal-box w-11/12 max-w-lg">
-        <h3 class="font-bold text-lg">{{ isEditing ? 'Edit Equipment' : 'Add New Equipment' }}</h3>
-        <EquipmentForm 
+        <h3 class="font-bold text-lg">
+          {{ isEditing ? "Edit Equipment" : "Add New Equipment" }}
+        </h3>
+        <EquipmentForm
           v-if="showAddModal || showEditModal"
-          :initial-data="currentItem" 
-          @save="handleSave" 
-          @close="closeModal" 
+          :initial-data="currentItem"
+          @save="handleSave"
+          @close="closeModal"
           class="py-4"
         />
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeModal">✕</button>
+        <button
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          @click="closeModal"
+        >
+          ✕
+        </button>
       </div>
-       <form method="dialog" class="modal-backdrop"><button @click="closeModal">close</button></form>
+      <form method="dialog" class="modal-backdrop">
+        <button @click="closeModal">close</button>
+      </form>
     </dialog>
 
     <ConfirmDialog
@@ -97,26 +188,25 @@
       @save="handleLend"
       @close="closeModal"
     />
-
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import * as dataService from '@/services/dataService'; 
-import EquipmentForm from '@/components/EquipmentForm.vue';
-import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import EquipmentHistoryModal from '@/components/EquipmentHistoryModal.vue';
-import LendModal from '@/components/LendModal.vue';
+import { ref, onMounted, computed } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import * as dataService from "@/services/dataService";
+import EquipmentForm from "@/components/EquipmentForm.vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import EquipmentHistoryModal from "@/components/EquipmentHistoryModal.vue";
+import LendModal from "@/components/LendModal.vue";
 
 const authStore = useAuthStore();
 
 const statusMap = {
-  0: 'Available',
-  1: 'Borrowed',
-  2: 'Under Maintenance',
-  3: 'Decommissioned'
+  0: "Available",
+  1: "Borrowed",
+  2: "Under Maintenance",
+  3: "Decommissioned",
 };
 
 const equipments = ref([]);
@@ -132,13 +222,13 @@ const currentItem = ref(null);
 
 const isEditing = computed(() => !!currentItem.value && showEditModal.value);
 
-const getStatusText = (statusCode) => statusMap[statusCode] || 'Unknown';
+const getStatusText = (statusCode) => statusMap[statusCode] || "Unknown";
 
 const getStatusBadgeClass = (statusCode) => ({
-  'badge-success': statusCode === 0,
-  'badge-warning': statusCode === 1,
-  'badge-info': statusCode === 2,
-  'badge-ghost': statusCode === 3
+  "badge-success": statusCode === 0,
+  "badge-warning": statusCode === 1,
+  "badge-info": statusCode === 2,
+  "badge-ghost": statusCode === 3,
 });
 
 const fetchEquipments = async () => {
@@ -158,7 +248,15 @@ const fetchEquipments = async () => {
 onMounted(fetchEquipments);
 
 const openAddModal = () => {
-  currentItem.value = { id: 0, name: '', serial: '', value: 0, position: '', status: 0, note: '' };
+  currentItem.value = {
+    id: 0,
+    name: "",
+    serial: "",
+    value: 0,
+    position: "",
+    status: 0,
+    note: "",
+  };
   showAddModal.value = true;
 };
 
@@ -200,7 +298,7 @@ const handleSave = async (formData) => {
 
   const payload = {
     ...formData,
-    owner_id: authStore.user.userId
+    owner_id: authStore.user.userId,
   };
 
   try {
@@ -223,8 +321,7 @@ const handleDelete = async () => {
     await dataService.deleteEquipment(currentItem.value.id);
     closeModal();
     await fetchEquipments();
-  } catch (err)
- {
+  } catch (err) {
     console.error("Failed to delete equipment:", err);
     error.value = `Failed to delete: ${err.response?.data?.error || err.message}`;
     closeModal();
@@ -255,15 +352,14 @@ const handleLend = async ({ user, telephone, note }) => {
 };
 
 const handleReturn = async (item) => {
-    try {
-        await dataService.updateEquipmentHistory(item.id);
-        await dataService.updateEquipment(item.id, { ...item, status: 0 }); // 0 = Available
-        await fetchEquipments();
-
-    } catch (err) {
-        console.error("Failed to return equipment:", err);
-        error.value = `Return failed: ${err.response?.data?.error || err.message}`;
-    }
+  try {
+    await dataService.updateEquipmentHistory(item.id);
+    await dataService.updateEquipment(item.id, { ...item, status: 0 }); // 0 = Available
+    await fetchEquipments();
+  } catch (err) {
+    console.error("Failed to return equipment:", err);
+    error.value = `Return failed: ${err.response?.data?.error || err.message}`;
+  }
 };
 </script>
 

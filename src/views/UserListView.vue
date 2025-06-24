@@ -70,17 +70,17 @@
               <span
                 v-if="hasRole(user.permission, PERMISSION_ADMIN)"
                 class="badge badge-primary badge-outline mr-1"
-                >Admin</span
+                >总管理员</span
               >
               <span
-                v-if="hasRole(user.permission, PERMISSION_TEACHER)"
+                v-if="hasRole(user.permission, PERMISSION_MEETING_MANAGER)"
                 class="badge badge-secondary badge-outline mr-1"
-                >Teacher</span
+                >会议室管理员</span
               >
               <span
                 v-if="hasRole(user.permission, PERMISSION_LAB_MANAGER)"
                 class="badge badge-accent badge-outline mr-1"
-                >Lab Manager</span
+                >实验室管理员</span
               >
             </td>
             <td>
@@ -190,8 +190,8 @@ import UserForm from "@/components/UserForm.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import {
   PERMISSION_ADMIN,
-  PERMISSION_TEACHER,
   PERMISSION_LAB_MANAGER,
+  PERMISSION_MEETING_MANAGER,
 } from "@/utils/permissions";
 
 const authStore = useAuthStore();

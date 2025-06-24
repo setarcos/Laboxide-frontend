@@ -123,10 +123,10 @@ const routes = [
     meta: { requiresAuth: true, title: "学生日志" },
   },
   {
-    path: '/equipments',
-    name: 'EquipmentView',
+    path: "/equipments",
+    name: "EquipmentView",
     component: EquipmentView,
-    meta: { requiresAuth: true, title: "设备管理" }
+    meta: { requiresAuth: true, title: "设备管理" },
   },
 ];
 

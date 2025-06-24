@@ -42,18 +42,18 @@
               @change="togglePermission(PERMISSION_ADMIN)"
               class="checkbox checkbox-primary"
             />
-            <span class="label-text">Admin</span>
+            <span class="label-text">总管理员</span>
           </label>
         </div>
         <div class="form-control">
           <label class="label cursor-pointer justify-start gap-2">
             <input
               type="checkbox"
-              :checked="hasPermission(PERMISSION_TEACHER)"
-              @change="togglePermission(PERMISSION_TEACHER)"
+              :checked="hasPermission(PERMISSION_MEETING_MANAGER)"
+              @change="togglePermission(PERMISSION_MEETING_MANAGER)"
               class="checkbox checkbox-primary"
             />
-            <span class="label-text">Teacher</span>
+            <span class="label-text">会议室管理员</span>
           </label>
         </div>
         <div class="form-control">
@@ -64,7 +64,7 @@
               @change="togglePermission(PERMISSION_LAB_MANAGER)"
               class="checkbox checkbox-primary"
             />
-            <span class="label-text">Lab Manager</span>
+            <span class="label-text">实验室管理员</span>
           </label>
         </div>
       </div>
@@ -86,8 +86,8 @@
 import { ref, watch, computed } from "vue";
 import {
   PERMISSION_ADMIN,
-  PERMISSION_TEACHER,
   PERMISSION_LAB_MANAGER,
+  PERMISSION_MEETING_MANAGER,
 } from "@/utils/permissions";
 
 const props = defineProps({

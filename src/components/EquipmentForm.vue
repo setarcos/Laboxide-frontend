@@ -25,7 +25,7 @@
         required
       />
     </div>
-    
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="form-control">
         <label class="label">
@@ -39,7 +39,7 @@
           required
         />
       </div>
-       <div class="form-control">
+      <div class="form-control">
         <label class="label">
           <span class="label-text">Position / Location</span>
         </label>
@@ -57,7 +57,10 @@
       <label class="label">
         <span class="label-text">Status</span>
       </label>
-      <select v-model.number="form.status" class="select select-bordered w-full">
+      <select
+        v-model.number="form.status"
+        class="select select-bordered w-full"
+      >
         <option :value="0">Available</option>
         <option :value="1">Borrowed</option>
         <option :value="2">Under Maintenance</option>
@@ -77,45 +80,51 @@
     </div>
 
     <div class="modal-action">
-      <button type="button" class="btn btn-ghost" @click="$emit('close')">Cancel</button>
+      <button type="button" class="btn btn-ghost" @click="$emit('close')">
+        Cancel
+      </button>
       <button type="submit" class="btn btn-primary">Save</button>
     </div>
   </form>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch } from "vue";
 
 const props = defineProps({
   initialData: {
     type: Object,
-    default: null
-  }
+    default: null,
+  },
 });
 
-const emit = defineEmits(['save', 'close']);
+const emit = defineEmits(["save", "close"]);
 
 const form = ref({});
 
 const defaultFormState = () => ({
   id: 0,
-  name: '',
-  serial: '',
+  name: "",
+  serial: "",
   value: 0,
-  position: '',
+  position: "",
   status: 0,
-  note: ''
+  note: "",
 });
 
-watch(() => props.initialData, (newData) => {
-  if (newData) {
-    form.value = { ...newData, status: Number(newData.status || 0) };
-  } else {
-    form.value = defaultFormState();
-  }
-}, { immediate: true, deep: true });
+watch(
+  () => props.initialData,
+  (newData) => {
+    if (newData) {
+      form.value = { ...newData, status: Number(newData.status || 0) };
+    } else {
+      form.value = defaultFormState();
+    }
+  },
+  { immediate: true, deep: true },
+);
 
 const submitForm = () => {
-  emit('save', { ...form.value });
+  emit("save", { ...form.value });
 };
 </script>

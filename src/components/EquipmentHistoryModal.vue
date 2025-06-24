@@ -1,8 +1,10 @@
 <template>
   <dialog id="history_modal" class="modal" :open="show">
     <div class="modal-box w-11/12 max-w-4xl">
-      <h3 class="font-bold text-lg">Borrow History for: {{ equipment?.name }}</h3>
-      
+      <h3 class="font-bold text-lg">
+        Borrow History for: {{ equipment?.name }}
+      </h3>
+
       <div class="py-4">
         <div v-if="isLoading" class="text-center py-6">
           <span class="loading loading-spinner text-primary"></span>
@@ -29,7 +31,13 @@
                 <td class="font-semibold">{{ history.user }}</td>
                 <td>{{ history.telephone }}</td>
                 <td>{{ formatDateTime(history.borrowed_date) }}</td>
-                <td>{{ history.returned_date ? formatDateTime(history.returned_date) : '—' }}</td>
+                <td>
+                  {{
+                    history.returned_date
+                      ? formatDateTime(history.returned_date)
+                      : "—"
+                  }}
+                </td>
                 <td class="text-xs whitespace-normal">{{ history.note }}</td>
               </tr>
             </tbody>
@@ -40,22 +48,29 @@
       <div class="modal-action">
         <button class="btn" @click="$emit('close')">Close</button>
       </div>
-       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="$emit('close')">✕</button>
+      <button
+        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+        @click="$emit('close')"
+      >
+        ✕
+      </button>
     </div>
-    <form method="dialog" class="modal-backdrop"><button @click="$emit('close')">close</button></form>
+    <form method="dialog" class="modal-backdrop">
+      <button @click="$emit('close')">close</button>
+    </form>
   </dialog>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import * as dataService from '@/services/dataService';
+import { ref, watch } from "vue";
+import * as dataService from "@/services/dataService";
 
 const props = defineProps({
   show: Boolean,
-  equipment: Object
+  equipment: Object,
 });
 
-defineEmits(['close']);
+defineEmits(["close"]);
 
 const histories = ref([]);
 const isLoading = ref(false);
@@ -67,23 +82,28 @@ const fetchHistory = async (itemId) => {
   histories.value = [];
   try {
     const response = await dataService.listHistoriesByItem(itemId);
-    histories.value = response.data.sort((a, b) => new Date(b.borrowed_date) - new Date(a.borrowed_date));
+    histories.value = response.data.sort(
+      (a, b) => new Date(b.borrowed_date) - new Date(a.borrowed_date),
+    );
   } catch (err) {
-    console.error('Failed to fetch history:', err);
+    console.error("Failed to fetch history:", err);
     error.value = err.response?.data || err;
   } finally {
     isLoading.value = false;
   }
 };
 
-watch(() => props.show, (newVal) => {
-  if (newVal && props.equipment) {
-    fetchHistory(props.equipment.id);
-  }
-});
+watch(
+  () => props.show,
+  (newVal) => {
+    if (newVal && props.equipment) {
+      fetchHistory(props.equipment.id);
+    }
+  },
+);
 
 const formatDateTime = (isoString) => {
-  if (!isoString) return '';
+  if (!isoString) return "";
   return new Date(isoString).toLocaleString();
 };
 </script>
