@@ -137,3 +137,22 @@ export const createEquipmentHistory = (data) =>
   api.post("/teacher/equipment/history", data);
 export const updateEquipmentHistory = (id, data) =>
   api.put(`/teacher/equipment/history/${id}`, data);
+
+// --- Meeting Room Management (Admin) ---
+export const getMeetingRooms = () => api.get("/admin/meeting_room");
+export const createMeetingRoom = (data) =>
+  api.post("/admin/meeting_room", data);
+export const updateMeetingRoom = (id, data) =>
+  api.put(`/admin/meeting_room/${id}`, data);
+export const deleteMeetingRoom = (id) =>
+  api.delete(`/admin/meeting_room/${id}`);
+
+// --- Meeting Agenda (User/Teacher) ---
+export const getAgendasForRoom = (roomId) =>
+  api.get(`/teacher/meeting_agenda/room/${roomId}`);
+export const createAgenda = (data) => api.post("/teacher/meeting_agenda", data);
+export const updateAgenda = (id, data) =>
+  api.put(`/teacher/meeting_agenda/${id}`, data);
+export const deleteAgenda = (id) => api.delete(`/teacher/meeting_agenda/${id}`);
+export const confirmAgenda = (id) =>
+  api.put(`/teacher/meeting_agenda/${id}/confirm`);

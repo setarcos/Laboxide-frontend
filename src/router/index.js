@@ -19,6 +19,8 @@ const StudentLogsView = () => import("@/views/StudentLogsView.vue");
 const LoginView = () => import("@/views/LoginView.vue");
 const AuthView = () => import("@/views/AuthView.vue");
 const EquipmentView = () => import("@/views/EquipmentView.vue");
+const MeetingRoomView = () => import("@/views/MeetingRoomView.vue");
+const MeetingBookingView = () => import("@/views/MeetingBookingView.vue");
 
 const routes = [
   {
@@ -127,6 +129,19 @@ const routes = [
     name: "EquipmentView",
     component: EquipmentView,
     meta: { requiresAuth: true, title: "设备管理" },
+  },
+  {
+    path: "/admin/meeting-rooms",
+    name: "MeetingRoomView",
+    component: MeetingRoomView,
+    meta: { requiresAuth: true, title: "会议室管理" },
+  },
+  {
+    path: "/meeting-rooms/:roomId?",
+    name: "MeetingBookingView",
+    component: MeetingBookingView,
+    props: true, // Pass route params as component props
+    meta: { requiresAuth: true, title: "会议室预定" },
   },
 ];
 

@@ -182,6 +182,12 @@
           class="btn btn-sm btn-outline"
           >Manage Semesters</router-link
         >
+        <router-link
+          v-if="authStore.isAdmin"
+          :to="{ name: 'MeetingRoomView' }"
+          class="btn btn-sm btn-outline"
+          >Manage Meeting Rooms</router-link
+        >
       </div>
     </div>
 
