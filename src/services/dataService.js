@@ -122,3 +122,13 @@ export const downloadTimelineFile = (timelineId) =>
   api.get(`/member/timeline/file/${timelineId}`, { responseType: "blob" });
 export const listTimelinesBySchedule = (subcourse_id, schedule_id) =>
   api.get(`/teacher/timeline/schedule/${subcourse_id}/${schedule_id}`);
+
+// --- Equipment functions ---
+export const listEquipments = (params) => api.get("/teacher/equipment", { params }); // params: { page, page_size }
+export const getEquipment = (id) => api.get(`/teacher/equipment/${id}`);
+export const createEquipment = (data) => api.post("/teacher/equipment", data);
+export const updateEquipment = (id, data) => api.put(`/teacher/equipment/${id}`, data);
+export const deleteEquipment = (id) => api.delete(`/teacher/equipment/${id}`);
+export const listHistoriesByItem = (itemId) => api.get(`/teacher/equipment/${itemId}/histories`);
+export const createEquipmentHistory = (data) => api.post("/teacher/equipment/history", data);
+export const updateEquipmentHistory = (id, data) => api.put(`/teacher/equipment/history/${id}`, data);

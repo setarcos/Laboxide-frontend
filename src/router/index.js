@@ -18,6 +18,7 @@ const StudentTimelineView = () => import("@/views/StudentTimelineView.vue");
 const StudentLogsView = () => import("@/views/StudentLogsView.vue");
 const LoginView = () => import("@/views/LoginView.vue");
 const AuthView = () => import("@/views/AuthView.vue");
+const EquipmentView = () => import("@/views/EquipmentView.vue");
 
 const routes = [
   {
@@ -120,6 +121,12 @@ const routes = [
     component: StudentLogsView,
     props: true,
     meta: { requiresAuth: true, title: "学生日志" },
+  },
+  {
+    path: '/equipments',
+    name: 'EquipmentView',
+    component: EquipmentView,
+    meta: { requiresAuth: true, title: "设备管理" }
   },
 ];
 
