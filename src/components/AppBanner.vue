@@ -18,11 +18,10 @@
           ></path>
         </svg>
       </label>
-      <!-- Title -->
-      <a class="btn btn-ghost text-xl">电子信息科学基础实验中心</a>
     </div>
     <div class="navbar-center">
-      <!-- Can add logo or center title here if needed -->
+      <a class="btn btn-ghost text-lg lg:hidden"> 电子信息科学<br>基础实验中心</a>
+      <a class="btn btn-ghost text-xl hidden lg:flex"> 电子信息科学基础实验中心</a>
     </div>
     <div class="navbar-end">
       <div v-if="authStore.isLoading" class="px-4">
@@ -52,7 +51,6 @@
       </div>
       <div v-else class="px-4">
         <a href="/login" class="btn btn-sm btn-primary">Login</a>
-        <!-- Adjust '/login' if your backend login URL is different -->
       </div>
     </div>
   </div>
