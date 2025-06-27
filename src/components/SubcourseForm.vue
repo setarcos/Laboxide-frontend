@@ -211,7 +211,7 @@ function createInitialFormData() {
   const data = props.initialData || {}; // Use empty object if initialData is null/undefined
   return {
     weekday: Math.floor(data.weekday / 10) ?? undefined,
-    partday: data.weekday % 10 ?? undefined,
+    partday: data.weekday % 10,
     room_id: data.room_id ?? undefined,
     tea_name: data.tea_name ?? props.realname,
     tea_id: data.tea_id ?? props.userId,

@@ -20,8 +20,12 @@
       </label>
     </div>
     <div class="navbar-center">
-      <a class="btn btn-ghost text-lg lg:hidden"> 电子信息科学<br>基础实验中心</a>
-      <a class="btn btn-ghost text-xl hidden lg:flex"> 电子信息科学基础实验中心</a>
+      <a class="btn btn-ghost text-lg lg:hidden">
+        电子信息科学<br />基础实验中心</a
+      >
+      <a class="btn btn-ghost text-xl hidden lg:flex">
+        电子信息科学基础实验中心</a
+      >
     </div>
     <div class="navbar-end">
       <div v-if="authStore.isLoading" class="px-4">
