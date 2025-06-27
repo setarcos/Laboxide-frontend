@@ -298,13 +298,13 @@
           {{ isEditing ? "Edit Group" : "Add New Group" }}
         </h3>
         <SubcourseForm
-          v-if="semesterStore.getCurrentSemesterId || currentItem?.semester_id"
+          v-if="semesterStore.getCurrentSemesterId || currentItem?.year_id"
           :key="formKey"
           :initial-data="currentItem"
           :is-saving="isSaving"
           :course-id="courseId"
           :semester-id="
-            currentItem?.semester_id || semesterStore.getCurrentSemesterId
+            currentItem?.year_id || semesterStore.getCurrentSemesterId
           "
           :user-id="authStore.user?.userId || ''"
           :realname="authStore.user?.realname || ''"
