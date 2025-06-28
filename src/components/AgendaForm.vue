@@ -132,18 +132,22 @@ watch(
         endTime: data.end_time.slice(0, 5),
       };
     } else if (props.bookingSlot) {
-      // This logic will also execute correctly
+      // Logic for creating a new booking
+      const startTime = props.bookingSlot.time;
+      // Calculate a default end time (1 hour after start)
+      const [hour] = startTime.split(":");
+      const nextHour = (parseInt(hour, 10) + 1).toString().padStart(2, "0");
       form.value = {
         title: "",
-        repeat: 0,
+        repeat: 1,
         date: props.bookingSlot.date,
         startTime: props.bookingSlot.time,
-        endTime: "",
+        endTime: `${nextHour}:00`,
       };
     } else {
       form.value = {
         title: "",
-        repeat: 0,
+        repeat: 1,
         date: "",
         startTime: "",
         endTime: "",
