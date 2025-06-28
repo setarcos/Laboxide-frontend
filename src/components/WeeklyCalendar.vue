@@ -1,6 +1,6 @@
 <template>
   <!-- The parent div needs to be a positioning context for the absolute-positioned events -->
-  <div class="relative bg-base-100 rounded-box shadow overflow-x-auto">
+  <div class="relative bg-base-100 rounded-box shadow overflow-x-auto z-0">
     <table class="table table-fixed w-full border-collapse">
       <thead>
         <tr>
@@ -70,10 +70,6 @@ th.sticky,
 td.sticky {
   position: sticky;
   left: 0;
-}
-/* We use a higher z-index on the header to ensure it stays above the events when scrolling */
-thead th {
-  z-index: 30;
 }
 /* Make the click target more obvious on hover */
 td:hover {
