@@ -237,7 +237,7 @@ const currentWeekDisplay = computed(() => {
 const canEdit = (agenda) => {
   if (!agenda || !authStore.user) return false;
   return (
-    agenda.userid === authStore.user.userId ||
+    (agenda.userid === authStore.user.userId && agenda.confirm === 0) ||
     authStore.hasPermission(PERMISSION_MEETING_MANAGER)
   );
 };

@@ -29,6 +29,7 @@ onMounted(async () => {
   try {
     // Send the token to our backend. The Vite proxy handles the URL.
     await postToken({ token: token });
+    authStore.resetAuth();
     await authStore.checkAuth();
     // On success, the backend sets an HttpOnly cookie.
     // We can now redirect to the protected area.

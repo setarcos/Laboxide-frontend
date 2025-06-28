@@ -139,7 +139,7 @@ export const updateEquipmentHistory = (id, data) =>
   api.put(`/teacher/equipment/history/${id}`, data);
 
 // --- Meeting Room Management (Admin) ---
-export const getMeetingRooms = () => api.get("/admin/meeting_room");
+export const getMeetingRooms = () => api.get("/teacher/meeting_room");
 export const createMeetingRoom = (data) =>
   api.post("/admin/meeting_room", data);
 export const updateMeetingRoom = (id, data) =>
