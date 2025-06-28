@@ -368,12 +368,25 @@ const handleSaveAgenda = async (formData) => {
   }
 
   const isEditing = modalMode.value === "edit";
+
+  // When editing, preserve the original user's ID and name. When creating, use the current user's.
+  // This is important for when a manager edits someone else's booking.
+  const userDetails = isEditing
+    ? {
+        userid: editingAgenda.value.userid,
+        username: editingAgenda.value.username,
+        confirm: editingAgenda.value.confirm,
+      }
+    : {
+        userid: authStore.user.userId,
+        username: authStore.user.realname,
+        confirm: 0,
+      };
+
   const fullPayload = {
     ...formData,
-    userid: authStore.user.userId,
-    username: authStore.user.realname,
+    ...userDetails,
     room_id: Number(selectedRoomId.value),
-    confirm: 0,
   };
 
   try {
