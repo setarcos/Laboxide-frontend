@@ -30,31 +30,28 @@
           >
             {{ time }}
           </td>
-          <!-- The empty cells that form the grid. They are now just placeholders. -->
+          <!-- The empty cells that form the grid. -->
           <td
             v-for="day in weekDays"
             :key="day.toISOString()"
-            class="border p-0.5 align-top relative hover:bg-base-200/50 group"
+            class="border p-0.5 align-top relative"
             @click="
               emit('book-slot', { date: format(day, 'yyyy-MM-dd'), time })
             "
           >
             <!-- The empty cell itself is the click-to-book target -->
-            <div class="h-full w-full hover:bg-base-200/50 group"></div>
+            <div
+              class="h-full w-full hover:bg-base-200/50 transition-colors duration-200"
+            ></div>
           </td>
         </tr>
+
+        <!-- Positioned Agenda Items -->
         <div
           v-for="agenda in props.agendas"
           :key="agenda.id"
-          class="absolute z-10 p-1.5 rounded-lg text-xs leading-tight flex flex-col overflow-hidden"
-          :class="{
-            'bg-primary/80 text-primary-content backdrop-blur-sm':
-              agenda.confirm,
-            'bg-warning/80 text-warning-content backdrop-blur-sm border-2 border-dashed border-base-content/30':
-              !agenda.confirm,
-            'cursor-pointer hover:ring-2 hover:ring-offset-1 hover:ring-secondary':
-              canEdit(agenda),
-          }"
+          class="absolute z-10 p-1.5 rounded-md text-xs leading-tight flex flex-col overflow-hidden box-border"
+          :class="getAgendaClasses(agenda)"
           :style="getAgendaStyle(agenda)"
           @click.stop="emit('view-agenda', agenda)"
         >
@@ -77,6 +74,10 @@ td.sticky {
 /* We use a higher z-index on the header to ensure it stays above the events when scrolling */
 thead th {
   z-index: 30;
+}
+/* Make the click target more obvious on hover */
+td:hover {
+  cursor: pointer;
 }
 </style>
 
@@ -109,7 +110,7 @@ const timeHeaderWidth = "6rem"; // 96px, must match `w-24` class
 const dayColumnWidth = `calc((100% - ${timeHeaderWidth}) / 7)`;
 const rowHeight = "5rem"; // 80px, must match `h-20` class on time cell
 const startHour = 8;
-const endHour = 18;
+const endHour = 23;
 
 // --- COMPUTED PROPERTIES ---
 const timeSlots = computed(() => {
@@ -134,16 +135,31 @@ const canEdit = (agenda) => {
   );
 };
 
-// --- CORE POSITIONING LOGIC ---
+// --- STYLING LOGIC ---
+const getAgendaClasses = (agenda) => {
+  const classes = {
+    "cursor-pointer hover:ring-2 hover:ring-offset-1 hover:ring-secondary":
+      canEdit(agenda),
+  };
+  if (agenda.confirm) {
+    return {
+      ...classes,
+      "bg-primary/20 text-gray-800 dark:text-gray-200 border-l-4 border-primary": true,
+    };
+  } else {
+    return {
+      ...classes,
+      "bg-warning/20 text-gray-800 dark:text-gray-200 border-l-4 border-warning": true,
+    };
+  }
+};
+
 const getAgendaStyle = (agenda) => {
-  // Find which day column the event belongs to
   const agendaDay = getAgendaDay(agenda);
   if (agendaDay === -1) {
-    // If the event is not in the current week, don't render it.
     return { display: "none" };
   }
 
-  // Calculate vertical position (top) and height
   const startTime = parseISO(`2000-01-01T${agenda.start_time}`);
   const minutesFromStartOfDay =
     (startTime.getHours() - startHour) * 60 + startTime.getMinutes();
@@ -151,18 +167,12 @@ const getAgendaStyle = (agenda) => {
 
   const endTime = parseISO(`2000-01-01T${agenda.end_time}`);
   const durationMinutes = differenceInMinutes(endTime, startTime);
-  const height = `calc(${durationMinutes / 60} * ${rowHeight})`;
+  const height = `calc((${durationMinutes / 60} * ${rowHeight}) - 1px)`;
 
-  // Calculate horizontal position (left) and width
   const left = `calc(${timeHeaderWidth} + ${agendaDay} * ${dayColumnWidth})`;
-  const width = dayColumnWidth;
+  const width = `calc(${dayColumnWidth} - 4px)`;
 
-  return {
-    top,
-    height,
-    left,
-    width,
-  };
+  return { top, height, left, width };
 };
 
 // Helper to find the column index (0-6) for an agenda item
