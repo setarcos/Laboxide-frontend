@@ -9,25 +9,55 @@
           type="button"
           @click="editor.chain().focus().toggleBold().run()"
           :class="{ 'btn-active': editor.isActive('bold') }"
-          class="btn btn-sm btn-ghost join-item"
+          class="btn btn-sm btn-square btn-ghost join-item"
+          aria-label="Bold"
+          title="Bold"
         >
-          Bold
+          <Bold class="w-4 h-4" />
         </button>
         <button
           type="button"
           @click="editor.chain().focus().toggleItalic().run()"
           :class="{ 'btn-active': editor.isActive('italic') }"
-          class="btn btn-sm btn-ghost join-item"
+          class="btn btn-sm btn-square btn-ghost join-item"
+          aria-label="Italic"
+          title="Italic"
         >
-          Italic
+          <Italic class="w-4 h-4" />
         </button>
         <button
           type="button"
           @click="editor.chain().focus().toggleStrike().run()"
           :class="{ 'btn-active': editor.isActive('strike') }"
-          class="btn btn-sm btn-ghost join-item"
+          class="btn btn-sm btn-square btn-ghost join-item"
+          aria-label="Strikethrough"
+          title="Strikethrough"
         >
-          Strike
+          <Strikethrough class="w-4 h-4" />
+        </button>
+      </div>
+
+      <!-- Lists -->
+      <div class="join">
+        <button
+          type="button"
+          @click="editor.chain().focus().toggleBulletList().run()"
+          :class="{ 'btn-active': editor.isActive('bulletList') }"
+          class="btn btn-sm btn-square btn-ghost join-item"
+          aria-label="Bullet List"
+          title="Bullet List"
+        >
+          <List class="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          @click="editor.chain().focus().toggleOrderedList().run()"
+          :class="{ 'btn-active': editor.isActive('orderedList') }"
+          class="btn btn-sm btn-square btn-ghost join-item"
+          aria-label="Numbered List"
+          title="Numbered List"
+        >
+          <ListOrdered class="w-4 h-4" />
         </button>
       </div>
       <div class="join">
@@ -35,27 +65,40 @@
           type="button"
           @click="setLink"
           :class="{ 'btn-active': editor.isActive('link') }"
-          class="btn btn-sm btn-ghost join-item"
+          class="btn btn-sm btn-square btn-ghost join-item"
+          aria-label="Set Link"
+          title="Set Link"
         >
-          Link
+          <Link class="w-4 h-4" />
         </button>
         <button
           type="button"
           @click="editor.chain().focus().unsetLink().run()"
           :disabled="!editor.isActive('link')"
-          class="btn btn-sm btn-ghost join-item"
+          class="btn btn-sm btn-square btn-ghost join-item"
+          aria-label="Unlink"
+          title="Unlink"
         >
-          Unlink
+          <Unlink class="w-4 h-4" />
         </button>
       </div>
       <div class="join">
-        <button
-          type="button"
-          @click="toggleSourceView"
-          class="btn btn-sm btn-ghost"
-        >
-          {{ isSourceViewActive ? "Show Editor" : "Show HTML" }}
-        </button>
+        <div class="p-2 border-b border-base-300 flex justify-end">
+            <button
+              type="button"
+              @click="toggleSourceView"
+              class="btn btn-sm btn-square btn-ghost"
+              :aria-label="isSourceViewActive ? 'Show Editor' : 'Show HTML'"
+              :title="isSourceViewActive ? 'Show Editor' : 'Show HTML'"
+            >
+              <template v-if="isSourceViewActive">
+                <Eye class="w-4 h-4" />
+              </template>
+              <template v-else>
+                <Code class="w-4 h-4" />
+              </template>
+            </button>
+        </div>
       </div>
     </div>
 
@@ -82,7 +125,19 @@
 import { ref, watch, onBeforeUnmount } from "vue";
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
+import TiptapLink from "@tiptap/extension-link";
+import {
+  Bold,
+  Italic,
+  Strikethrough,
+  List,
+  ListOrdered,
+  Link,
+  Unlink,
+  Image,
+  Code,
+  Eye,
+} from 'lucide-vue-next';
 
 const props = defineProps({
   modelValue: {
@@ -113,7 +168,7 @@ const editor = useEditor({
   content: props.modelValue,
   extensions: [
     StarterKit,
-    Link.configure({
+    TiptapLink.configure({
       openOnClick: false,
       autolink: true,
     }),
