@@ -73,13 +73,7 @@
       <label class="label" for="course-intro">
         <span class="label-text">Introduction</span>
       </label>
-      <textarea
-        id="course-intro"
-        v-model="formData.intro"
-        class="textarea textarea-bordered w-full"
-        placeholder="Brief course description"
-        rows="3"
-      ></textarea>
+      <RichTextEditor id="course-intro" v-model="formData.intro" />
     </div>
     <div>
       <label class="label" for="course-mailbox">
@@ -123,6 +117,8 @@
 <script setup>
 import { ref, watch } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import RichTextEditor from "@/components/RichTextEditor.vue";
+
 const authStore = useAuthStore();
 
 const props = defineProps({

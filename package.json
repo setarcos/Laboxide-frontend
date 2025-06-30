@@ -12,6 +12,9 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.22",
+    "@tiptap/extension-link": "^2.23.0",
+    "@tiptap/starter-kit": "^2.23.0",
+    "@tiptap/vue-3": "^2.23.0",
     "axios": "^1.7.2",
     "daisyui": "^4.12.2",
     "date-fns": "^4.1.0",

@@ -137,9 +137,10 @@
 
             <div>
               <p class="font-semibold text-sm text-gray-500 mb-2">课程大纲</p>
-              <div class="prose max-w-none bg-base-200 p-4 rounded-md">
-                <p style="white-space: pre-wrap">{{ course.intro }}</p>
-              </div>
+              <div
+                class="prose max-w-none bg-base-200 p-4 rounded-md"
+                v-html="course.intro"
+              ></div>
             </div>
           </div>
 
