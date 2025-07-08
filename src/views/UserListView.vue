@@ -92,7 +92,6 @@
                     class="btn btn-xs btn-ghost btn-circle"
                     title="Edit"
                     @click="openEditModal(user)"
-                    :disabled="authStore.user?.userId === user.user_id"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
