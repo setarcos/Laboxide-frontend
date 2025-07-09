@@ -84,20 +84,20 @@
       </div>
       <div class="join">
         <div class="p-2 border-b border-base-300 flex justify-end">
-            <button
-              type="button"
-              @click="toggleSourceView"
-              class="btn btn-sm btn-square btn-ghost"
-              :aria-label="isSourceViewActive ? 'Show Editor' : 'Show HTML'"
-              :title="isSourceViewActive ? 'Show Editor' : 'Show HTML'"
-            >
-              <template v-if="isSourceViewActive">
-                <Eye class="w-4 h-4" />
-              </template>
-              <template v-else>
-                <Code class="w-4 h-4" />
-              </template>
-            </button>
+          <button
+            type="button"
+            @click="toggleSourceView"
+            class="btn btn-sm btn-square btn-ghost"
+            :aria-label="isSourceViewActive ? 'Show Editor' : 'Show HTML'"
+            :title="isSourceViewActive ? 'Show Editor' : 'Show HTML'"
+          >
+            <template v-if="isSourceViewActive">
+              <Eye class="w-4 h-4" />
+            </template>
+            <template v-else>
+              <Code class="w-4 h-4" />
+            </template>
+          </button>
         </div>
       </div>
     </div>
@@ -134,10 +134,9 @@ import {
   ListOrdered,
   Link,
   Unlink,
-  Image,
   Code,
   Eye,
-} from 'lucide-vue-next';
+} from "lucide-vue-next";
 
 const props = defineProps({
   modelValue: {
