@@ -123,7 +123,16 @@
 
             <!-- Teacher/Admin Column: Semester ID (if showing all) -->
             <td v-if="showAllSemesters && (isTeacher || authStore.isAdmin)">
-              {{ subcourse.year_id }}
+              <span v-if="isLoadingSemesters" class="text-xs italic"
+                >Loading Semesters...</span
+              >
+              <span
+                v-else-if="semesterError"
+                class="text-xs text-error"
+                :title="semesterError"
+                >Semesters Error</span
+              >
+              <span v-else>{{ getSemesterName(subcourse.year_id) }}</span>
             </td>
 
             <!-- Actions Column -->
@@ -371,6 +380,10 @@ const labrooms = ref([]);
 const isLoadingLabrooms = ref(false);
 const labroomError = ref(null);
 
+const semesters = ref([]);
+const isLoadingSemesters = ref(false);
+const semesterError = ref(null);
+
 // Modal states
 const showAddModal = ref(false);
 const showEditModal = ref(false);
@@ -381,7 +394,7 @@ const formKey = ref(0);
 // Teacher-specific state
 const showAllSemesters = ref(false);
 
-// --- NEW: Student Enrollment State ---
+// --- Student Enrollment State ---
 const myEnrolledSubcourseId = ref(null); // ID of the subcourse the student is in for THIS course
 const isLoadingMyEnrollment = ref(false);
 const myEnrollmentError = ref(null);
@@ -403,14 +416,14 @@ const tableColumnCount = computed(() => {
   return count;
 });
 
-// Fetch Labrooms (existing)
+// Fetch Labrooms
 const fetchLabrooms = async () => {
   if (labrooms.value.length > 0 || isLoadingLabrooms.value) return;
   isLoadingLabrooms.value = true;
   labroomError.value = null;
   try {
     const response = await dataService.getLabrooms();
-    labrooms.value = response.data?.data || response.data || []; // Adjust based on your API response structure
+    labrooms.value = response.data;
   } catch (err) {
     console.error("Failed to fetch lab rooms in Tab:", err);
     labroomError.value = `Error loading rooms: ${err.response?.data?.error || err.message}`;
@@ -423,6 +436,27 @@ const getRoomName = (roomId) => {
   if (!roomId || labrooms.value.length === 0) return "N/A";
   const room = labrooms.value.find((r) => r.id === roomId);
   return room ? `${room.name} (${room.room})` : `Unknown Room (ID: ${roomId})`;
+};
+
+const fetchSemesters = async () => {
+  if (semesters.value.length > 0 || isLoadingSemesters.value) return;
+  isLoadingSemesters.value = true;
+  semesterError.value = null;
+  try {
+    const response = await dataService.getSemesters();
+    semesters.value = response.data;
+  } catch (err) {
+    console.error("Failed to fetch lab rooms in Tab:", err);
+    semesterError.value = err.messages;
+  } finally {
+    isLoadingSemesters.value = false;
+  }
+};
+
+const getSemesterName = (semId) => {
+  if (!semId || semesters.value.length === 0) return "N/A";
+  const sem = semesters.value.find((r) => r.id === semId);
+  return sem ? sem.name : `Unknown Semester(ID: ${semId})`;
 };
 
 // Fetch subcourses logic (Slightly adjusted for clarity)
@@ -463,14 +497,13 @@ const fetchSubcourses = async () => {
   const params = { course_id: props.courseId };
   if (semesterIdToFetch) {
     params.year_id = semesterIdToFetch;
+  } else {
+    fetchSemesters();
   }
 
   try {
     const response = await dataService.getSubcourses(params);
-    // Assume response.data contains the array, potentially nested e.g., response.data.data
-    subcourses.value = response.data?.data || response.data || [];
-    // TODO: Ensure the API response for subcourses includes 'current_students' count if needed for the 'Full' status check.
-    // If not, you might need another API call or adjust the backend.
+    subcourses.value = response.data;
   } catch (err) {
     console.error("Failed to fetch subcourses:", err);
     error.value = err.response?.data?.error || err.message || err;
@@ -479,7 +512,6 @@ const fetchSubcourses = async () => {
   }
 };
 
-// --- NEW: Fetch Student's Enrollment Status ---
 const fetchMyEnrollmentStatus = async () => {
   if (!isStudent.value || !props.courseId) {
     myEnrolledSubcourseId.value = null; // Ensure it's null if not a student or no courseId
@@ -523,7 +555,7 @@ const fetchMyEnrollmentStatus = async () => {
   }
 };
 
-// --- Modal Operations (existing) ---
+// --- Modal Operations ---
 const openAddModal = () => {
   // Allow add only if semester known (or admin/teacher override?) - Sticking to current semester for now
   if (!semesterStore.getCurrentSemesterId) {
@@ -555,7 +587,7 @@ const closeModal = () => {
   isSaving.value = false;
 };
 
-// --- CRUD Handlers (Teacher/Admin - existing) ---
+// --- CRUD Handlers (Teacher/Admin) ---
 const handleSave = async (formData) => {
   if (!isTeacher.value && !isAdmin.value) return;
 
@@ -604,7 +636,7 @@ const handleDelete = async () => {
   }
 };
 
-// --- NEW: Student Action Handlers ---
+// --- Student Action Handlers ---
 const handleJoinGroup = async (subcourseId) => {
   if (!isStudent.value || isProcessingAction.value) return;
 
