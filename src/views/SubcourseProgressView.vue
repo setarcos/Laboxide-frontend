@@ -1,4 +1,3 @@
-// src/views/SubcourseProgressView.vue
 <template>
   <div class="prose max-w-none">
     <h2>
@@ -565,7 +564,7 @@ import {
   calculateCurrentWeek,
   formatTimestamp,
 } from "@/utils/weekday";
-import TeacherTimelineLogForm from "@/components/TeacherTimelineLogForm.vue"; // Needs to be created
+import TeacherTimelineLogForm from "@/components/TeacherTimelineLogForm.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { useFileHandling } from "@/utils/fileops";
 
@@ -709,9 +708,6 @@ const studentProgressData = computed(() => {
     // Note: This check relies on the backend's "recent" time window.
     // A log confirmed outside this window won't make the bar green based on *this* API.
 
-    // Determine if *no* recent log (confirmed or unconfirmed) exists for the student
-    const noRecentLog = !recentLogForStudent;
-
     return {
       student,
       loggedStepsCount,
@@ -720,7 +716,6 @@ const studentProgressData = computed(() => {
       unconfirmedFinalLog, // Add the unconfirmed log if found (for button)
       hasConfirmedFinalLog, // Add status if a recent log is confirmed (for bar color)
       recentLogForStudent, // Add the raw recent log (or null) to easily check for *any* recent log
-      noRecentLog, // Explicit flag if no recent log exists
     };
   });
 });
@@ -821,9 +816,6 @@ const fetchWeeklyData = async () => {
       );
 
       // Fetch all timeline entries for this subcourse AND this week's schedule_id
-      // Note: Backend listTimelinesBySchedule might not filter by schedule_id
-      // If it fetches ALL timelines for subcourse, need to filter by entry.schedule_id === selectedSchedule.value.id
-      // Assuming it DOES filter by schedule_id based on the service function name
       const timelineRes = await dataService.listTimelinesBySchedule(
         props.id,
         selectedSchedule.value.id,
