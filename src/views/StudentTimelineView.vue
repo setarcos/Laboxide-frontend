@@ -91,8 +91,6 @@
         <div class="collapse-content peer-checked:bg-base-100">
           <div v-if="group.entries.length > 0" class="overflow-x-auto mt-4">
             <table class="table table-sm w-full">
-              <!-- Added table classes -->
-              <!-- Table Header -->
               <thead>
                 <tr>
                   <th>Timestamp</th>
@@ -101,7 +99,6 @@
                   <th>Note / File</th>
                 </tr>
               </thead>
-              <!-- Table Body -->
               <tbody>
                 <tr v-for="entry in group.entries" :key="entry.id">
                   <!-- Timestamp Column -->
@@ -250,9 +247,7 @@ const error = ref({ page: null }); // Combined error state
 
 // Get passed state (student name, subcourse name) - provide fallbacks
 const studentNameDisplay = ref(
-  route.meta?.state?.studentName ||
-    route.params?.studentName ||
-    props.studentId,
+  route.meta?.state?.studentName || props.studentId,
 );
 const subcourseNameDisplay = ref(route.meta?.state?.subcourseName || "");
 
