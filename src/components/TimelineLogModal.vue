@@ -2,7 +2,12 @@
 <template>
   <div class="modal-content-wrapper">
     <h3 class="font-bold text-lg mb-4">
-      Log Progress for {{ subcourse.course_name }} (Week {{ currentWeek }})
+      {{
+        $t("tlmodal.title", {
+          course: subcourse.course_name,
+          week: currentWeek,
+        })
+      }}
     </h3>
 
     <!-- Loading State -->
@@ -36,9 +41,7 @@
       <!-- Week Selection Dropdown -->
       <div class="form-control mb-4">
         <label class="label pb-1">
-          <span class="label-text font-semibold"
-            >Target Week for this Log:</span
-          >
+          <span class="label-text font-semibold">{{ $t("tlmodal.week") }}</span>
         </label>
         <select
           v-model="selectedScheduleId"
@@ -57,7 +60,7 @@
             :key="sched.id"
             :value="sched.id"
           >
-            Week {{ sched.week }}
+            {{ $t("tlmodal.weekday", { week: sched.week }) }}
             <span v-if="sched.id === scheduleForWeek?.id"> (Current Week)</span>
             <span v-if="sched.name"> - {{ sched.name }}</span>
           </option>
@@ -67,13 +70,12 @@
       <!-- Step Selection -->
       <div class="form-control mb-4">
         <label class="label pb-1">
-          <span class="label-text font-semibold"
-            >Select Step or Action to Log:</span
-          >
+          <span class="label-text font-semibold">{{
+            $t("tlmodal.target")
+          }}</span>
         </label>
         <div v-if="!selectedScheduleId" class="text-warning text-sm italic">
-          Please select a target week from the dropdown above to see available
-          steps.
+          {{ $t("tlmodal.noweek") }}
         </div>
         <div v-else-if="isFetchingSubSchedules" class="text-center py-3">
           <span class="loading loading-sm loading-spinner text-info"></span>
@@ -132,9 +134,9 @@
               value="other"
               v-model="selectedStepValue"
             />
-            <span class="flex-grow font-semibold text-info text-sm"
-              >Others / Custom Log Entry</span
-            >
+            <span class="flex-grow font-semibold text-info text-sm">{{
+              $t("tlmodal.others")
+            }}</span>
           </label>
           <label
             class="flex items-center cursor-pointer p-1.5 rounded hover:bg-base-200 border border-transparent has-[:checked]:border-accent has-[:checked]:bg-accent/10"
@@ -146,9 +148,9 @@
               value="finish"
               v-model="selectedStepValue"
             />
-            <span class="flex-grow font-semibold text-accent text-sm"
-              >Finish Experiment / Final Log</span
-            >
+            <span class="flex-grow font-semibold text-accent text-sm">{{
+              $t("tlmodal.finish")
+            }}</span>
           </label>
         </div>
       </div>
@@ -157,9 +159,9 @@
       <div v-if="selectedStepValue === 'other'">
         <div class="form-control mb-4">
           <label class="label pb-1">
-            <span class="label-text font-semibold"
-              >Custom Log Entry Title:</span
-            >
+            <span class="label-text font-semibold">{{
+              $t("tlmodal.custom")
+            }}</span>
           </label>
           <input
             type="text"
@@ -185,7 +187,7 @@
         class="mt-4 border-t pt-4"
       >
         <h4 class="font-semibold mb-2 text-base">
-          Add Note/File for Log Entry (Week {{ selectedScheduleObject?.week }}):
+          {{ $t("tlmodal.add") }}
           <span class="font-normal text-primary text-sm">
             {{
               selectedStepValue === "other"
@@ -196,7 +198,7 @@
         </h4>
         <div class="form-control mb-3">
           <label class="label cursor-pointer justify-start gap-4">
-            <span class="label-text text-sm">Type:</span>
+            <span class="label-text text-sm">{{ $t("tlmodal.type") }}</span>
             <span class="flex items-center gap-2 text-sm">
               <input
                 type="radio"
@@ -205,7 +207,7 @@
                 :value="0"
                 v-model="noteType"
               />
-              Text Note
+              {{ $t("tlmodal.note") }}
             </span>
             <span class="flex items-center gap-2 text-sm">
               <input
@@ -215,7 +217,7 @@
                 :value="1"
                 v-model="noteType"
               />
-              File Upload
+              {{ $t("tlmodal.file") }}
             </span>
           </label>
         </div>
@@ -264,7 +266,7 @@
             :disabled="isSaving || !isLoggable"
             :class="{ loading: isSaving }"
           >
-            {{ isSaving ? "Saving..." : "Save Log Entry" }}
+            {{ isSaving ? "Saving..." : $t("tlmodal.save") }}
           </button>
         </div>
       </div>
@@ -278,7 +280,7 @@
         @click="$emit('close')"
         :disabled="isSaving"
       >
-        Cancel
+        {{ $t("button.cancel") }}
       </button>
     </div>
   </div>

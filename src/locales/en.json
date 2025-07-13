@@ -10,7 +10,40 @@
     "course": "Course Name",
     "week": "Week Day",
     "room": "Room",
-    "action": "Actions"
+    "action": "Actions",
+    "log": "Log Progress",
+    "confirm": "Log Confirmed",
+    "finallog": "Final Experiment Log:",
+    "progress": "View Progress"
+  },
+  "tlmodal": {
+    "title": "Log Progress for {course} (Week {week}):",
+    "week": "Target Week for this log:",
+    "noweek": "Please select a target week from the dropdown above to see available steps.",
+    "others": "Ohters/ Custom Log Entry",
+    "finish": "Finish Experiment / Final Log",
+    "custom": "Custom Log Entry Title:",
+    "add": "Add Note/File for Log Entry:",
+    "note": "Text Note",
+    "file": "File Upload",
+    "type": "Type:",
+    "save": "Save Log Entry",
+    "weekday": "Week {week}",
+    "target": "Select Step or Action to Log:"
+  },
+  "stulog": {
+    "student": "Student:",
+    "room": "Lab Room",
+    "lab": "Lab / Experiment Name",
+    "seat": "Seat Number",
+    "note": "Equipments Note",
+    "notehint": "Is there anything broken?",
+    "post": "Post-Lab Checks",
+    "clean": "Clean the table",
+    "off": "Turn off all equipments",
+    "save": "Save Log",
+    "update": "Update Log",
+    "logdetail": "Editable Log Details"
   },
   "button": {
     "login": "Login",

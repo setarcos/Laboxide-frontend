@@ -92,7 +92,6 @@
 <script setup>
 import { useAuthStore } from "@/stores/auth";
 import { useI18n } from "vue-i18n";
-import { computed } from "vue";
 
 const authStore = useAuthStore();
 const { locale, availableLocales } = useI18n();

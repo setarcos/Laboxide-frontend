@@ -10,7 +10,40 @@
     "course": "课程名称",
     "week": "时间",
     "room": "地点",
-    "action": "操作"
+    "action": "操作",
+    "log": "记录进度",
+    "confirm": "已完成",
+    "finallog": "实验日志",
+    "progress": "查看进度"
+  },
+  "tlmodal": {
+    "title": "{course}(第{week}周)实验记录：",
+    "week": "课程周：",
+    "noweek": "请先选择课程周才可以看到备选记录内容。",
+    "others": "自定义内容",
+    "finish": "完成实验/实验日志",
+    "custom": "自定义内容标题：",
+    "add": "添加记录或文件：",
+    "note": "文本记录",
+    "file": "文件记录",
+    "type": "类型：",
+    "save": "保存记录",
+    "weekday": "第{week}周",
+    "target": "选择记录内容"
+  },
+  "stulog": {
+    "student": "学生：",
+    "room": "实验室",
+    "lab": "实验名称",
+    "seat": "座位号",
+    "note": "设备记录",
+    "notehint": "记录有故障的设备",
+    "post": "课后检查",
+    "clean": "清理桌面",
+    "off": "关闭所有设备",
+    "save": "保存日志",
+    "update": "更新日志",
+    "logdetail": "填写日志内容"
   },
   "button": {
     "login": "登录",

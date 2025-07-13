@@ -125,8 +125,8 @@
                   >
                     <span>{{
                       hasConfirmedLog(course.id)
-                        ? "Log Confirmed"
-                        : "Log Progress"
+                        ? $t("dashboard.confirm")
+                        : $t("dashboard.log")
                     }}</span>
                   </button>
                   <div v-if="authStore.isTeacher" class="flex gap-1">
@@ -138,7 +138,7 @@
                       class="btn btn-xs btn-outline btn-secondary"
                       title="View Student Progress"
                     >
-                      View Progress
+                      {{ $t("dashboard.progress") }}
                     </router-link>
                   </div>
                 </td>
@@ -225,10 +225,9 @@
     <dialog id="finish_log_modal" class="modal" :open="showFinishLogModal">
       <div class="modal-box w-11/12 max-w-2xl">
         <h3 class="font-bold text-lg mb-4">
-          Final Experiment Log for
           {{ selectedSubcourseForFinishLog?.course_name }} ({{
             getWeekdayName(selectedSubcourseForFinishLog?.weekday)
-          }})
+          }}) {{ $t("dashboard.finallog") }}
         </h3>
 
         <div v-if="isLoadingFinishLogDefaults" class="text-center p-10">

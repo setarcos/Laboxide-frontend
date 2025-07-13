@@ -4,18 +4,18 @@
     <div class="space-y-4">
       <!-- Display Student Info (Read-only, name from store) -->
       <div class="text-sm">
-        <strong>Student:</strong>
+        <strong>{{ $t("stulog.student") }}</strong>
         {{ authStore.user?.realname || formData.stu_name || "N/A" }} ({{
           formData.stu_id || "N/A"
         }})
       </div>
 
-      <div class="divider text-xs">Editable Log Details</div>
+      <div class="divider text-xs">{{ $t("stulog.logdetail") }}</div>
 
       <!-- Lab Room Selection -->
       <div class="form-control">
         <label for="room_id" class="label">
-          <span class="label-text">Lab Room</span>
+          <span class="label-text">{{ $t("stulog.room") }}</span>
           <!-- Add <span class="text-error">*</span> if room selection is mandatory -->
         </label>
         <div v-if="isLoadingRooms" class="text-sm text-gray-500 py-2">
@@ -64,7 +64,7 @@
       <!-- Editable Fields -->
       <div class="form-control">
         <label for="lab_name" class="label">
-          <span class="label-text">Lab / Experiment Name</span>
+          <span class="label-text">{{ $t("stulog.lab") }}</span>
         </label>
         <input
           id="lab_name"
@@ -77,7 +77,7 @@
 
       <div class="form-control">
         <label for="seat" class="label">
-          <span class="label-text">Seat Number</span>
+          <span class="label-text">{{ $t("stulog.seat") }}</span>
         </label>
         <input
           id="seat"
@@ -92,7 +92,7 @@
       <div class="form-control">
         <label for="note" class="label">
           <span class="label-text"
-            >Student Note <span class="text-error">*</span></span
+            >{{ $t("stulog.note") }}<span class="text-error">*</span></span
           >
         </label>
         <textarea
@@ -103,14 +103,14 @@
           required
         ></textarea>
         <label class="label">
-          <span class="label-text-alt text-gray-500"
-            >Describe work or enter "None". Field is required.</span
-          >
+          <span class="label-text-alt text-gray-500">{{
+            $t("stulog.notehint")
+          }}</span>
         </label>
       </div>
 
       <!-- Mandatory Confirmation Checkboxes -->
-      <div class="divider text-xs">Post-Lab Checks</div>
+      <div class="divider text-xs">{{ $t("stulog.post") }}</div>
       <div class="space-y-2 mt-2">
         <div class="form-control">
           <label
@@ -124,7 +124,7 @@
               class="checkbox checkbox-primary checkbox-sm"
             />
             <span class="label-text"
-              >Clean the table <span class="text-error">*</span></span
+              >{{ $t("stulog.clean") }}<span class="text-error">*</span></span
             >
           </label>
         </div>
@@ -140,7 +140,7 @@
               class="checkbox checkbox-primary checkbox-sm"
             />
             <span class="label-text"
-              >Turn off all equipment <span class="text-error">*</span></span
+              >{{ $t("stulog.off") }}<span class="text-error">*</span></span
             >
           </label>
         </div>
@@ -151,7 +151,7 @@
     <!-- Actions -->
     <div class="modal-action mt-6">
       <button type="button" class="btn btn-ghost" @click="$emit('close')">
-        Cancel
+        {{ $t("button.cancel") }}
       </button>
       <button
         type="submit"
@@ -159,7 +159,13 @@
         :disabled="isSubmitDisabled"
         :class="{ loading: isSaving }"
       >
-        {{ isSaving ? "Saving..." : formData.id ? "Update Log" : "Save Log" }}
+        {{
+          isSaving
+            ? "Saving..."
+            : formData.id
+              ? $t("stulog.update")
+              : $t("stulog.save")
+        }}
       </button>
     </div>
   </form>
