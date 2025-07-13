@@ -18,7 +18,7 @@
             d="M12 4v16m8-8H4"
           />
         </svg>
-        Add Schedule Item
+        {{ $t("course.addsche") }}
       </button>
     </div>
 
@@ -55,10 +55,10 @@
           <tr>
             <th class="w-10"></th>
             <!-- Column for expand toggle -->
-            <th class="w-16 text-center">Week</th>
-            <th>Topic / Name</th>
-            <th>Requirement / Details</th>
-            <th v-if="isTeacher" class="w-20">Actions</th>
+            <th class="w-16 text-center">{{ $t("course.week") }}</th>
+            <th>{{ $t("course.topic") }}</th>
+            <th>{{ $t("course.requirement") }}</th>
+            <th v-if="isTeacher" class="w-20">{{ $t("course.op") }}</th>
           </tr>
         </thead>
         <!-- Use template v-for to group main row and sub-schedule row -->
@@ -171,7 +171,9 @@
                 </div>
                 <!-- Sub-schedule List -->
                 <div v-else>
-                  <h4 class="text-sm font-semibold mb-2 ml-2">Steps:</h4>
+                  <h4 class="text-sm font-semibold mb-2 ml-2">
+                    {{ $t("course.step") }}
+                  </h4>
                   <ul
                     v-if="item.subschedules && item.subschedules.length > 0"
                     class="list-none pl-4 space-y-1"
@@ -259,7 +261,7 @@
                           d="M12 4v16m8-8H4"
                         />
                       </svg>
-                      Add Step
+                      {{ $t("course.addstep") }}
                     </button>
                   </div>
                 </div>
@@ -284,7 +286,7 @@
     >
       <div class="modal-box w-11/12 max-w-2xl">
         <h3 class="font-bold text-lg">
-          {{ isEditing ? "Edit Schedule Item" : "Add Schedule Item" }}
+          {{ isEditing ? $t("course.editsche") : $t("course.addsche") }}
         </h3>
         <ScheduleForm
           :key="formKey"
@@ -311,7 +313,7 @@
     <ConfirmDialog
       :show="showDeleteModal"
       dialogId="schedule_delete_confirm_modal"
-      title="Delete Schedule Item"
+      :title="$t('course.delsche')"
       :message="deleteConfirmationMessage"
       @confirm="handleDelete"
       @close="closeModal"

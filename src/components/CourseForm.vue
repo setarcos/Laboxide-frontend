@@ -30,7 +30,11 @@
     </div>
     <div>
       <label class="label" for="course-code">
-        <span class="label-text">{{ $t("course.id") }},{{ $t("course.credit") }},{{ $t("course.hours") }}</span>
+        <span class="label-text"
+          >{{ $t("course.id") }},{{ $t("course.credit") }},{{
+            $t("course.hours")
+          }}</span
+        >
       </label>
       <input
         id="course-code"
@@ -109,7 +113,9 @@
       <button type="button" class="btn btn-ghost" @click="$emit('close')">
         {{ $t("button.cancel") }}
       </button>
-      <button type="submit" class="btn btn-primary">{{ $t("course.save") }}</button>
+      <button type="submit" class="btn btn-primary">
+        {{ $t("course.save") }}
+      </button>
     </div>
   </form>
 </template>

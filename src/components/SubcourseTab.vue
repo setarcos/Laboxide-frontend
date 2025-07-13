@@ -7,7 +7,7 @@
     >
       <div class="form-control">
         <label class="label cursor-pointer gap-2">
-          <span class="label-text">Show All Semesters</span>
+          <span class="label-text">{{ $t("course.allterm") }}</span>
           <input
             type="checkbox"
             class="toggle toggle-primary"
@@ -30,7 +30,7 @@
             d="M12 4v16m8-8H4"
           />
         </svg>
-        Add Group
+        {{ $t("course.addgroup") }}
       </button>
     </div>
 
@@ -80,14 +80,14 @@
       <table class="table table-zebra w-full">
         <thead>
           <tr>
-            <th>上课时间</th>
-            <th>地点</th>
-            <th>教师</th>
-            <th>人数上限</th>
+            <th>{{ $t("course.coursetime") }}</th>
+            <th>{{ $t("course.room") }}</th>
+            <th>{{ $t("course.teacher") }}</th>
+            <th>{{ $t("course.limit") }}</th>
             <th v-if="showAllSemesters && (isTeacher || authStore.isAdmin)">
-              学期
+              {{ $t("course.term") }}
             </th>
-            <th v-if="authStore.user">操作</th>
+            <th v-if="authStore.user">{{ $t("course.op") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -304,7 +304,7 @@
     >
       <div class="modal-box w-11/12 max-w-lg">
         <h3 class="font-bold text-lg">
-          {{ isEditing ? "Edit Group" : "Add New Group" }}
+          {{ isEditing ? $t("course.editgroup") : $t("course.addgroup") }}
         </h3>
         <SubcourseForm
           v-if="semesterStore.getCurrentSemesterId || currentItem?.year_id"

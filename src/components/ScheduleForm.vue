@@ -4,7 +4,7 @@
     <!-- Week -->
     <div class="form-control mb-4">
       <label class="label" for="schedule-week">
-        <span class="label-text">Week Number</span>
+        <span class="label-text">{{ $t("course.week") }}</span>
       </label>
       <input
         id="schedule-week"
@@ -20,7 +20,7 @@
     <!-- Name / Topic -->
     <div class="form-control mb-4">
       <label class="label" for="schedule-name">
-        <span class="label-text">Topic / Name</span>
+        <span class="label-text">{{ $t("course.topic") }}</span>
       </label>
       <input
         id="schedule-name"
@@ -35,7 +35,7 @@
     <!-- Requirement -->
     <div class="form-control mb-4">
       <label class="label" for="schedule-requirement">
-        <span class="label-text">Requirement / Details</span>
+        <span class="label-text">{{ $t("course.requirement") }}</span>
       </label>
       <textarea
         id="schedule-requirement"
@@ -43,18 +43,12 @@
         placeholder="Describe the activities, required readings, assignments due, etc. for this week."
         v-model="formData.requirement"
       ></textarea>
-      <label class="label">
-        <span class="label-text-alt"
-          >Markdown or simple formatting might be supported depending on
-          display.</span
-        >
-      </label>
     </div>
 
     <!-- Actions -->
     <div class="modal-action mt-6">
       <button type="button" class="btn btn-ghost" @click="$emit('close')">
-        Cancel
+        {{ $t("button.cancel") }}
       </button>
       <button
         type="submit"
@@ -65,7 +59,7 @@
           v-if="isSaving"
           class="loading loading-spinner loading-xs mr-2"
         ></span>
-        {{ isSaving ? "Saving..." : "Save Schedule Item" }}
+        {{ isSaving ? "Saving..." : $t("course.savesche") }}
       </button>
     </div>
   </form>

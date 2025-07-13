@@ -5,7 +5,7 @@
     <div v-if="isTeacher" class="mb-6 p-3 bg-base-200 rounded-lg shadow">
       <div class="form-control w-full mb-2">
         <label class="label py-1" for="file-description">
-          <span class="label-text text-sm">New File Description:</span>
+          <span class="label-text text-sm">{{ $t("course.newfile") }}</span>
         </label>
         <input
           id="file-description"
@@ -33,7 +33,7 @@
             v-if="isUploading"
             class="loading loading-spinner loading-xs"
           ></span>
-          {{ isUploading ? "..." : "Upload" }}
+          {{ isUploading ? "..." : $t("button.upload") }}
         </button>
       </div>
 
@@ -74,10 +74,10 @@
       <table class="table table-zebra w-full">
         <thead>
           <tr>
-            <th>Filename</th>
-            <th>Description</th>
+            <th>{{ $t("course.filename") }}</th>
+            <th>{{ $t("course.filedesc") }}</th>
             <!-- Add other relevant headers if backend provides (e.g., upload date) -->
-            <th>Actions</th>
+            <th>{{ $t("course.op") }}</th>
           </tr>
         </thead>
         <tbody>

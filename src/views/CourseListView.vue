@@ -80,7 +80,11 @@
             <td>{{ course.code.split(",")[2] }}</td>
             <td>
               {{
-                course.term === 1 ? $t("course.spring") : course.term === 2 ? $t("course.fall") : $t("course.summer")
+                course.term === 1
+                  ? $t("course.spring")
+                  : course.term === 2
+                    ? $t("course.fall")
+                    : $t("course.summer")
               }}
             </td>
             <td>{{ course.tea_name }}</td>
