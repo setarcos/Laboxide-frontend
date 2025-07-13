@@ -28,6 +28,33 @@
       >
     </div>
     <div class="navbar-end">
+      <div class="dropdown dropdown-end mr-2">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+            />
+          </svg>
+        </div>
+        <ul
+          tabindex="0"
+          class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-20"
+        >
+          <li v-for="lang in availableLocales" :key="lang">
+            <a @click="changeLanguage(lang)">{{ lang.toUpperCase() }}</a>
+          </li>
+        </ul>
+      </div>
+
       <div v-if="authStore.isLoading" class="px-4">
         <span class="loading loading-spinner loading-sm"></span>
       </div>
@@ -50,11 +77,13 @@
               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
             />
           </svg>
-          Logout
+          {{ $t("button.logout") }}
         </button>
       </div>
       <div v-else class="px-4">
-        <a href="/login" class="btn btn-sm btn-primary">Login</a>
+        <a href="/login" class="btn btn-sm btn-primary">{{
+          $t("button.login")
+        }}</a>
       </div>
     </div>
   </div>
@@ -62,7 +91,16 @@
 
 <script setup>
 import { useAuthStore } from "@/stores/auth";
+import { useI18n } from "vue-i18n";
+import { computed } from "vue";
+
 const authStore = useAuthStore();
+const { locale, availableLocales } = useI18n();
+
+const changeLanguage = (lang) => {
+  locale.value = lang;
+  localStorage.setItem("user-lang", lang);
+};
 
 const handleLogout = async () => {
   await authStore.logout();

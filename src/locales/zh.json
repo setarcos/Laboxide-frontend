@@ -1,0 +1,30 @@
+{
+  "message": {
+    "welcome": "欢迎回来",
+    "login": "请登录系统访问更多功能。"
+  },
+  "dashboard": {
+    "welcome": "欢迎来到{semester}学期的第{week}周！",
+    "vacation": "当前是假期~！",
+    "mycourse": "我的课程",
+    "course": "课程名称",
+    "week": "时间",
+    "room": "地点",
+    "action": "操作"
+  },
+  "button": {
+    "login": "登录",
+    "logout": "退出",
+    "submit": "提交",
+    "cancel": "取消"
+  },
+  "navbar": {
+    "dashboard": "个人中心",
+    "course": "全部课程",
+    "labroom": "实验室",
+    "equipment": "我的设备",
+    "meeting": "会议室预订",
+    "user": "用户管理",
+    "semester": "学期管理"
+  }
+}

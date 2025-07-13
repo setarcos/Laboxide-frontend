@@ -1,0 +1,30 @@
+{
+  "message": {
+    "welcome": "Welcome back",
+    "login": "Please log in to access more features."
+  },
+  "dashboard": {
+    "welcome": "Welcome to Week {week} of the {semester} semester!",
+    "vacation": "Currently on vacation~!",
+    "mycourse": "My Courses",
+    "course": "Course Name",
+    "week": "Week Day",
+    "room": "Room",
+    "action": "Actions"
+  },
+  "button": {
+    "login": "Login",
+    "logout": "Logout",
+    "submit": "Submit",
+    "cancel": "Cancel"
+  },
+  "navbar": {
+    "dashboard": "Dashboard",
+    "course": "Courses",
+    "labroom": "Lab Rooms",
+    "equipment": "My Equipments",
+    "meeting": "Meeting Rooms",
+    "user": "Users",
+    "semester": "Semesters"
+  }
+}

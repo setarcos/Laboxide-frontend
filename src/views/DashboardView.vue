@@ -3,10 +3,10 @@
     <!-- Use prose for nice typography -->
     <p v-if="authStore.isLoading">Loading user information...</p>
     <p v-else-if="authStore.user">
-      Welcome back, <strong>{{ authStore.user.realname }}</strong
+      {{ $t("message.welcome") }}, <strong>{{ authStore.user.realname }}</strong
       >!
     </p>
-    <p v-else>Please log in to access more features.</p>
+    <p v-else>{{ $t("message.login") }}</p>
 
     <!-- Semester Greeting -->
     <p class="mt-2 text-lg text-info font-medium">
@@ -27,7 +27,7 @@
       class="card bg-base-100 shadow-xl mt-6"
     >
       <div class="card-body">
-        <h2 class="card-title">My Courses</h2>
+        <h2 class="card-title">{{ $t("dashboard.mycourse") }}</h2>
 
         <!-- Loading State for Courses -->
         <div v-if="isLoadingMyCourses" class="text-center py-5">
@@ -80,10 +80,10 @@
           <table class="table table-sm table-zebra w-full">
             <thead>
               <tr>
-                <th>Course Name</th>
-                <th>Day</th>
-                <th>Room</th>
-                <th v-if="authStore.isStudent">Actions</th>
+                <th>{{ $t("dashboard.course") }}</th>
+                <th>{{ $t("dashboard.week") }}</th>
+                <th>{{ $t("dashboard.room") }}</th>
+                <th>{{ $t("dashboard.action") }}</th>
               </tr>
             </thead>
             <tbody>
@@ -270,9 +270,11 @@ import { useAuthStore } from "@/stores/auth";
 import { useSemesterStore } from "@/stores/semester";
 import * as dataService from "@/services/dataService";
 import { getWeekdayName, calculateCurrentWeek } from "@/utils/weekday";
+import { useI18n } from "vue-i18n";
 import StudentLogForm from "@/components/StudentLogForm.vue";
 import TimelineLogModal from "@/components/TimelineLogModal.vue";
 
+const { t } = useI18n();
 const authStore = useAuthStore();
 const semesterStore = useSemesterStore();
 
@@ -466,9 +468,12 @@ const semesterGreeting = computed(() => {
   const semester = semesterStore.currentSemester;
 
   if (currentWeekNumber.value) {
-    return `Welcome to Week ${currentWeekNumber.value} of the ${semester.name} semester!`;
+    return t("dashboard.welcome", {
+      week: currentWeekNumber.value,
+      semester: semester.name,
+    });
   } else {
-    return "Currently on vacation~!";
+    return t("dashboard.vacation");
   }
 });
 
