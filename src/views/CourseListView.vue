@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-2xl font-semibold mb-4">Manage Courses</h1>
+    <h1 class="text-2xl font-semibold mb-4">{{ $t("course.title") }}</h1>
 
     <!-- Add Button (Admin only) -->
     <div class="mb-4 text-right" v-if="authStore.isAdmin">
@@ -19,7 +19,7 @@
             d="M12 4v16m8-8H4"
           />
         </svg>
-        Add Course
+        {{ $t("course.add") }}
       </button>
     </div>
 
@@ -51,13 +51,13 @@
       <table class="table table-zebra w-full">
         <thead>
           <tr>
-            <th>课程名</th>
-            <th>课程号</th>
-            <th>学分</th>
-            <th>学时</th>
-            <th>学期</th>
-            <th>教师</th>
-            <th>操作</th>
+            <th>{{ $t("course.name") }}</th>
+            <th>{{ $t("course.id") }}</th>
+            <th>{{ $t("course.credit") }}</th>
+            <th>{{ $t("course.hours") }}</th>
+            <th>{{ $t("course.term") }}</th>
+            <th>{{ $t("course.teacher") }}</th>
+            <th>{{ $t("course.op") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -80,7 +80,7 @@
             <td>{{ course.code.split(",")[2] }}</td>
             <td>
               {{
-                course.term === 1 ? "春季" : course.term === 2 ? "秋季" : "暑期"
+                course.term === 1 ? $t("course.spring") : course.term === 2 ? $t("course.fall") : $t("course.summer")
               }}
             </td>
             <td>{{ course.tea_name }}</td>
@@ -149,7 +149,7 @@
     >
       <div class="modal-box w-11/12 max-w-2xl">
         <h3 class="font-bold text-lg">
-          {{ isEditing ? "Edit Course" : "Add New Course" }}
+          {{ isEditing ? $t("course.edit") : $t("course.add") }}
         </h3>
         <CourseForm
           :initial-data="currentItem"
@@ -174,7 +174,7 @@
     <ConfirmDialog
       :show="showDeleteModal"
       dialogId="course_delete_confirm_modal"
-      title="Delete Course"
+      :title="$t('course.delete')"
       :message="`Are you sure you want to delete the course '${currentItem?.name}' (ID: ${currentItem?.id})? This action cannot be undone.`"
       @confirm="handleDelete"
       @close="closeModal"

@@ -1,6 +1,7 @@
 {
   "message": {
     "welcome": "Welcome back",
+    "back": "Back",
     "login": "Please log in to access more features."
   },
   "dashboard": {
@@ -50,6 +51,31 @@
     "logout": "Logout",
     "submit": "Submit",
     "cancel": "Cancel"
+  },
+  "course": {
+    "title": "Course List",
+    "name": "Course Name",
+    "ename": "English Name",
+    "id": "Course ID",
+    "credit": "Credits",
+    "hours": "Hours",
+    "term": "Term",
+    "teacher": "Teacher",
+    "teaid": "Teacher ID",
+    "intro": "Introduction",
+    "mail": "Mailbox",
+    "op": "Operations",
+    "spring": "Spring",
+    "fall": "Fall",
+    "summer": "Summer",
+    "detail": "Details",
+    "schedule": "Schedule",
+    "material": "Materials",
+    "subcourse": "Sub-courses",
+    "delete": "Delete Course",
+    "save": "Save Course",
+    "edit": "Edit Course",
+    "add": "Add Course"
   },
   "navbar": {
     "dashboard": "Dashboard",

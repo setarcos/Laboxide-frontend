@@ -2,7 +2,7 @@
   <form @submit.prevent="submitForm" class="space-y-4 p-2">
     <div>
       <label class="label" for="course-name">
-        <span class="label-text">Course Name</span>
+        <span class="label-text">{{ $t("course.name") }}</span>
       </label>
       <input
         id="course-name"
@@ -16,7 +16,7 @@
     </div>
     <div>
       <label class="label" for="course-ename">
-        <span class="label-text">English Name</span>
+        <span class="label-text">{{ $t("course.ename") }}</span>
       </label>
       <input
         id="course-ename"
@@ -30,7 +30,7 @@
     </div>
     <div>
       <label class="label" for="course-code">
-        <span class="label-text">课程号,学分,学时</span>
+        <span class="label-text">{{ $t("course.id") }},{{ $t("course.credit") }},{{ $t("course.hours") }}</span>
       </label>
       <input
         id="course-code"
@@ -44,7 +44,7 @@
     </div>
     <div>
       <label class="label" for="course-tea_id">
-        <span class="label-text">Teacher ID</span>
+        <span class="label-text">{{ $t("course.teaid") }}</span>
       </label>
       <input
         id="course-tea_id"
@@ -58,7 +58,7 @@
     </div>
     <div>
       <label class="label" for="course-tea_name">
-        <span class="label-text">Teacher Name</span>
+        <span class="label-text">{{ $t("course.teacher") }}</span>
       </label>
       <input
         id="course-tea_name"
@@ -71,13 +71,13 @@
     </div>
     <div>
       <label class="label" for="course-intro">
-        <span class="label-text">Introduction</span>
+        <span class="label-text">{{ $t("course.intro") }}</span>
       </label>
       <RichTextEditor id="course-intro" v-model="formData.intro" />
     </div>
     <div>
       <label class="label" for="course-mailbox">
-        <span class="label-text">Mailbox</span>
+        <span class="label-text">{{ $t("course.mail") }}</span>
       </label>
       <input
         id="course-mailbox"
@@ -90,7 +90,7 @@
     </div>
     <div>
       <label class="label" for="course-term">
-        <span class="label-text">学期</span>
+        <span class="label-text">{{ $t("course.term") }}</span>
       </label>
       <select
         id="course-term"
@@ -99,17 +99,17 @@
         required
         :disabled="!authStore.isAdmin"
       >
-        <option value="1">春季</option>
-        <option value="2">秋季</option>
-        <option value="3">暑期</option>
+        <option value="1">{{ $t("course.spring") }}</option>
+        <option value="2">{{ $t("course.fall") }}</option>
+        <option value="3">{{ $t("course.summer") }}</option>
       </select>
     </div>
 
     <div class="flex justify-end gap-2 pt-4">
       <button type="button" class="btn btn-ghost" @click="$emit('close')">
-        Cancel
+        {{ $t("button.cancel") }}
       </button>
-      <button type="submit" class="btn btn-primary">Save Course</button>
+      <button type="submit" class="btn btn-primary">{{ $t("course.save") }}</button>
     </div>
   </form>
 </template>

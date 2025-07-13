@@ -1,10 +1,11 @@
 {
   "message": {
     "welcome": "欢迎回来",
+    "back": "返回",
     "login": "请登录系统访问更多功能。"
   },
   "dashboard": {
-    "welcome": "欢迎来到{semester}学期的第{week}周！",
+    "welcome": "今天是{semester}学期的第{week}周！",
     "vacation": "当前是假期~！",
     "mycourse": "我的课程",
     "course": "课程名称",
@@ -50,6 +51,31 @@
     "logout": "退出",
     "submit": "提交",
     "cancel": "取消"
+  },
+  "course": {
+    "title": "课程列表",
+    "name": "课程名",
+    "ename": "英文名",
+    "id": "课程号",
+    "credit": "学分",
+    "hours": "学时",
+    "term": "学期",
+    "teacher": "教师",
+    "teaid": "教师ID",
+    "intro": "课程大纲",
+    "mail": "邮箱",
+    "op": "操作",
+    "spring": "春季",
+    "fall": "秋季",
+    "summer": "暑期",
+    "detail": "详细信息",
+    "schedule": "时间安排",
+    "material": "课程资料",
+    "subcourse": "分组信息",
+    "delete": "删除课程",
+    "save": "保存课程",
+    "edit": "修改课程",
+    "add": "新建课程"
   },
   "navbar": {
     "dashboard": "个人中心",

@@ -17,7 +17,7 @@
             d="M15.75 19.5L8.25 12l7.5-7.5"
           />
         </svg>
-        Back
+        {{ $t("message.back") }}
       </button>
     </div>
 
@@ -64,28 +64,28 @@
           :class="{ 'tab-active': activeTab === 'details' }"
           @click.prevent="setActiveTab('details')"
         >
-          Details
+          {{ $t("course.detail") }}
         </a>
         <a
           class="tab tab-lg"
           :class="{ 'tab-active': activeTab === 'schedule' }"
           @click.prevent="setActiveTab('schedule')"
         >
-          Schedule
+          {{ $t("course.schedule") }}
         </a>
         <a
           class="tab tab-lg"
           :class="{ 'tab-active': activeTab === 'materials' }"
           @click.prevent="setActiveTab('materials')"
         >
-          Materials
+          {{ $t("course.material") }}
         </a>
         <a
           class="tab tab-lg"
           :class="{ 'tab-active': activeTab === 'subcourse' }"
           @click.prevent="setActiveTab('subcourse')"
         >
-          分组信息
+          {{ $t("course.subcourse") }}
         </a>
       </div>
 
@@ -96,35 +96,35 @@
           <div v-if="activeTab === 'details'">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-6">
               <div>
-                <p class="font-semibold text-sm text-gray-500">课程号</p>
+                <p class="font-semibold text-sm text-gray-500">{{ $t("course.id") }}</p>
                 <p class="text-lg">{{ course.code.split(",")[0] }}</p>
               </div>
               <div>
-                <p class="font-semibold text-sm text-gray-500">学分</p>
+                <p class="font-semibold text-sm text-gray-500">{{ $t("course.credit") }}</p>
                 <p class="text-lg">{{ course.code.split(",")[1] }}</p>
               </div>
               <div>
-                <p class="font-semibold text-sm text-gray-500">学时</p>
+                <p class="font-semibold text-sm text-gray-500">{{ $t("course.hours") }}</p>
                 <p class="text-lg">{{ course.code.split(",")[2] }}</p>
               </div>
               <div>
-                <p class="font-semibold text-sm text-gray-500">学期</p>
+                <p class="font-semibold text-sm text-gray-500">{{ $t("course.term") }}</p>
                 <p class="text-lg">
                   {{
                     course.term === "1"
-                      ? "春季"
+                    ? $t("course.spring")
                       : course.term === "2"
-                        ? "秋季"
-                        : "暑期"
+                        ? $t("course.fall")
+                        : $t("course.summer")
                   }}
                 </p>
               </div>
               <div>
-                <p class="font-semibold text-sm text-gray-500">教师</p>
+                <p class="font-semibold text-sm text-gray-500">{{ $t("course.teacher") }}</p>
                 <p class="text-lg">{{ course.tea_name }}</p>
               </div>
               <div>
-                <p class="font-semibold text-sm text-gray-500">邮箱</p>
+                <p class="font-semibold text-sm text-gray-500">{{ $t("course.mail") }}</p>
                 <p class="text-lg">
                   <a
                     :href="`mailto:${course.mailbox}`"
@@ -136,7 +136,7 @@
             </div>
 
             <div>
-              <p class="font-semibold text-sm text-gray-500 mb-2">课程大纲</p>
+              <p class="font-semibold text-sm text-gray-500 mb-2">{{ $t("course.intro") }}</p>
               <div
                 class="prose max-w-none bg-base-200 p-4 rounded-md"
                 v-html="course.intro"
