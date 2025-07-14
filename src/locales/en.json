@@ -114,6 +114,65 @@
     "meetroom": "Meeting Room Booking",
     "dash": "Dashboard"
   },
+  "meeting": {
+    "title": "Meeting Room Booking",
+    "error_prefix": "Error:",
+    "select_room_label": "Select a Meeting Room",
+    "select_room_placeholder": "Please select a room",
+    "prev_week": "« Prev Week",
+    "next_week": "Next Week »",
+    "loading": "Loading...",
+    "no_room_selected": "Please select a meeting room to see the schedule.",
+    "time": "Time",
+    "pending": "(Pending)",
+    "form": {
+      "title": "Meeting Title",
+      "placeholder_title": "e.g., Weekly Team Sync",
+      "repeat": "Repeat",
+      "repeat_once": "One-time Event",
+      "repeat_weekly": "Weekly",
+      "date_label": "Booking Date",
+      "repeat_label": "Repeat End Date",
+      "repeat_hint": "The booking will repeat every {weekday} until this date.",
+      "start_time": "Start Time",
+      "end_time": "End Time",
+      "cancel": "Cancel",
+      "create": "Create Booking",
+      "update": "Update Booking",
+      "error": {
+        "required_title": "Meeting title is required.",
+        "required_time": "Start and End times are required.",
+        "time_order": "End time must be after start time.",
+        "too_long": "Meeting duration cannot exceed 4 hours."
+      }
+    },
+    "modal": {
+      "new": "New Meeting Room Booking",
+      "edit": "Edit Booking",
+      "view": "Booking Details",
+      "title": "Title:",
+      "booked_by": "Booked by:",
+      "date": "Date:",
+      "time": "Time:",
+      "repeats": "(Repeats Weekly)",
+      "pending": "This booking is pending confirmation from a manager.",
+      "confirmed": "This booking is confirmed.",
+      "close": "Close",
+      "confirm": "Confirm",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "delete_modal": {
+      "title": "Delete Booking",
+      "message": "Are you sure you want to delete the booking '{title}'? This action cannot be undone."
+    },
+    "conflict": "This time conflicts with \"{title}\" ({start}-{end}).",
+    "save_failed": "Failed to save: {error}",
+    "confirm_failed": "Failed to confirm: {error}",
+    "delete_failed": "Failed to delete: {error}",
+    "load_rooms_failed": "Failed to load meeting rooms.",
+    "load_agendas_failed": "Failed to load agendas."
+  },
   "navbar": {
     "dashboard": "Dashboard",
     "course": "Courses",

@@ -114,6 +114,65 @@
     "meetroom": "会议室预订",
     "dash": "个人中心"
   },
+  "meeting": {
+    "title": "会议室预订",
+    "error_prefix": "错误：",
+    "select_room_label": "选择会议室",
+    "select_room_placeholder": "请选择会议室",
+    "prev_week": "« 上一周",
+    "next_week": "下一周 »",
+    "loading": "加载中...",
+    "no_room_selected": "请选择会议室以查看预定安排。",
+    "time": "时间",
+    "pending": "(待确认)",
+    "form": {
+      "title": "会议标题",
+      "placeholder_title": "例如：电路基础例会",
+      "repeat": "重复",
+      "repeat_once": "单次会议",
+      "repeat_weekly": "每周重复",
+      "date_label": "预定日期",
+      "repeat_label": "重复结束日期",
+      "repeat_hint": "预定将每周重复（每周{weekday}）直到此日期。",
+      "start_time": "开始时间",
+      "end_time": "结束时间",
+      "cancel": "取消",
+      "create": "创建预定",
+      "update": "更新预定",
+      "error": {
+        "required_title": "会议标题不能为空",
+        "required_time": "必须填写开始和结束时间",
+        "time_order": "结束时间必须晚于开始时间",
+        "too_long": "会议时长不能超过4小时"
+      }
+    },
+    "modal": {
+      "new": "新建会议室预订",
+      "edit": "编辑预订",
+      "view": "预订详情",
+      "title": "标题：",
+      "booked_by": "预订人：",
+      "date": "日期：",
+      "time": "时间：",
+      "repeats": "(每周重复)",
+      "pending": "此预订等待确认。",
+      "confirmed": "此预订已确认。",
+      "close": "关闭",
+      "confirm": "确认",
+      "edit": "编辑",
+      "delete": "删除"
+    },
+    "delete_modal": {
+      "title": "删除预订",
+      "message": "确定要删除'{title}'的预订吗？此操作无法撤销。"
+    },
+    "conflict": "该时间段与\"{title}\"({start}-{end})冲突。",
+    "save_failed": "保存失败：{error}",
+    "confirm_failed": "确认失败：{error}",
+    "delete_failed": "删除失败：{error}",
+    "load_rooms_failed": "加载会议室失败。",
+    "load_agendas_failed": "加载预定表失败。"
+  },
   "navbar": {
     "dashboard": "个人中心",
     "course": "全部课程",

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-2xl font-semibold mb-4">Meeting Room Booking</h1>
+    <h1 class="text-2xl font-semibold mb-4">{{ $t("meeting.title") }}</h1>
 
     <!-- Global Error Display -->
     <div v-if="error" class="alert alert-error shadow-lg mb-4">
@@ -18,7 +18,7 @@
             d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span>{{ error }}</span>
+        <span>{{ $t("meeting.error_prefix") }} {{ error }}</span>
         <button class="btn btn-xs btn-ghost" @click="error = null">✕</button>
       </div>
     </div>
@@ -29,14 +29,18 @@
     >
       <div class="form-control w-full sm:w-auto">
         <label class="label"
-          ><span class="label-text">Select a Meeting Room</span></label
+          ><span class="label-text">{{
+            $t("meeting.select_room_label")
+          }}</span></label
         >
         <select
           v-model="selectedRoomId"
           class="select select-bordered"
           @change="onRoomChange"
         >
-          <option disabled value="">Please select a room</option>
+          <option disabled value="">
+            {{ $t("meeting.select_room_placeholder") }}
+          </option>
           <option v-for="room in meetingRooms" :key="room.id" :value="room.id">
             {{ room.room }} - {{ room.info }}
           </option>
@@ -44,11 +48,15 @@
       </div>
 
       <div v-if="selectedRoomId" class="flex items-center gap-2">
-        <button class="btn" @click="changeWeek(-1)">« Prev Week</button>
+        <button class="btn" @click="changeWeek(-1)">
+          {{ $t("meeting.prev_week") }}
+        </button>
         <div class="text-center font-semibold p-2">
           {{ currentWeekDisplay }}
         </div>
-        <button class="btn" @click="changeWeek(1)">Next Week »</button>
+        <button class="btn" @click="changeWeek(1)">
+          {{ $t("meeting.next_week") }}
+        </button>
       </div>
     </div>
 
@@ -57,7 +65,7 @@
       <span class="loading loading-lg loading-spinner text-primary"></span>
     </div>
     <div v-else-if="!selectedRoomId" class="text-center py-10 italic">
-      Please select a meeting room to see the schedule.
+      {{ $t("meeting.no_room_selected") }}
     </div>
 
     <!-- Weekly Calendar -->
@@ -82,10 +90,10 @@
         <h3 class="font-bold text-lg mb-4">
           {{
             modalMode === "create"
-              ? "New Meeting Room Booking"
+              ? $t("meeting.modal.new")
               : modalMode === "edit"
-                ? "Edit Booking"
-                : "Booking Details"
+                ? $t("meeting.modal.edit")
+                : $t("meeting.modal.view")
           }}
         </h3>
 
@@ -102,20 +110,28 @@
         <!-- READ-ONLY VIEW -->
         <div v-if="modalMode === 'view'" class="space-y-3">
           <div>
-            <span class="font-semibold w-24 inline-block">Title:</span>
+            <span class="font-semibold w-24 inline-block">{{
+              $t("meeting.modal.title")
+            }}</span>
             {{ viewingAgenda.title }}
           </div>
           <div>
-            <span class="font-semibold w-24 inline-block">Booked by:</span>
+            <span class="font-semibold w-24 inline-block">{{
+              $t("meeting.modal.booked_by")
+            }}</span>
             {{ viewingAgenda.username }}
           </div>
           <div>
-            <span class="font-semibold w-24 inline-block">Date:</span>
+            <span class="font-semibold w-24 inline-block">{{
+              $t("meeting.modal.date")
+            }}</span>
             {{ viewingAgenda.date }}
-            {{ viewingAgenda.repeat === 1 ? "(Repeats Weekly)" : "" }}
+            {{ viewingAgenda.repeat === 1 ? $t("meeting.modal.repeats") : "" }}
           </div>
           <div>
-            <span class="font-semibold w-24 inline-block">Time:</span>
+            <span class="font-semibold w-24 inline-block">{{
+              $t("meeting.modal.time")
+            }}</span>
             {{ viewingAgenda.start_time.slice(0, 5) }} -
             {{ viewingAgenda.end_time.slice(0, 5) }}
           </div>
@@ -123,19 +139,19 @@
             class="alert alert-warning text-sm mt-2"
             v-if="!viewingAgenda.confirm"
           >
-            This booking is pending confirmation from a manager.
+            {{ $t("meeting.modal.pending") }}
           </div>
           <div
             class="alert alert-success text-sm mt-2"
             v-if="viewingAgenda.confirm"
           >
-            This booking is confirmed.
+            {{ $t("meeting.modal.confirmed") }}
           </div>
 
           <!-- Action buttons for the read-only view -->
           <div class="modal-action">
             <button class="btn btn-ghost" @click="closeAgendaModal">
-              Close
+              {{ $t("meeting.modal.close") }}
             </button>
             <button
               v-if="
@@ -145,21 +161,21 @@
               class="btn btn-success"
               @click="handleConfirmAgenda(viewingAgenda.id)"
             >
-              Confirm
+              {{ $t("meeting.modal.confirm") }}
             </button>
             <button
               v-if="canEdit(viewingAgenda)"
               class="btn btn-error"
               @click="openDeleteConfirmModal(viewingAgenda)"
             >
-              Delete
+              {{ $t("meeting.modal.delete") }}
             </button>
             <button
               v-if="canEdit(viewingAgenda)"
               class="btn btn-primary"
               @click="switchToEditMode"
             >
-              Edit
+              {{ $t("meeting.modal.edit") }}
             </button>
           </div>
         </div>
@@ -173,8 +189,10 @@
     <ConfirmDialog
       :show="showDeleteConfirm"
       dialogId="agenda_delete_confirm_modal"
-      title="Delete Booking"
-      :message="`Are you sure you want to delete the booking '${agendaToDelete?.title}'? This action cannot be undone.`"
+      :title="$t('meeting.delete_modal.title')"
+      :message="
+        $t('meeting.delete_modal.message', { title: agendaToDelete?.title })
+      "
       @confirm="handleDeleteAgenda"
       @close="closeDeleteConfirmModal"
     />
@@ -187,7 +205,6 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import * as dataService from "@/services/dataService";
 import {
-  format,
   startOfWeek,
   endOfWeek,
   addWeeks,
@@ -201,7 +218,9 @@ import { PERMISSION_MEETING_MANAGER } from "@/utils/permissions";
 import WeeklyCalendar from "@/components/WeeklyCalendar.vue";
 import AgendaForm from "@/components/AgendaForm.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import { useI18n } from "vue-i18n";
 
+const { d: formatDate } = useI18n();
 const props = defineProps({
   roomId: [String, Number],
 });
@@ -230,7 +249,7 @@ const agendaToDelete = ref(null);
 const currentWeekDisplay = computed(() => {
   const start = startOfWeek(currentDate.value, { weekStartsOn: 1 });
   const end = endOfWeek(currentDate.value, { weekStartsOn: 1 });
-  return `${format(start, "MMM d")} - ${format(end, "MMM d, yyyy")}`;
+  return `${formatDate(start, "short")} - ${formatDate(end, "long")}`;
 });
 
 // --- PERMISSIONS HELPER ---

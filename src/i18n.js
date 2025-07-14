@@ -13,6 +13,16 @@ const i18n = createI18n({
   legacy: false,
   locale: defaultLocale,
   fallbackLocale: "en",
+  datetimeFormats: {
+    en: {
+      short: { month: "short", day: "numeric" },
+      long: { month: "short", day: "numeric", year: "numeric" },
+    },
+    zh: {
+      short: { month: "numeric", day: "numeric" },
+      long: { year: "numeric", month: "numeric", day: "numeric" },
+    },
+  },
   messages: { en, zh },
 });
 

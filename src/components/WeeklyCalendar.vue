@@ -1,5 +1,4 @@
 <template>
-  <!-- The parent div needs to be a positioning context for the absolute-positioned events -->
   <div class="relative bg-base-100 rounded-box shadow overflow-x-auto z-0">
     <table class="table table-fixed w-full border-collapse">
       <thead>
@@ -8,7 +7,7 @@
           <th
             class="w-24 border p-2 text-center bg-base-200 z-20 sticky left-0"
           >
-            Time
+            {{ $t("meeting.time") }}
           </th>
           <!-- Headers for each day of the week -->
           <th
@@ -16,8 +15,10 @@
             :key="day.toISOString()"
             class="border p-2 text-center bg-base-200"
           >
-            <div>{{ format(day, "E") }}</div>
-            <div class="font-normal text-sm">{{ format(day, "MMM d") }}</div>
+            <div>{{ format(day, "EEE", { locale: localeObject }) }}</div>
+            <div class="font-normal text-sm">
+              {{ format(day, "MMM d", { locale: localeObject }) }}
+            </div>
           </th>
         </tr>
       </thead>
@@ -39,7 +40,6 @@
               emit('book-slot', { date: format(day, 'yyyy-MM-dd'), time })
             "
           >
-            <!-- The empty cell itself is the click-to-book target -->
             <div
               class="h-full w-full hover:bg-base-200/50 transition-colors duration-200"
             ></div>
@@ -57,7 +57,9 @@
         >
           <p class="font-bold truncate">{{ agenda.title }}</p>
           <p class="truncate">{{ agenda.username }}</p>
-          <p v-if="!agenda.confirm" class="text-xs italic mt-auto">(Pending)</p>
+          <p v-if="!agenda.confirm" class="text-xs italic mt-auto">
+            {{ $t("meeting.pending") }}
+          </p>
         </div>
       </tbody>
     </table>
@@ -91,6 +93,11 @@ import {
   isEqual,
   differenceInMinutes,
 } from "date-fns";
+import { useI18n } from "vue-i18n";
+import { enUS, zhCN } from "date-fns/locale";
+
+const { locale } = useI18n();
+const localeObject = computed(() => (locale.value === "zh" ? zhCN : enUS));
 
 const props = defineProps({
   agendas: { type: Array, required: true },

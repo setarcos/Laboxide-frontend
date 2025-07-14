@@ -7,11 +7,13 @@
 
     <!-- Title -->
     <div class="form-control">
-      <label class="label"><span class="label-text">Meeting Title</span></label>
+      <label class="label">
+        <span class="label-text">{{ $t("meeting.form.title") }}</span>
+      </label>
       <input
         type="text"
         v-model="form.title"
-        placeholder="e.g., Weekly Team Sync"
+        :placeholder="$t('meeting.form.placeholder_title')"
         class="input input-bordered"
         required
       />
@@ -19,18 +21,26 @@
 
     <!-- Repeat Options -->
     <div class="form-control mt-4">
-      <label class="label"><span class="label-text">Repeat</span></label>
+      <label class="label">
+        <span class="label-text">{{ $t("meeting.form.repeat") }}</span>
+      </label>
       <select v-model="form.repeat" class="select select-bordered">
-        <option :value="0">One-time Event</option>
-        <option :value="1">Weekly</option>
+        <option :value="0">{{ $t("meeting.form.repeat_once") }}</option>
+        <option :value="1">{{ $t("meeting.form.repeat_weekly") }}</option>
       </select>
     </div>
 
     <!-- Date -->
     <div class="form-control mt-4">
-      <label class="label"
-        ><span class="label-text">{{ dateLabel }}</span></label
-      >
+      <label class="label">
+        <span class="label-text">
+          {{
+            form.repeat === 1
+              ? $t("meeting.form.repeat_label")
+              : $t("meeting.form.date_label")
+          }}
+        </span>
+      </label>
       <input
         type="date"
         v-model="form.date"
@@ -38,14 +48,16 @@
         required
       />
       <div v-if="form.repeat === 1" class="label-text-alt mt-1">
-        The booking will repeat every {{ weekDayName }} until this date.
+        {{ $t("meeting.form.repeat_hint", { weekday: weekDayName }) }}
       </div>
     </div>
 
     <!-- Time Pickers -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
       <div class="form-control">
-        <label class="label"><span class="label-text">Start Time</span></label>
+        <label class="label">
+          <span class="label-text">{{ $t("meeting.form.start_time") }}</span>
+        </label>
         <input
           type="time"
           v-model="form.startTime"
@@ -53,10 +65,11 @@
           required
           step="1800"
         />
-        <!-- 30 min steps -->
       </div>
       <div class="form-control">
-        <label class="label"><span class="label-text">End Time</span></label>
+        <label class="label">
+          <span class="label-text">{{ $t("meeting.form.end_time") }}</span>
+        </label>
         <input
           type="time"
           v-model="form.endTime"
@@ -70,10 +83,10 @@
     <!-- Actions -->
     <div class="modal-action">
       <button type="button" class="btn btn-ghost" @click="$emit('close')">
-        Cancel
+        {{ $t("meeting.form.cancel") }}
       </button>
       <button type="submit" class="btn btn-primary">
-        {{ isEditing ? "Update Booking" : "Create Booking" }}
+        {{ isEditing ? $t("meeting.form.update") : $t("meeting.form.create") }}
       </button>
     </div>
   </form>
@@ -82,6 +95,9 @@
 <script setup>
 import { ref, watch, computed } from "vue";
 import { differenceInMinutes, parseISO } from "date-fns";
+import { useI18n } from "vue-i18n";
+
+const { t, d } = useI18n();
 
 const props = defineProps({
   initialData: {
@@ -106,23 +122,17 @@ const form = ref({
 const errorMessage = ref("");
 
 const isEditing = computed(() => !!props.initialData?.id);
-const dateLabel = computed(() =>
-  form.value.repeat === 1 ? "Repeat End Date" : "Booking Date",
-);
 
 const weekDayName = computed(() => {
   if (!form.value.date) return "";
-  const dateObj = new Date(form.value.date + "T00:00:00");
-  return dateObj.toLocaleDateString(undefined, { weekday: "long" });
+  return d(new Date(form.value.date + "T00:00:00"), { weekday: "long" });
 });
 
-// --- WATCHER 1: To populate the form when the modal opens ---
 watch(
   () => [props.initialData, props.bookingSlot],
   () => {
-    errorMessage.value = ""; // Clear any previous errors when data changes
+    errorMessage.value = "";
     if (isEditing.value) {
-      // This logic will now execute correctly
       const data = props.initialData;
       form.value = {
         title: data.title,
@@ -132,9 +142,7 @@ watch(
         endTime: data.end_time.slice(0, 5),
       };
     } else if (props.bookingSlot) {
-      // Logic for creating a new booking
       const startTime = props.bookingSlot.time;
-      // Calculate a default end time (1 hour after start)
       const [hour] = startTime.split(":");
       const nextHour = (parseInt(hour, 10) + 1).toString().padStart(2, "0");
       form.value = {
@@ -157,7 +165,6 @@ watch(
   { immediate: true, deep: true },
 );
 
-// --- WATCHER 2: To handle incoming submission errors from the parent ---
 watch(
   () => props.submissionError,
   (newError) => {
@@ -167,27 +174,23 @@ watch(
 watch(
   form,
   () => {
-    // As the user types, clear the error message. The parent will re-set it on the next failed submit.
-    if (errorMessage.value) {
-      errorMessage.value = "";
-    }
+    if (errorMessage.value) errorMessage.value = "";
   },
   { deep: true },
 );
 
 const submitForm = () => {
   errorMessage.value = "";
-  // --- Validation ---
   if (!form.value.title.trim()) {
-    errorMessage.value = "Meeting title is required.";
+    errorMessage.value = t("meeting.form.error.required_title");
     return;
   }
   if (!form.value.startTime || !form.value.endTime) {
-    errorMessage.value = "Start and End times are required.";
+    errorMessage.value = t("meeting.form.error.required_time");
     return;
   }
   if (form.value.endTime <= form.value.startTime) {
-    errorMessage.value = "End time must be after start time.";
+    errorMessage.value = t("meeting.form.error.time_order");
     return;
   }
 
@@ -196,12 +199,10 @@ const submitForm = () => {
   const durationInMinutes = differenceInMinutes(end, start);
 
   if (durationInMinutes > 240) {
-    errorMessage.value = "Meeting duration cannot exceed 4 hours.";
+    errorMessage.value = t("meeting.form.error.too_long");
     return;
   }
-  errorMessage.value = "";
 
-  // --- Prepare Payload ---
   const payload = {
     title: form.value.title.trim(),
     repeat: Number(form.value.repeat),
