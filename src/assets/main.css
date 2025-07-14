@@ -12,6 +12,9 @@ body {
   .input:focus {
     @apply outline-none ring-2 ring-primary;
   }
+  .prose a {
+    @apply no-underline;
+  }
 }
 
 /* Improve scrollbar styling (optional) */
