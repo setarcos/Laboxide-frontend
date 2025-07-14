@@ -53,7 +53,7 @@
       <table class="table table-zebra w-full table-sm">
         <thead>
           <tr>
-            <th class="w-10"></th>
+            <th v-if="isUser" class="w-10"></th>
             <!-- Column for expand toggle -->
             <th class="w-16 text-center">{{ $t("course.week") }}</th>
             <th>{{ $t("course.topic") }}</th>
@@ -65,7 +65,7 @@
         <template v-for="item in sortedSchedules" :key="item.id">
           <!-- Main Schedule Row -->
           <tr class="hover">
-            <td class="w-10 text-center">
+            <td v-if="isUser" class="w-10 text-center">
               <button
                 class="btn btn-xs btn-ghost btn-circle"
                 :title="isExpanded(item.id) ? 'Collapse steps' : 'Expand steps'"
@@ -402,6 +402,7 @@ const subFormKey = ref(Date.now()); // Use timestamp for key to force re-render
 
 // Computed properties
 const isTeacher = computed(() => authStore.isTeacher);
+const isUser = computed(() => authStore.isAuthenticated);
 const isEditing = computed(() => !!currentItem.value && showEditModal.value);
 const isEditingSub = computed(
   () => !!currentSubItem.value && showEditSubModal.value,
