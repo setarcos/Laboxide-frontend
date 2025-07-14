@@ -471,11 +471,9 @@ const fetchSubcourses = async () => {
     if (!showAllSemesters.value) {
       semesterIdToFetch = semesterStore.getCurrentSemesterId;
       if (!semesterIdToFetch) {
-        console.warn(
-          "Current semester ID missing for teacher/admin, showing none for 'current'.",
-        );
+        // Might be in vacation.
         isLoading.value = false;
-        return; // Don't fetch if specific semester needed but ID unknown
+        return;
       }
     }
     // If showAllSemesters is true, semesterIdToFetch remains null (fetch all)
@@ -483,16 +481,10 @@ const fetchSubcourses = async () => {
     // Students ALWAYS need the current semester
     semesterIdToFetch = semesterStore.getCurrentSemesterId;
     if (!semesterIdToFetch) {
-      console.error("Current semester ID missing for student.");
-      error.value = "Current semester information is required to view groups.";
       isLoading.value = false;
       return;
     }
   }
-
-  console.log(
-    `Fetching subcourses for course ${props.courseId}, Semester: ${semesterIdToFetch ?? "All"}`,
-  );
 
   const params = { course_id: props.courseId };
   if (semesterIdToFetch) {
