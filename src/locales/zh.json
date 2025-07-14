@@ -96,6 +96,24 @@
     "edit": "修改课程",
     "add": "新建课程"
   },
+  "route": {
+    "login": "用户登陆",
+    "auth": "用户认证",
+    "courses": "全部课程",
+    "lab": "实验室",
+    "user": "用户管理",
+    "semester": "学期管理",
+    "404": "页面丢失",
+    "course": "课程信息",
+    "students": "学生列表",
+    "progress": "学生进度",
+    "timeline": "学生时间线",
+    "studentlog": "实验室日志",
+    "equip": "设备管理",
+    "meeting": "管理会议室",
+    "meetroom": "会议室预订",
+    "dash": "个人中心"
+  },
   "navbar": {
     "dashboard": "个人中心",
     "course": "全部课程",

@@ -96,6 +96,24 @@
     "edit": "Edit Course",
     "add": "Add Course"
   },
+  "route": {
+    "login": "Login",
+    "auth": "Auth",
+    "courses": "All Courses",
+    "lab": "All Labrooms",
+    "user": "Manage Users",
+    "semester": "Manage Semester",
+    "404": "Page Not Found",
+    "course": "Course Info",
+    "students": "Student List",
+    "progress": "Student Progress",
+    "timeline": "Student Timeline",
+    "studentlog": "Student Logs",
+    "equip": "Equipments Management",
+    "meeting": "Manage Meeting Rooms",
+    "meetroom": "Meeting Room Booking",
+    "dash": "Dashboard"
+  },
   "navbar": {
     "dashboard": "Dashboard",
     "course": "Courses",

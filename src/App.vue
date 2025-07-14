@@ -9,7 +9,6 @@ import { computed, onMounted } from "vue";
 import DefaultLayout from "./layouts/DefaultLayout.vue";
 import { useAuthStore } from "./stores/auth";
 import { useSemesterStore } from "./stores/semester";
-// Import other layouts if you create them (e.g., AuthLayout)
 
 // Basic layout switching, defaults to DefaultLayout
 // You could expand this based on route meta fields if needed
@@ -29,7 +28,6 @@ onMounted(async () => {
       authStore.checkAuth(),
       semesterStore.fetchCurrentSemester(),
     ]);
-    console.log("Initial auth and semester data loaded.");
   } catch (error) {
     console.error("Failed to load initial application data:", error);
     // Handle the error, maybe show an error message to the user

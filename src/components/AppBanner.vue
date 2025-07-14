@@ -92,9 +92,11 @@
 <script setup>
 import { useAuthStore } from "@/stores/auth";
 import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 
 const authStore = useAuthStore();
-const { locale, availableLocales } = useI18n();
+const { t, locale, availableLocales } = useI18n();
+const router = useRouter();
 
 const changeLanguage = (lang) => {
   locale.value = lang;
@@ -105,6 +107,10 @@ const handleLogout = async () => {
   await authStore.logout();
   // Redirection should be handled by logout action or router guards
 };
+
+router.afterEach((to) => {
+  document.title = to.meta.title ? t(to.meta.title) : "Default Title";
+});
 </script>
 
 <style scoped>

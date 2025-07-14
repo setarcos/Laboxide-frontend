@@ -28,26 +28,26 @@ const routes = [
     name: "Dashboard",
     component: DashboardView,
     // Add meta.title
-    meta: { requiresAuth: false, title: "Dashboard" },
+    meta: { requiresAuth: false, title: "route.dash" },
   },
   {
     path: "/login",
     name: "login",
     component: LoginView,
-    meta: { requiresAuth: false, title: "Login" },
+    meta: { requiresAuth: false, title: "route.login" },
   },
   {
     path: "/auth",
     name: "auth",
     component: AuthView,
-    meta: { requiresAuth: false, title: "Auth" },
+    meta: { requiresAuth: false, title: "route.auth" },
   },
   {
     path: "/courses",
     name: "Courses",
     component: CourseListView,
     // Add meta.title
-    meta: { requiresAuth: false, title: "Manage Courses" },
+    meta: { requiresAuth: false, title: "route.courses" },
   },
   {
     path: "/labrooms",
@@ -57,7 +57,7 @@ const routes = [
     meta: {
       requiresAuth: true,
       requiredPermission: PERMISSION_LAB_MANAGER | PERMISSION_ADMIN,
-      title: "Manage Lab Rooms",
+      title: "route.lab",
     },
   },
   {
@@ -68,7 +68,7 @@ const routes = [
     meta: {
       requiresAuth: true,
       requiredPermission: PERMISSION_ADMIN,
-      title: "Manage Users",
+      title: "route.user",
     },
   },
   {
@@ -79,7 +79,7 @@ const routes = [
     meta: {
       requiresAuth: true,
       requiredPermission: PERMISSION_ADMIN,
-      title: "Manage Semesters",
+      title: "route.semester",
     },
   },
   // Catch-all 404 route
@@ -88,60 +88,61 @@ const routes = [
     name: "NotFound",
     component: NotFoundView,
     // Add meta.title for 404
-    meta: { title: "Page Not Found" },
+    meta: { title: "route.404" },
   },
   {
     path: "/courses/:id", // :id is a dynamic parameter
     name: "CourseDetail", // Matches the name used in <router-link>
     component: CourseDetailView,
     props: true, // Automatically pass route params as props to the component
+    meta: { title: "route.course" },
   },
   {
     path: "/subcourses/:id",
     name: "SubcourseStudents",
     component: SubcourseStudentsView,
     props: true, // Pass route param 'id' as prop to the component
-    meta: { requiresAuth: true, title: "学生列表" },
+    meta: { requiresAuth: true, title: "route.students" },
   },
   {
     path: "/progress/:id", // Use subcourse ID from route
     name: "SubcourseProgress",
     component: SubcourseProgressView, // Use imported component
     props: true, // Pass route param 'id' as prop
-    meta: { requiresAuth: true, title: "学生进度" }, // Protect route
+    meta: { requiresAuth: true, title: "route.progress" }, // Protect route
   },
   {
     path: "/timeline/:subcourseId/:studentId/",
     name: "StudentTimeline",
     component: StudentTimelineView,
     props: true, // Pass route params (subcourseId, studentId) as props
-    meta: { requiresAuth: true, title: "学生时间线" },
+    meta: { requiresAuth: true, title: "route.timeline" },
   },
   {
     path: "/labrooms/logs/:roomId", // The new route
     name: "StudentLogs",
     component: StudentLogsView,
     props: true,
-    meta: { requiresAuth: true, title: "学生日志" },
+    meta: { requiresAuth: true, title: "route.studentlog" },
   },
   {
     path: "/equipments",
     name: "EquipmentView",
     component: EquipmentView,
-    meta: { requiresAuth: true, title: "设备管理" },
+    meta: { requiresAuth: true, title: "route.equip" },
   },
   {
     path: "/admin/meeting-rooms",
     name: "MeetingRoomView",
     component: MeetingRoomView,
-    meta: { requiresAuth: true, title: "会议室管理" },
+    meta: { requiresAuth: true, title: "route.meeting" },
   },
   {
     path: "/meeting-rooms/:roomId?",
     name: "MeetingBookingView",
     component: MeetingBookingView,
     props: true, // Pass route params as component props
-    meta: { requiresAuth: true, title: "会议室预定" },
+    meta: { requiresAuth: true, title: "route.meetroom" },
   },
 ];
 
@@ -183,13 +184,6 @@ router.beforeEach(async (to, from, next) => {
   else {
     next();
   }
-});
-
-router.afterEach((to) => {
-  // Optional: Use nextTick to wait for potential DOM updates, though often unnecessary for title
-  // nextTick(() => {
-  if (to.meta?.title) document.title = `${to.meta.title}`;
-  // });
 });
 
 export default router;
