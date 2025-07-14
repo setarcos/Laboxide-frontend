@@ -48,9 +48,12 @@
     </div>
 
     <!-- Course Content Area (only renders if course loaded successfully) -->
-    <div v-else-if="course" class="max-w-4xl mx-auto">
+    <div
+      v-else-if="course"
+      class="overflow-x-auto bg-base-100 rounded-box shadow"
+    >
       <!-- Course Title (remains above tabs) -->
-      <h1 class="text-3xl font-bold mb-6">
+      <h1 class="text-3xl font-bold mb-4 mt-2 text-center">
         {{ course.name }}
         <span v-if="course.ename" class="text-xl text-gray-500"
           >({{ course.ename }})</span
@@ -91,10 +94,10 @@
 
       <!-- Tab Content -->
       <div class="card bg-base-100 shadow-xl">
-        <div class="card-body min-h-[400px]">
-          <!-- Details Tab Content -->
-          <div v-if="activeTab === 'details'">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-6">
+        <!-- Details Tab Content -->
+        <div v-if="activeTab === 'details'">
+          <div class="card-body min-h-[400px]">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4 mb-6">
               <div>
                 <p class="font-semibold text-sm text-gray-500">
                   {{ $t("course.id") }}
@@ -157,29 +160,23 @@
               ></div>
             </div>
           </div>
+        </div>
 
-          <!-- Schedule Tab Content (Placeholder) -->
-          <div v-if="activeTab === 'schedule'">
-            <ScheduleTab
-              v-if="activeTab === 'schedule'"
-              :courseId="course.id"
-            />
-          </div>
+        <!-- Schedule Tab Content (Placeholder) -->
+        <div v-if="activeTab === 'schedule'">
+          <ScheduleTab v-if="activeTab === 'schedule'" :courseId="course.id" />
+        </div>
 
-          <!-- Materials Tab Content (Placeholder) -->
-          <div v-if="activeTab === 'materials'">
-            <MaterialTab
-              v-if="activeTab === 'materials'"
-              :courseId="course.id"
-            />
-          </div>
+        <!-- Materials Tab Content (Placeholder) -->
+        <div v-if="activeTab === 'materials'">
+          <MaterialTab v-if="activeTab === 'materials'" :courseId="course.id" />
+        </div>
 
-          <div v-if="activeTab === 'subcourse'">
-            <SubcourseTab
-              v-if="activeTab === 'subcourse'"
-              :courseId="course.id"
-            />
-          </div>
+        <div v-if="activeTab === 'subcourse'">
+          <SubcourseTab
+            v-if="activeTab === 'subcourse'"
+            :courseId="course.id"
+          />
         </div>
       </div>
     </div>
