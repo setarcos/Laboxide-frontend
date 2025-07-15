@@ -3,7 +3,7 @@
   <div class="modal-content-wrapper">
     <h3 class="font-bold text-lg mb-4">
       {{
-        $t("tlmodal.title", {
+        $t("tlform.title", {
           course: subcourse.course_name,
           week: currentWeek,
         })
@@ -13,7 +13,7 @@
     <!-- Loading State -->
     <div v-if="isLoading" class="text-center py-10">
       <span class="loading loading-lg loading-spinner text-info"></span>
-      <p>Loading schedules, steps, and progress...</p>
+      <p>{{ $t("tlform.loading") }}</p>
     </div>
 
     <!-- Error State -->
@@ -38,10 +38,10 @@
 
     <!-- Main Content -->
     <div v-else>
-      <!-- Week Selection Dropdown -->
+      <!-- Week Selection -->
       <div class="form-control mb-4">
         <label class="label pb-1">
-          <span class="label-text font-semibold">{{ $t("tlmodal.week") }}</span>
+          <span class="label-text font-semibold">{{ $t("tlform.week") }}</span>
         </label>
         <select
           v-model="selectedScheduleId"
@@ -51,8 +51,8 @@
           <option disabled :value="null">
             {{
               allAvailableSchedules.length === 0
-                ? "No schedules available"
-                : "Select a week"
+                ? $t("tlform.no_schedule")
+                : $t("tlform.select_week")
             }}
           </option>
           <option
@@ -60,8 +60,10 @@
             :key="sched.id"
             :value="sched.id"
           >
-            {{ $t("tlmodal.weekday", { week: sched.week }) }}
-            <span v-if="sched.id === scheduleForWeek?.id"> (Current Week)</span>
+            {{ $t("tlform.week_label", { week: sched.week }) }}
+            <span v-if="sched.id === scheduleForWeek?.id">
+              ({{ $t("tlform.current_week") }})
+            </span>
             <span v-if="sched.name"> - {{ sched.name }}</span>
           </option>
         </select>
@@ -71,15 +73,15 @@
       <div class="form-control mb-4">
         <label class="label pb-1">
           <span class="label-text font-semibold">{{
-            $t("tlmodal.target")
+            $t("tlform.target")
           }}</span>
         </label>
         <div v-if="!selectedScheduleId" class="text-warning text-sm italic">
-          {{ $t("tlmodal.noweek") }}
+          {{ $t("tlform.no_week_selected") }}
         </div>
         <div v-else-if="isFetchingSubSchedules" class="text-center py-3">
           <span class="loading loading-sm loading-spinner text-info"></span>
-          <p class="text-xs">Loading steps for selected week...</p>
+          <p class="text-xs">{{ $t("tlform.loading_steps") }}</p>
         </div>
         <div
           v-else-if="
@@ -89,9 +91,11 @@
           "
           class="text-info text-sm italic"
         >
-          No specific steps defined for Week {{ selectedScheduleObject.week }}.
-          You can use 'Others' or mark as finished.
+          {{
+            $t("tlform.no_steps_defined", { week: selectedScheduleObject.week })
+          }}
         </div>
+
         <!-- Step List -->
         <div v-else-if="subSchedules.length > 0" class="space-y-1">
           <label
@@ -109,7 +113,7 @@
             <span
               v-if="isStepLogged(step.title)"
               class="mr-2 tooltip tooltip-right"
-              data-tip="Already Logged with this original title for the selected week"
+              :data-tip="$t('tlform.logged_tip')"
             >
               ✅
             </span>
@@ -122,7 +126,8 @@
             </span>
           </label>
         </div>
-        <!-- "Others" / "Finish" Options - only if a schedule is selected -->
+
+        <!-- Others and Finish -->
         <div v-if="selectedScheduleId" class="space-y-1 mt-1">
           <label
             class="flex items-center cursor-pointer p-1.5 rounded hover:bg-base-200 border border-transparent has-[:checked]:border-info has-[:checked]:bg-info/10"
@@ -134,9 +139,9 @@
               value="other"
               v-model="selectedStepValue"
             />
-            <span class="flex-grow font-semibold text-info text-sm">{{
-              $t("tlmodal.others")
-            }}</span>
+            <span class="flex-grow font-semibold text-info text-sm">
+              {{ $t("tlform.others") }}
+            </span>
           </label>
           <label
             class="flex items-center cursor-pointer p-1.5 rounded hover:bg-base-200 border border-transparent has-[:checked]:border-accent has-[:checked]:bg-accent/10"
@@ -148,36 +153,36 @@
               value="finish"
               v-model="selectedStepValue"
             />
-            <span class="flex-grow font-semibold text-accent text-sm">{{
-              $t("tlmodal.finish")
-            }}</span>
+            <span class="flex-grow font-semibold text-accent text-sm">
+              {{ $t("tlform.finish") }}
+            </span>
           </label>
         </div>
       </div>
 
-      <!-- Custom Title Input (Only if "Others" is selected) -->
+      <!-- Custom Title Input -->
       <div v-if="selectedStepValue === 'other'">
         <div class="form-control mb-4">
           <label class="label pb-1">
             <span class="label-text font-semibold">{{
-              $t("tlmodal.custom")
+              $t("tlform.custom")
             }}</span>
           </label>
           <input
             type="text"
             class="input input-bordered w-full input-sm text-sm"
             v-model="customTitle"
-            placeholder="Enter title for your custom log entry"
+            :placeholder="$t('tlform.custom_placeholder')"
           />
           <span
             v-if="selectedStepValue === 'other' && !customTitle.trim()"
             class="text-warning text-xs mt-1"
-            >A title is required for custom log entries.</span
+            >{{ $t("tlform.custom_required") }}</span
           >
         </div>
       </div>
 
-      <!-- Note Input (Only if a standard step or "Others" is selected, and a schedule is selected) -->
+      <!-- Note Input -->
       <div
         v-if="
           selectedScheduleId &&
@@ -187,18 +192,19 @@
         class="mt-4 border-t pt-4"
       >
         <h4 class="font-semibold mb-2 text-base">
-          {{ $t("tlmodal.add") }}
+          {{ $t("tlform.add") }}
           <span class="font-normal text-primary text-sm">
             {{
               selectedStepValue === "other"
-                ? customTitle || "(No title entered)"
+                ? customTitle || $t("tlform.no_title")
                 : selectedStepValue
             }}
           </span>
         </h4>
+
         <div class="form-control mb-3">
           <label class="label cursor-pointer justify-start gap-4">
-            <span class="label-text text-sm">{{ $t("tlmodal.type") }}</span>
+            <span class="label-text text-sm">{{ $t("tlform.type") }}</span>
             <span class="flex items-center gap-2 text-sm">
               <input
                 type="radio"
@@ -207,7 +213,7 @@
                 :value="0"
                 v-model="noteType"
               />
-              {{ $t("tlmodal.note") }}
+              {{ $t("tlform.note") }}
             </span>
             <span class="flex items-center gap-2 text-sm">
               <input
@@ -217,26 +223,24 @@
                 :value="1"
                 v-model="noteType"
               />
-              {{ $t("tlmodal.file") }}
+              {{ $t("tlform.file") }}
             </span>
           </label>
         </div>
 
-        <!-- Text Note Input -->
         <div v-if="noteType === 0" class="form-control">
           <textarea
             class="textarea textarea-bordered h-24 text-sm"
-            placeholder="Enter your observations or notes for this log entry..."
+            :placeholder="$t('tlform.note_placeholder')"
             v-model="noteContent"
           ></textarea>
           <span
             v-if="noteType === 0 && !noteContent.trim()"
             class="text-warning text-xs mt-1"
-            >A text note is required.</span
+            >{{ $t("tlform.note_required") }}</span
           >
         </div>
 
-        <!-- File Input -->
         <div v-if="noteType === 1" class="form-control">
           <input
             type="file"
@@ -244,13 +248,13 @@
             ref="fileInputRef"
             @change="handleFileChange"
           />
-          <span v-if="fileError" class="text-error text-xs mt-1">{{
-            fileError
-          }}</span>
+          <span v-if="fileError" class="text-error text-xs mt-1">
+            {{ fileError }}
+          </span>
           <span
             v-if="noteType === 1 && !fileToUpload && !fileError"
             class="text-warning text-xs mt-1"
-            >A file is required.</span
+            >{{ $t("tlform.file_required") }}</span
           >
         </div>
 
@@ -266,13 +270,13 @@
             :disabled="isSaving || !isLoggable"
             :class="{ loading: isSaving }"
           >
-            {{ isSaving ? "Saving..." : $t("tlmodal.save") }}
+            {{ isSaving ? $t("tlform.saving") : $t("tlform.save") }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- General Modal Actions -->
+    <!-- Modal Cancel Button -->
     <div class="modal-action mt-6 border-t pt-4">
       <button
         type="button"
@@ -290,6 +294,9 @@
 import { ref, watch, computed, onMounted, onUnmounted } from "vue";
 import * as dataService from "@/services/dataService";
 import { useAuthStore } from "@/stores/auth";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps({
   subcourse: { type: Object, required: true },
@@ -481,15 +488,14 @@ const handleFileChange = (event) => {
 
     if (!isFileTypeAllowed && file.size > 0) {
       // Added file.size > 0 check for empty type files
-      fileError.value =
-        "Unsupported file type. Allowed: images, PDF, text, common documents.";
+      fileError.value = t("tlform.error_file_type");
       fileToUpload.value = null;
       if (fileInputRef.value) fileInputRef.value.value = "";
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
       // 10MB limit
-      fileError.value = "File is too large (max 10MB).";
+      fileError.value = t("tlform.error_file_size");
       fileToUpload.value = null;
       if (fileInputRef.value) fileInputRef.value.value = "";
       return;
@@ -513,16 +519,15 @@ const submitTimelineEntry = async () => {
   if (!isLoggable.value) {
     console.warn("Attempted to save invalid log entry.");
     // Warnings are shown near inputs by isLoggable's dependent checks
-    if (!selectedScheduleId.value)
-      saveError.value = "Target week not selected.";
+    if (!selectedScheduleId.value) saveError.value = t("tlform.error_no_week");
     else if (!selectedStepValue.value)
-      saveError.value = "No step/action selected.";
+      saveError.value = t("tlform.error_no_step");
     else if (selectedStepValue.value === "other" && !customTitle.value.trim())
-      saveError.value = "Custom title required for 'Others'.";
+      saveError.value = t("tlform.error_no_custom");
     else if (noteType.value === 0 && !noteContent.value.trim())
-      saveError.value = "Text note required.";
+      saveError.value = t("tlform.error_no_note");
     else if (noteType.value === 1 && !fileToUpload.value)
-      saveError.value = "File required for upload.";
+      saveError.value = t("tlform.error_no_file");
     return;
   }
 
@@ -534,8 +539,7 @@ const submitTimelineEntry = async () => {
     console.warn(
       "Submit called with invalid selection or missing schedule ID.",
     );
-    saveError.value =
-      "Cannot save: ensure a target week and a loggable step are selected.";
+    saveError.value = t("tlform.error_not_loggable");
     return;
   }
 
@@ -647,8 +651,7 @@ watch(selectedStepValue, (newValue) => {
   if (newValue === "finish") {
     if (!selectedScheduleId.value) {
       // This should ideally not happen if UI is structured well
-      saveError.value =
-        "Please select a target week before marking as finished.";
+      saveError.value = t("tlform.error_finish_no_week");
       selectedStepValue.value = null; // Revert selection
       return;
     }

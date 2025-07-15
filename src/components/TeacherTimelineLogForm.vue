@@ -2,7 +2,7 @@
 <template>
   <form @submit.prevent="submitForm">
     <p class="text-sm mb-4">
-      Adding log for student:
+      {{ $t("progress.adding_log_for") }}
       <span class="font-semibold"
         >{{ student.stu_name }} ({{ student.stu_id }})</span
       >
@@ -10,7 +10,7 @@
 
     <div class="form-control mb-3">
       <label class="label cursor-pointer justify-start gap-4">
-        <span class="label-text text-sm">Type:</span>
+        <span class="label-text text-sm">{{ $t("progress.type") }}:</span>
         <span class="flex items-center gap-2 text-sm">
           <input
             type="radio"
@@ -19,7 +19,7 @@
             :value="0"
             v-model="noteType"
           />
-          Text Note
+          {{ $t("progress.text_note") }}
         </span>
         <span class="flex items-center gap-2 text-sm">
           <input
@@ -29,19 +29,19 @@
             :value="1"
             v-model="noteType"
           />
-          File Upload
+          {{ $t("progress.file_upload") }}
         </span>
       </label>
     </div>
 
     <!-- Text Note Input -->
     <div v-if="noteType === 0" class="form-control mb-4">
-      <label class="label pb-1"
-        ><span class="label-text">Note Content:</span></label
-      >
+      <label class="label pb-1">
+        <span class="label-text">{{ $t("progress.note_content") }}</span>
+      </label>
       <textarea
         class="textarea textarea-bordered h-24 text-sm"
-        placeholder="Enter observation or note..."
+        :placeholder="$t('progress.note_placeholder')"
         v-model="noteContent"
         required
       ></textarea>
@@ -49,9 +49,9 @@
 
     <!-- File Input -->
     <div v-if="noteType === 1" class="form-control mb-4">
-      <label class="label pb-1"
-        ><span class="label-text">Select File:</span></label
-      >
+      <label class="label pb-1">
+        <span class="label-text">{{ $t("progress.select_file") }}</span>
+      </label>
       <input
         type="file"
         class="file-input file-input-bordered file-input-sm w-full text-sm"
@@ -59,12 +59,14 @@
         @change="handleFileChange"
         required
       />
-      <span v-if="fileError" class="text-error text-xs mt-1">{{
-        fileError
-      }}</span>
+      <span v-if="fileError" class="text-error text-xs mt-1">
+        {{ fileError }}
+      </span>
     </div>
 
-    <div v-if="saveError" class="text-error text-sm mt-2">{{ saveError }}</div>
+    <div v-if="saveError" class="text-error text-sm mt-2">
+      {{ saveError }}
+    </div>
 
     <div class="modal-action mt-6">
       <button
@@ -73,7 +75,7 @@
         @click="$emit('close')"
         :disabled="isSaving"
       >
-        Cancel
+        {{ $t("progress.cancel") }}
       </button>
       <button
         type="submit"
@@ -81,7 +83,7 @@
         :class="{ loading: isSaving }"
         :disabled="isSaving || !isNoteValid"
       >
-        {{ isSaving ? "Saving..." : "Save Log Entry" }}
+        {{ isSaving ? $t("progress.saving") : $t("progress.save_log_entry") }}
       </button>
     </div>
   </form>

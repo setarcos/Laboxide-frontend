@@ -1,18 +1,19 @@
 <template>
   <div class="prose max-w-none">
     <h2>
-      Student Progress: {{ subcourseDetails?.course_name }} ({{
+      {{ $t("progress.student_progress") }}:
+      {{ subcourseDetails?.course_name }} ({{
         getWeekdayName(subcourseDetails?.weekday)
       }})
-      <span v-if="subcourseDetails?.room_name"
-        >- {{ subcourseDetails.room_name }}</span
-      >
+      <span v-if="subcourseDetails?.room_name">
+        - {{ subcourseDetails.room_name }}
+      </span>
     </h2>
 
     <!-- Loading State -->
     <div v-if="isLoading.initial" class="text-center py-10">
       <span class="loading loading-lg loading-spinner text-primary"></span>
-      <p>Loading course data...</p>
+      <p>{{ $t("progress.loading_course_data") }}</p>
     </div>
 
     <!-- Error State -->
@@ -31,7 +32,9 @@
             d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span>Error loading data: {{ error.initial }}</span>
+        <span
+          >{{ $t("progress.error_loading_data") }}: {{ error.initial }}</span
+        >
       </div>
     </div>
 
@@ -43,7 +46,9 @@
       >
         <div class="form-control w-40">
           <label class="label pb-1">
-            <span class="label-text font-semibold">Select Week:</span>
+            <span class="label-text font-semibold"
+              >{{ $t("progress.select_week") }}:</span
+            >
           </label>
           <select
             class="select select-bordered select-sm"
@@ -55,7 +60,7 @@
               disabled
               value=""
             >
-              Loading weeks...
+              {{ $t("progress.loading_weeks") }}
             </option>
             <!-- Generate options dynamically based on typical semester length or fetched schedules -->
             <option
@@ -63,8 +68,10 @@
               :key="weekNum"
               :value="weekNum"
             >
-              Week {{ weekNum }}
-              {{ weekNum === currentWeekNumber ? "(Current)" : "" }}
+              {{ $t("progress.week", { week: weekNum }) }}
+              <span v-if="weekNum === currentWeekNumber">{{
+                ` (${$t("progress.current")})`
+              }}</span>
             </option>
           </select>
         </div>
@@ -74,7 +81,11 @@
             @click="toggleAllTimelines"
             :disabled="isLoading.weekly || !students.length"
           >
-            {{ showAllTimelines ? "Collapse All Logs" : "Expand All Logs" }}
+            {{
+              showAllTimelines
+                ? $t("progress.collapse_all_logs")
+                : $t("progress.expand_all_logs")
+            }}
           </button>
         </div>
       </div>
@@ -85,7 +96,9 @@
         class="text-center py-6"
       >
         <span class="loading loading-md loading-spinner text-secondary"></span>
-        <p>Loading data for Week {{ selectedWeek }}...</p>
+        <p>
+          {{ $t("progress.loading_data_for_week", { week: selectedWeek }) }}
+        </p>
       </div>
       <div
         v-else-if="error.weekly && !isLoading.initial"
@@ -114,14 +127,14 @@
         v-if="isLoading.recentLogs"
         class="text-center text-sm text-gray-500"
       >
-        Fetching recent final logs...
+        {{ $t("progress.fetching_recent_final_logs") }}
         <span class="loading loading-dots loading-xs"></span>
       </div>
       <div
         v-else-if="error.recentLogs"
         class="alert alert-error shadow-sm my-2 text-sm"
       >
-        Error fetching recent logs: {{ error.recentLogs }}
+        {{ $t("progress.error_fetching_recent_logs") }}: {{ error.recentLogs }}
       </div>
 
       <!-- Students Table -->
@@ -132,11 +145,15 @@
         <table class="table table-zebra w-full table-sm">
           <thead>
             <tr>
-              <th>Student ID</th>
-              <th>Name</th>
-              <th>Seat</th>
-              <th class="w-1/4">Progress (Week {{ selectedWeek }})</th>
-              <th>Actions</th>
+              <th>{{ $t("progress.student_id") }}</th>
+              <th>{{ $t("progress.name") }}</th>
+              <th>{{ $t("progress.seat") }}</th>
+              <th class="w-1/4">
+                {{ $t("progress.progress") }} ({{
+                  $t("progress.week", { week: selectedWeek })
+                }})
+              </th>
+              <th>{{ $t("progress.actions") }}</th>
             </tr>
           </thead>
           <tbody>
@@ -152,7 +169,7 @@
                   <!-- Tooltip shows progress count -->
                   <div
                     class="tooltip cursor-pointer"
-                    :data-tip="`${studentData.loggedStepsCount} / ${totalStepsForWeek} steps logged`"
+                    :data-tip="`${studentData.loggedStepsCount} / ${totalStepsForWeek} ${$t('progress.steps_logged')}`"
                     @click="toggleStudentTimeline(studentData.student.stu_id)"
                   >
                     <!-- Progress bar - color is dynamic -->
@@ -172,10 +189,10 @@
                     <button
                       class="btn btn-xs btn-outline btn-info"
                       @click="openTeacherLogModal(studentData.student)"
-                      title="Add general log entry for student"
+                      :title="$t('progress.add_general_log_entry')"
                       :disabled="!selectedSchedule?.id"
                     >
-                      Add Log
+                      {{ $t("progress.add_log") }}
                     </button>
                     <!-- Button to Confirm an existing UNCONFIRMED Final Log -->
                     <button
@@ -184,10 +201,10 @@
                       @click="
                         openConfirmModalForLog(studentData.unconfirmedFinalLog)
                       "
-                      title="Confirm student's final log submission"
+                      :title="$t('progress.confirm_student_final_log')"
                       :disabled="isLoading.confirmLog || isLoading.forceLog"
                     >
-                      Confirm Final Log
+                      {{ $t("progress.confirm_final_log") }}
                     </button>
 
                     <!-- Button to FORCE a new, CONFIRMED Final Log -->
@@ -197,7 +214,7 @@
                       "
                       class="btn btn-xs btn-outline btn-warning"
                       @click="confirmForceLog(studentData.student)"
-                      title="Force a 'Final Log' entry for this student for the current week"
+                      :title="$t('progress.force_final_log_entry')"
                       :disabled="
                         isLoading.forceLog === studentData.student.stu_id ||
                         isLoading.weekly ||
@@ -208,7 +225,7 @@
                         v-if="isLoading.forceLog === studentData.student.stu_id"
                         class="loading loading-spinner loading-sm mr-1"
                       ></span>
-                      Force Log
+                      {{ $t("progress.force_log") }}
                     </button>
                   </div>
                 </td>
@@ -223,8 +240,12 @@
                 <td :colspan="5" class="bg-base-200 p-0">
                   <div class="px-4 py-3">
                     <h4 class="text-sm font-semibold mb-2">
-                      Timeline Logs for {{ studentData.student.stu_name }} (Week
-                      {{ selectedWeek }}):
+                      {{
+                        $t("progress.timeline_logs_for", {
+                          name: studentData.student.stu_name,
+                          week: selectedWeek,
+                        })
+                      }}:
                       <span
                         v-if="isLoading.timelines[studentData.student.stu_id]"
                         class="loading loading-dots loading-xs ml-2"
@@ -234,7 +255,7 @@
                       v-if="error.timelines[studentData.student.stu_id]"
                       class="text-error text-xs italic"
                     >
-                      Error loading logs:
+                      {{ $t("progress.error_loading_logs") }}:
                       {{ error.timelines[studentData.student.stu_id] }}
                     </div>
                     <ul
@@ -252,7 +273,10 @@
                         <div class="flex justify-between items-start">
                           <div>
                             <span class="font-semibold mr-2">
-                              {{ entry.subschedule || "General Note" }}:
+                              {{
+                                entry.subschedule ||
+                                $t("progress.general_note")
+                              }}:
                             </span>
                             <!-- Note/File Display -->
                             <span v-if="entry.notetype === 0">{{
@@ -263,7 +287,7 @@
                               href="#"
                               @click.prevent="handleFileClick(entry)"
                               class="link link-hover text-info break-all"
-                              :title="`Download or Preview ${entry.note}`"
+                              :title="`${$t('progress.download_or_preview')} ${entry.note}`"
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -294,14 +318,15 @@
                                 'text-success':
                                   entry.tea_id === authStore.user?.userId,
                               }"
-                              >{{ entry.tea_id }}</span
                             >
+                              {{ entry.tea_id }}
+                            </span>
                             <!-- Delete Button -->
                             <button
                               v-if="entry.tea_id === authStore.user?.userId"
                               class="btn btn-xs btn-ghost btn-circle text-error p-0 align-middle"
                               @click="confirmDeleteTimeline(entry)"
-                              title="Delete this log entry"
+                              :title="$t('progress.delete_log_entry')"
                               :disabled="isLoading.weekly"
                             >
                               <svg
@@ -324,7 +349,7 @@
                       </li>
                     </ul>
                     <p v-else class="text-xs italic text-base-content/70 pl-2">
-                      No timeline entries found for this student this week.
+                      {{ $t("progress.no_timeline_entries_found") }}
                     </p>
                   </div>
                 </td>
@@ -337,7 +362,7 @@
         v-else-if="!isLoading.initial && !isLoading.weekly"
         class="text-center py-5 italic text-gray-500"
       >
-        No students found for this lab session.
+        {{ $t("progress.no_students_found_for_session") }}
       </div>
     </div>
 
@@ -345,8 +370,12 @@
     <dialog id="teacher_log_modal" class="modal" :open="showTeacherLogModal">
       <div class="modal-box w-11/12 max-w-lg">
         <h3 class="font-bold text-lg mb-4">
-          Add Log for {{ studentForTeacherLog?.stu_name }} (Week
-          {{ selectedWeek }})
+          {{
+            $t("progress.add_log_for", {
+              name: studentForTeacherLog?.stu_name,
+              week: selectedWeek,
+            })
+          }}
         </h3>
         <TeacherTimelineLogForm
           v-if="studentForTeacherLog && selectedSchedule"
@@ -359,8 +388,7 @@
           @close="closeTeacherLogModal"
         />
         <div v-else class="text-center text-warning p-4">
-          Cannot add log: Missing student or schedule information for the
-          selected week.
+          {{ $t("progress.cannot_add_log_missing_info") }}
         </div>
         <button
           class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -370,7 +398,9 @@
         </button>
       </div>
       <form method="dialog" class="modal-backdrop">
-        <button @click="closeTeacherLogModal">close</button>
+        <button @click="closeTeacherLogModal">
+          {{ $t("progress.close") }}
+        </button>
       </form>
     </dialog>
 
@@ -378,8 +408,8 @@
     <ConfirmDialog
       :show="showDeleteConfirm"
       dialogId="timeline_delete_confirm_modal"
-      title="Delete Log Entry"
-      :message="`Are you sure you want to delete the log entry: '${getTimelineEntryDescription(entryToDelete)}'?`"
+      :title="$t('progress.delete_log_entry')"
+      :message="`${$t('progress.confirm_delete_log_entry')} '${getTimelineEntryDescription(entryToDelete)}'?`"
       @confirm="deleteTimelineEntry"
       @close="
         showDeleteConfirm = false;
@@ -395,26 +425,33 @@
     >
       <div class="modal-box w-11/12 max-w-lg">
         <h3 class="font-bold text-lg mb-4">
-          Confirm Final Log for {{ currentLogToConfirm?.stu_name }}
+          {{
+            $t("progress.confirm_final_log_for", {
+              name: currentLogToConfirm?.stu_name,
+            })
+          }}
         </h3>
         <div v-if="currentLogToConfirm">
-          <p class="mb-3">Student's Note:</p>
+          <p class="mb-3">{{ $t("progress.student_note") }}:</p>
           <div
             class="p-3 bg-base-300 rounded-box mb-4 max-h-40 overflow-y-auto text-sm"
           >
-            {{ currentLogToConfirm.note || "No student note provided." }}
+            {{
+              currentLogToConfirm.note ||
+              $t("progress.no_student_note_provided")
+            }}
           </div>
 
           <div class="form-control mb-4">
             <label class="label">
-              <span class="label-text"
-                >Teacher's Confirmation Note (Optional):</span
-              >
+              <span class="label-text">
+                {{ $t("progress.teacher_confirmation_note_optional") }}:
+              </span>
             </label>
             <textarea
               class="textarea textarea-bordered h-24"
               v-model="teacherConfirmationNote"
-              placeholder="Add any notes about the confirmation..."
+              :placeholder="$t('progress.add_notes_about_confirmation')"
             ></textarea>
           </div>
 
@@ -428,22 +465,22 @@
                 v-if="isLoading.confirmLog"
                 class="loading loading-spinner loading-sm mr-2"
               ></span>
-              Confirm Log
+              {{ $t("progress.confirm_log") }}
             </button>
             <button
               class="btn"
               @click="closeConfirmModalForLog"
               :disabled="isLoading.confirmLog"
             >
-              Cancel
+              {{ $t("progress.cancel") }}
             </button>
           </div>
           <div v-if="error.confirmLog" class="text-error text-sm mt-2">
-            Error: {{ error.confirmLog }}
+            {{ $t("progress.error") }}: {{ error.confirmLog }}
           </div>
         </div>
         <div v-else class="text-center text-warning p-4">
-          Cannot confirm log: Log information is missing.
+          {{ $t("progress.cannot_confirm_log_missing_info") }}
         </div>
         <button
           class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -453,7 +490,9 @@
         </button>
       </div>
       <form method="dialog" class="modal-backdrop">
-        <button @click="closeConfirmModalForLog">close</button>
+        <button @click="closeConfirmModalForLog">
+          {{ $t("progress.close") }}
+        </button>
       </form>
     </dialog>
 
@@ -461,9 +500,9 @@
     <ConfirmDialog
       :show="showForceConfirm"
       dialogId="force_log_confirm_modal"
-      title="Force Final Log"
-      :message="`Are you sure you want to force a 'Final Log' entry for ${studentToForceLog?.stu_name || 'this student'} for Week ${selectedWeek}? This action cannot be undone and will mark their progress for this week as complete.`"
-      confirmButtonText="Force Log"
+      :title="$t('progress.force_final_log')"
+      :message="`${$t('progress.confirm_force_final_log_msg', { name: studentToForceLog?.stu_name || $t('progress.this_student'), week: selectedWeek })}`"
+      confirmButtonText="{{ $t('progress.force_log') }}"
       @confirm="handleForceLog"
       @close="cancelForceLog"
     />
@@ -474,12 +513,12 @@
     >
       <div class="modal-box w-11/12 max-w-3xl p-6">
         <h3 class="font-bold text-lg mb-4 break-all">
-          Image Preview: {{ previewImageFilename }}
+          {{ $t("progress.image_preview") }}: {{ previewImageFilename }}
         </h3>
         <!-- Loading State -->
         <div v-if="isPreviewLoading" class="text-center py-10">
           <span class="loading loading-lg loading-spinner text-info"></span>
-          <p>Loading image preview...</p>
+          <p>{{ $t("progress.loading_image_preview") }}</p>
         </div>
         <!-- Error State -->
         <div v-else-if="previewError" class="alert alert-error shadow-sm my-4">
@@ -497,7 +536,10 @@
                 d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <span>Error loading preview: {{ previewError }}</span>
+            <span
+              >{{ $t("progress.error_loading_preview") }}:
+              {{ previewError }}</span
+            >
           </div>
         </div>
         <!-- Image Display -->
@@ -513,7 +555,7 @@
         </div>
         <!-- Fallback if no image URL -->
         <div v-else class="text-center text-warning p-4">
-          Could not load image preview.
+          {{ $t("progress.could_not_load_image_preview") }}
         </div>
 
         <!-- Close Button -->
@@ -533,21 +575,21 @@
             "
             :disabled="isPreviewLoading"
           >
-            Download Image
+            {{ $t("progress.download_image") }}
           </button>
           <button
             class="btn btn-ghost"
             @click="closePreviewModal"
             :disabled="isPreviewLoading"
           >
-            Close
+            {{ $t("progress.close") }}
           </button>
         </div>
       </div>
       <!-- Backdrop -->
       <form method="dialog" class="modal-backdrop">
         <button @click="closePreviewModal" :disabled="isPreviewLoading">
-          close
+          {{ $t("progress.close") }}
         </button>
       </form>
     </dialog>
@@ -567,6 +609,7 @@ import {
 import TeacherTimelineLogForm from "@/components/TeacherTimelineLogForm.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { useFileHandling } from "@/utils/fileops";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps({
   id: {
@@ -576,6 +619,7 @@ const props = defineProps({
   },
 });
 
+const { t } = useI18n();
 const authStore = useAuthStore();
 const semesterStore = useSemesterStore();
 
@@ -801,7 +845,9 @@ const fetchWeeklyData = async () => {
     if (!scheduleForWeek) {
       // This is not necessarily an error if a course has gaps in weeks
       console.warn(`No schedule found for Week ${selectedWeek.value}.`);
-      error.weekly = `No schedule details available for Week ${selectedWeek.value}. Progress tracking might be unavailable.`;
+      error.weekly = t("progress.no_schedule_for_week", {
+        week: selectedWeek.value,
+      });
       subSchedulesForWeek.value = []; // Ensure steps are empty
       timelineEntries.value = {}; // Ensure timelines are empty
       selectedSchedule.value = null; // Ensure selectedSchedule is null if no schedule found
