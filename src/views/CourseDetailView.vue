@@ -24,7 +24,7 @@
     <!-- Loading State -->
     <div v-if="isLoading" class="text-center py-20">
       <span class="loading loading-lg loading-spinner text-primary"></span>
-      <p class="mt-2">Loading course details...</p>
+      <p class="mt-2">{{ $t("course.loading") }}</p>
     </div>
 
     <!-- Error State -->
@@ -43,7 +43,9 @@
             d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span>Error loading course details: {{ error.message || error }}</span>
+        <span
+          >{{ $t("course.error_loading") }}: {{ error.message || error }}</span
+        >
       </div>
     </div>
 
@@ -183,9 +185,9 @@
 
     <!-- Not Found State -->
     <div v-else class="text-center py-20">
-      <h2 class="text-2xl font-semibold">Course Not Found</h2>
+      <h2 class="text-2xl font-semibold">{{ $t("course.not_found") }}</h2>
       <p class="mt-2 text-gray-600">
-        The course you are looking for does not exist or could not be loaded.
+        {{ $t("course.not_found_desc") }}
       </p>
     </div>
   </div>

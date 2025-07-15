@@ -1,7 +1,7 @@
 <template>
   <div class="redirect-container">
-    <h2>Connecting to Login Service</h2>
-    <p>You will be redirected momentarily...</p>
+    <h2>{{ $t("message.loginservice") }}</h2>
+    <p>{{ $t("message.redirect") }}</p>
     <!-- You can add a loading spinner here for better UX -->
 
     <!--

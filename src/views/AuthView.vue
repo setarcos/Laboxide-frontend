@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Authenticating...</h2>
+    <h2>{{ $t("message.auth") }}</h2>
     <p v-if="error">{{ error }}</p>
   </div>
 </template>

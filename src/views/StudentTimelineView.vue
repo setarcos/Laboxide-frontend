@@ -17,25 +17,27 @@
             d="M15.75 19.5L8.25 12l7.5-7.5"
           />
         </svg>
-        Back
+        {{ $t("timeline.back") }}
       </button>
     </div>
 
     <!-- Title -->
     <h1 class="text-2xl font-bold mb-4">
-      Timeline for {{ studentNameDisplay }} ({{ studentId }})
+      {{
+        $t("timeline.timeline_for", { name: studentNameDisplay, id: studentId })
+      }}
     </h1>
     <p
       v-if="subcourseNameDisplay"
       class="text-lg mb-6 text-base-content text-opacity-80"
     >
-      Course: {{ subcourseNameDisplay }}
+      {{ $t("timeline.course_label", { name: subcourseNameDisplay }) }}
     </p>
 
     <!-- Loading State -->
     <div v-if="isLoading.page" class="text-center py-10">
       <span class="loading loading-lg loading-spinner text-primary"></span>
-      <p class="mt-2">Loading timeline...</p>
+      <p class="mt-2">{{ $t("timeline.loading_timeline") }}</p>
     </div>
 
     <!-- Error State -->
@@ -54,7 +56,9 @@
             d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span>Error loading timeline details: {{ error.page }}</span>
+        <span
+          >{{ $t("timeline.error_loading_timeline") }}: {{ error.page }}</span
+        >
       </div>
     </div>
 
@@ -64,7 +68,7 @@
         v-if="Object.keys(groupedTimelines).length === 0"
         class="text-center italic py-6"
       >
-        No timeline entries found for this student in this group.
+        {{ $t("timeline.no_timeline_entries") }}
       </div>
 
       <!-- Loop through grouped timelines -->
@@ -82,10 +86,11 @@
           class="collapse-title text-xl font-medium peer-checked:bg-base-300"
         >
           {{
-            group.scheduleInfo.name || `Schedule ID ${group.scheduleInfo.id}`
+            group.scheduleInfo.name ||
+            $t("timeline.schedule_fallback", { id: group.scheduleInfo.id })
           }}
           <span class="text-sm font-normal"
-            >({{ group.entries.length }} entries)</span
+            >({{ group.entries.length }} {{ $t("timeline.entries") }})</span
           >
         </div>
         <div class="collapse-content peer-checked:bg-base-100">
@@ -93,15 +98,14 @@
             <table class="table table-sm w-full">
               <thead>
                 <tr>
-                  <th>Timestamp</th>
-                  <th>By</th>
-                  <th>Subschedule</th>
-                  <th>Note / File</th>
+                  <th>{{ $t("timeline.timestamp") }}</th>
+                  <th>{{ $t("timeline.by") }}</th>
+                  <th>{{ $t("timeline.subschedule") }}</th>
+                  <th>{{ $t("timeline.note_file") }}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="entry in group.entries" :key="entry.id">
-                  <!-- Timestamp Column -->
                   <td
                     class="text-xs text-base-content text-opacity-70 whitespace-nowrap"
                   >
@@ -126,8 +130,8 @@
                       class="link link-hover text-info break-all"
                       :title="
                         isImageFile(entry.note)
-                          ? `Preview ${entry.note}`
-                          : `Download ${entry.note}`
+                          ? $t('timeline.preview_title', { name: entry.note })
+                          : $t('timeline.download_title', { name: entry.note })
                       "
                     >
                       <svg
@@ -152,7 +156,7 @@
             </table>
           </div>
           <div v-else class="mt-4 text-sm text-base-content text-opacity-70">
-            No entries for this group yet.
+            {{ $t("timeline.no_entries_yet") }}
           </div>
         </div>
       </div>
@@ -166,13 +170,12 @@
     >
       <div class="modal-box w-11/12 max-w-5xl">
         <h3 class="font-bold text-lg mb-4">
-          Preview: {{ previewImageFilename }}
+          {{ $t("timeline.preview") }}: {{ previewImageFilename }}
         </h3>
 
-        <!-- Loading/Error inside Modal -->
         <div v-if="isPreviewLoading" class="text-center py-10">
-          <span class="loading loading-spinner text-primary"></span> Loading
-          image...
+          <span class="loading loading-spinner text-primary"></span>
+          {{ $t("timeline.loading_image") }}
         </div>
         <div
           v-else-if="previewError"
@@ -197,14 +200,14 @@
             "
             :disabled="isPreviewLoading"
           >
-            Download Image
+            {{ $t("timeline.download_image") }}
           </button>
           <button
             class="btn btn-ghost"
             @click="closePreviewModal"
             :disabled="isPreviewLoading"
           >
-            Close
+            {{ $t("timeline.close") }}
           </button>
         </div>
         <button
@@ -217,7 +220,7 @@
       </div>
       <form method="dialog" class="modal-backdrop">
         <button @click="closePreviewModal" :disabled="isPreviewLoading">
-          close
+          {{ $t("timeline.close") }}
         </button>
       </form>
     </dialog>

@@ -2,6 +2,9 @@
   "message": {
     "welcome": "Welcome back",
     "back": "Back",
+    "auth": "Authenticating...",
+    "loginservice": "Connecting to Login Service",
+    "redirect": "You will be redirected momentarily...",
     "login": "Please log in to access more features."
   },
   "dashboard": {
@@ -94,6 +97,10 @@
     "savesche": "Save Schedule Item",
     "save": "Save Course",
     "edit": "Edit Course",
+    "loading": "Loading course details...",
+    "error_loading": "Error loading course details",
+    "not_found": "Course Not Found",
+    "not_found_desc": "The course you are looking for does not exist or could not be loaded.",
     "add": "Add Course"
   },
   "route": {
@@ -172,6 +179,27 @@
     "delete_failed": "Failed to delete: {error}",
     "load_rooms_failed": "Failed to load meeting rooms.",
     "load_agendas_failed": "Failed to load agendas."
+  },
+  "timeline": {
+    "back": "Back",
+    "timeline_for": "Timeline for {name} ({id})",
+    "course_label": "Course: {name}",
+    "loading_timeline": "Loading timeline...",
+    "error_loading_timeline": "Error loading timeline details",
+    "no_timeline_entries": "No timeline entries found for this student in this group.",
+    "timestamp": "Timestamp",
+    "by": "By",
+    "subschedule": "Subschedule",
+    "note_file": "Note / File",
+    "no_entries_yet": "No entries for this group yet.",
+    "preview": "Preview",
+    "loading_image": "Loading image...",
+    "download_image": "Download Image",
+    "close": "Close",
+    "entries": "entries",
+    "schedule_fallback": "Schedule ID {id}",
+    "preview_title": "Preview {name}",
+    "download_title": "Download {name}"
   },
   "navbar": {
     "dashboard": "Dashboard",

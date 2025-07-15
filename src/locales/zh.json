@@ -2,6 +2,9 @@
   "message": {
     "welcome": "欢迎回来",
     "back": "返回",
+    "auth": "用户验证中...",
+    "loginservice": "连接用户登陆服务",
+    "redirect": "即将跳转到登陆界面...",
     "login": "请登录系统访问更多功能。"
   },
   "dashboard": {
@@ -94,6 +97,10 @@
     "savesche": "保存实验",
     "save": "保存课程",
     "edit": "修改课程",
+    "loading": "正在加载课程详情...",
+    "error_loading": "课程详情加载失败",
+    "not_found": "未找到课程",
+    "not_found_desc": "您查找的课程不存在或无法加载",
     "add": "新建课程"
   },
   "route": {
@@ -172,6 +179,27 @@
     "delete_failed": "删除失败：{error}",
     "load_rooms_failed": "加载会议室失败。",
     "load_agendas_failed": "加载预定表失败。"
+  },
+  "timeline": {
+    "back": "返回",
+    "timeline_for": "{name} ({id}) 的时间线",
+    "course_label": "课程: {name}",
+    "loading_timeline": "正在加载时间线...",
+    "error_loading_timeline": "加载时间线详情时出错",
+    "no_timeline_entries": "当前分组中未找到该学生的时间线记录",
+    "timestamp": "时间",
+    "by": "记录人",
+    "subschedule": "步骤",
+    "note_file": "记录内容",
+    "no_entries_yet": "本分组尚无任何记录",
+    "preview": "预览",
+    "loading_image": "正在加载图片...",
+    "download_image": "下载图片",
+    "close": "关闭",
+    "entries": "条记录",
+    "schedule_fallback": "实验ID {id}",
+    "preview_title": "预览 {name}",
+    "download_title": "下载 {name}"
   },
   "navbar": {
     "dashboard": "个人中心",
