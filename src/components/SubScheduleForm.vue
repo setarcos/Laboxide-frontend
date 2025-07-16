@@ -3,7 +3,7 @@
   <form @submit.prevent="submitForm">
     <div class="form-control mb-4">
       <label class="label" for="sub-step">
-        <span class="label-text">Step Number</span>
+        <span class="label-text">{{ $t("course.stepno") }}</span>
       </label>
       <input
         id="sub-step"
@@ -19,7 +19,7 @@
 
     <div class="form-control mb-4">
       <label class="label" for="sub-title">
-        <span class="label-text">Step Title / Description</span>
+        <span class="label-text">{{ $t("course.steptitle") }}</span>
       </label>
       <input
         id="sub-title"
@@ -42,7 +42,7 @@
         @click="$emit('close')"
         :disabled="isSaving"
       >
-        Cancel
+        {{ $t("button.cancel") }}
       </button>
       <button
         type="submit"
@@ -50,7 +50,7 @@
         :class="{ loading: isSaving }"
         :disabled="isSaving"
       >
-        {{ isSaving ? "Saving..." : "Save Step" }}
+        {{ isSaving ? $t("button.saving") : $t("course.savestep") }}
       </button>
     </div>
   </form>

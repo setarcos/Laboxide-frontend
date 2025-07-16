@@ -5,9 +5,7 @@
       <!-- Display Student Info (Read-only, name from store) -->
       <div class="text-sm">
         <strong>{{ $t("stulog.student") }}</strong>
-        {{
-          authStore.user?.realname || formData.stu_name || $t("stulog.na")
-        }}
+        {{ authStore.user?.realname || formData.stu_name || $t("stulog.na") }}
         ({{ formData.stu_id || $t("stulog.na") }})
       </div>
 
