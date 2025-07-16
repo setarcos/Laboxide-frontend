@@ -133,6 +133,9 @@
     "no_room_selected": "请选择会议室以查看预定安排。",
     "time": "时间",
     "pending": "(待确认)",
+    "confirmed": "(已确认)",
+    "switch_to_list": "转到列表模式",
+    "switch_to_calendar": "转到日历模式",
     "form": {
       "title": "会议标题",
       "placeholder_title": "例如：电路基础例会",

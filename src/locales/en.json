@@ -133,6 +133,9 @@
     "no_room_selected": "Please select a meeting room to see the schedule.",
     "time": "Time",
     "pending": "(Pending)",
+    "confirmed": "(Confirmed)",
+    "switch_to_list": "Switch to list",
+    "switch_to_calendar": "Switch to calendar",
     "form": {
       "title": "Meeting Title",
       "placeholder_title": "e.g., Weekly Team Sync",

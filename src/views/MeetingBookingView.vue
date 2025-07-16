@@ -28,25 +28,30 @@
       class="flex flex-wrap items-center justify-between gap-4 p-4 bg-base-200 rounded-box mb-6"
     >
       <div class="form-control w-full sm:w-auto">
-        <label class="label"
-          ><span class="label-text">{{
-            $t("meeting.select_room_label")
-          }}</span></label
-        >
-        <select
-          v-model="selectedRoomId"
-          class="select select-bordered"
-          @change="onRoomChange"
-        >
-          <option disabled value="">
-            {{ $t("meeting.select_room_placeholder") }}
-          </option>
-          <option v-for="room in meetingRooms" :key="room.id" :value="room.id">
-            {{ room.room }} - {{ room.info }}
-          </option>
-        </select>
+        <div class="flex items-center gap-4">
+          <label class="label"
+            ><span class="label-text">{{
+              $t("meeting.select_room_label")
+            }}</span></label
+          >
+          <select
+            v-model="selectedRoomId"
+            class="select select-bordered"
+            @change="onRoomChange"
+          >
+            <option disabled value="">
+              {{ $t("meeting.select_room_placeholder") }}
+            </option>
+            <option
+              v-for="room in meetingRooms"
+              :key="room.id"
+              :value="room.id"
+            >
+              {{ room.room }} - {{ room.info }}
+            </option>
+          </select>
+        </div>
       </div>
-
       <div v-if="selectedRoomId" class="flex items-center gap-2">
         <button class="btn" @click="changeWeek(-1)">
           {{ $t("meeting.prev_week") }}
@@ -56,6 +61,46 @@
         </div>
         <button class="btn" @click="changeWeek(1)">
           {{ $t("meeting.next_week") }}
+        </button>
+
+        <!-- View Toggle Button -->
+        <button
+          class="btn btn-ghost"
+          @click="viewMode = viewMode === 'calendar' ? 'list' : 'calendar'"
+          :title="
+            viewMode === 'calendar'
+              ? $t('meeting.switch_to_list')
+              : $t('meeting.switch_to_calendar')
+          "
+        >
+          <svg
+            v-if="viewMode === 'calendar'"
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 10h16M4 14h16M4 18h16"
+            />
+          </svg>
+          <svg
+            v-else
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
         </button>
       </div>
     </div>
@@ -73,6 +118,7 @@
       v-else
       :agendas="agendas"
       :current-date="currentDate"
+      :view-mode="viewMode"
       @book-slot="openBookingModal"
       @view-agenda="openViewModal"
     />
@@ -236,6 +282,7 @@ const currentDate = ref(new Date());
 const isLoading = ref(false);
 const error = ref(null);
 const formError = ref("");
+const viewMode = ref("calendar"); // 'calendar' or 'list'
 
 const modalMode = ref("closed"); // 'closed', 'create', 'view', 'edit'
 const newBookingSlot = ref(null);
