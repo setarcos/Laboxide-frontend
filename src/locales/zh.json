@@ -161,6 +161,7 @@
     "time": "时间",
     "pending": "(待确认)",
     "confirmed": "(已确认)",
+    "no_meetings": "当前还没有会议预订。",
     "switch_to_list": "转到列表模式",
     "switch_to_calendar": "转到日历模式",
     "form": {

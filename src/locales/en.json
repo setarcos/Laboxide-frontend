@@ -161,6 +161,7 @@
     "time": "Time",
     "pending": "(Pending)",
     "confirmed": "(Confirmed)",
+    "no_meetings": "No meetings has been booked yet.",
     "switch_to_list": "Switch to list",
     "switch_to_calendar": "Switch to calendar",
     "form": {
