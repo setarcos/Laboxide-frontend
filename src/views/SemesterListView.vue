@@ -1,6 +1,8 @@
 <template>
   <div>
-    <h1 class="text-2xl font-semibold mb-4">Manage Semesters</h1>
+    <h1 class="text-2xl font-semibold mb-4">
+      {{ $t("term.manageSemesters") }}
+    </h1>
 
     <!-- Add Button (Admin only) -->
     <div class="mb-4 text-right" v-if="authStore.isAdmin">
@@ -19,7 +21,7 @@
             d="M12 4v16m8-8H4"
           />
         </svg>
-        Add Semester
+        {{ $t("term.addSemester") }}
       </button>
     </div>
 
@@ -42,7 +44,7 @@
             d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span>Error loading semesters: {{ error.message || error }}</span>
+        <span>{{ $t("term.loadError", { msg: error.message || error }) }}</span>
       </div>
     </div>
 
@@ -51,16 +53,16 @@
       <table class="table table-zebra w-full">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Actions</th>
+            <th>{{ $t("term.name") }}</th>
+            <th>{{ $t("term.startDate") }}</th>
+            <th>{{ $t("term.endDate") }}</th>
+            <th>{{ $t("term.actions") }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="semesters.length === 0">
             <td colspan="5" class="text-center italic py-4">
-              No semesters found.
+              {{ $t("term.noSemesters") }}
             </td>
           </tr>
           <tr v-for="semester in semesters" :key="semester.id">
@@ -73,7 +75,7 @@
                 <template v-if="authStore.isAdmin">
                   <button
                     class="btn btn-xs btn-ghost btn-circle"
-                    title="Edit"
+                    :title="$t('term.edit')"
                     @click="openEditModal(semester)"
                   >
                     <svg
@@ -93,7 +95,7 @@
                   </button>
                   <button
                     class="btn btn-xs btn-ghost btn-circle text-error"
-                    title="Delete"
+                    :title="$t('term.delete')"
                     @click="openDeleteModal(semester)"
                   >
                     <svg
@@ -112,9 +114,9 @@
                     </svg>
                   </button>
                 </template>
-                <span v-else class="text-xs italic text-base-content/50"
-                  >No actions</span
-                >
+                <span v-else class="text-xs italic text-base-content/50">
+                  {{ $t("term.noActions") }}
+                </span>
               </div>
             </td>
           </tr>
@@ -130,7 +132,7 @@
     >
       <div class="modal-box w-11/12 max-w-lg">
         <h3 class="font-bold text-lg">
-          {{ isEditing ? "Edit Semester" : "Add New Semester" }}
+          {{ isEditing ? $t("term.editSemester") : $t("term.addSemester") }}
         </h3>
         <SemesterForm
           :initial-data="currentItem"
@@ -154,8 +156,13 @@
     <ConfirmDialog
       :show="showDeleteModal"
       dialogId="semester_delete_confirm_modal"
-      title="Delete Semester"
-      :message="`Are you sure you want to delete the semester '${currentItem?.name}' (ID: ${currentItem?.id})?`"
+      :title="$t('term.deleteSemester')"
+      :message="
+        $t('term.deleteConfirm', {
+          name: currentItem?.name,
+          id: currentItem?.id,
+        })
+      "
       @confirm="handleDelete"
       @close="closeModal"
     />

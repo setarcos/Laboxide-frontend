@@ -2,20 +2,20 @@
   <form @submit.prevent="submitForm" class="space-y-4 p-2">
     <div>
       <label class="label" for="semester-name">
-        <span class="label-text">Semester Name</span>
+        <span class="label-text">{{ $t("term.semesterName") }}</span>
       </label>
       <input
         id="semester-name"
         type="text"
         v-model="formData.name"
-        placeholder="e.g., Fall 2024, 2024-2025 Term 1"
+        :placeholder="$t('term.namePlaceholder')"
         class="input input-bordered w-full"
         required
       />
     </div>
     <div>
       <label class="label" for="semester-start">
-        <span class="label-text">Start Date</span>
+        <span class="label-text">{{ $t("term.startDate") }}</span>
       </label>
       <input
         id="semester-start"
@@ -27,7 +27,7 @@
     </div>
     <div>
       <label class="label" for="semester-end">
-        <span class="label-text">End Date</span>
+        <span class="label-text">{{ $t("term.endDate") }}</span>
       </label>
       <input
         id="semester-end"
@@ -40,9 +40,11 @@
 
     <div class="flex justify-end gap-2 pt-4">
       <button type="button" class="btn btn-ghost" @click="$emit('close')">
-        Cancel
+        {{ $t("button.cancel") }}
       </button>
-      <button type="submit" class="btn btn-primary">Save Semester</button>
+      <button type="submit" class="btn btn-primary">
+        {{ $t("term.saveSemester") }}
+      </button>
     </div>
   </form>
 </template>

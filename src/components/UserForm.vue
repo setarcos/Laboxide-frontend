@@ -2,37 +2,39 @@
   <form @submit.prevent="submitForm" class="space-y-4 p-2">
     <div>
       <label class="label" for="user-id">
-        <span class="label-text">User ID / Login Name</span>
+        <span class="label-text">{{ $t("user.userIdLabel") }}</span>
       </label>
       <!-- Disable user_id field when editing -->
       <input
         id="user-id"
         type="text"
         v-model="formData.user_id"
-        placeholder="Unique login identifier"
+        :placeholder="$t('user.userIdPlaceholder')"
         class="input input-bordered w-full"
         :disabled="isEditing"
         required
       />
       <p v-if="isEditing" class="text-xs text-base-content/60 mt-1">
-        User ID cannot be changed after creation.
+        {{ $t("user.userIdImmutable") }}
       </p>
     </div>
+
     <div>
       <label class="label" for="user-username">
-        <span class="label-text">Real Name</span>
+        <span class="label-text">{{ $t("user.realNameLabel") }}</span>
       </label>
       <input
         id="user-username"
         type="text"
         v-model="formData.username"
-        placeholder="User's full name"
+        :placeholder="$t('user.realNamePlaceholder')"
         class="input input-bordered w-full"
         required
       />
     </div>
+
     <div>
-      <span class="label label-text">Permissions</span>
+      <span class="label label-text">{{ $t("user.permissions") }}</span>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <div class="form-control">
           <label class="label cursor-pointer justify-start gap-2">
@@ -42,7 +44,7 @@
               @change="togglePermission(PERMISSION_ADMIN)"
               class="checkbox checkbox-primary"
             />
-            <span class="label-text">总管理员</span>
+            <span class="label-text">{{ $t("user.roleAdmin") }}</span>
           </label>
         </div>
         <div class="form-control">
@@ -53,7 +55,7 @@
               @change="togglePermission(PERMISSION_MEETING_MANAGER)"
               class="checkbox checkbox-primary"
             />
-            <span class="label-text">会议室管理员</span>
+            <span class="label-text">{{ $t("user.roleMeetingManager") }}</span>
           </label>
         </div>
         <div class="form-control">
@@ -64,20 +66,22 @@
               @change="togglePermission(PERMISSION_LAB_MANAGER)"
               class="checkbox checkbox-primary"
             />
-            <span class="label-text">实验室管理员</span>
+            <span class="label-text">{{ $t("user.roleLabManager") }}</span>
           </label>
         </div>
       </div>
       <p class="text-xs text-base-content/60 mt-1">
-        Current permission value: {{ formData.permission }}
+        {{ $t("user.currentPermission") }}: {{ formData.permission }}
       </p>
     </div>
 
     <div class="flex justify-end gap-2 pt-4">
       <button type="button" class="btn btn-ghost" @click="$emit('close')">
-        Cancel
+        {{ $t("button.cancel") }}
       </button>
-      <button type="submit" class="btn btn-primary">Save User</button>
+      <button type="submit" class="btn btn-primary">
+        {{ $t("user.saveUser") }}
+      </button>
     </div>
   </form>
 </template>

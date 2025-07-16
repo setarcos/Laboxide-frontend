@@ -5,9 +5,10 @@
       <!-- Display Student Info (Read-only, name from store) -->
       <div class="text-sm">
         <strong>{{ $t("stulog.student") }}</strong>
-        {{ authStore.user?.realname || formData.stu_name || "N/A" }} ({{
-          formData.stu_id || "N/A"
-        }})
+        {{
+          authStore.user?.realname || formData.stu_name || $t("stulog.na")
+        }}
+        ({{ formData.stu_id || $t("stulog.na") }})
       </div>
 
       <div class="divider text-xs">{{ $t("stulog.logdetail") }}</div>
@@ -19,7 +20,7 @@
           <!-- Add <span class="text-error">*</span> if room selection is mandatory -->
         </label>
         <div v-if="isLoadingRooms" class="text-sm text-gray-500 py-2">
-          Loading rooms...
+          {{ $t("stulog.loadingRooms") }}
         </div>
         <div
           v-else-if="roomError"
@@ -51,11 +52,13 @@
         >
           <option :value="null" disabled>
             {{
-              labRooms.length === 0 ? "No rooms available" : "Select a lab room"
+              labRooms.length === 0
+                ? $t("stulog.noRooms")
+                : $t("stulog.selectRoom")
             }}
           </option>
           <option v-for="room in labRooms" :key="room.id" :value="room.id">
-            {{ room.name }}({{ room.room }})
+            {{ room.name }} ({{ room.room }})
           </option>
         </select>
       </div>
@@ -70,7 +73,7 @@
           id="lab_name"
           type="text"
           v-model.trim="formData.lab_name"
-          placeholder="Enter the lab or experiment name"
+          :placeholder="$t('stulog.labPlaceholder')"
           class="input input-bordered w-full"
         />
       </div>
@@ -83,7 +86,7 @@
           id="seat"
           type="number"
           v-model.number="formData.seat"
-          placeholder="Enter your seat number (if applicable)"
+          :placeholder="$t('stulog.seatPlaceholder')"
           class="input input-bordered w-full"
           min="0"
         />
@@ -98,7 +101,7 @@
         <textarea
           id="note"
           v-model.trim="formData.note"
-          placeholder="Describe your work, issues encountered, etc."
+          :placeholder="$t('stulog.notePlaceholder')"
           class="textarea textarea-bordered h-32 w-full"
           required
         ></textarea>
@@ -161,7 +164,7 @@
       >
         {{
           isSaving
-            ? "Saving..."
+            ? $t("button.saving")
             : formData.id
               ? $t("stulog.update")
               : $t("stulog.save")

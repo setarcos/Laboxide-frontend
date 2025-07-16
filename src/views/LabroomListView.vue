@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-2xl font-semibold mb-4">Manage Lab Rooms</h1>
+    <h1 class="text-2xl font-semibold mb-4">{{ $t("lab.manageRooms") }}</h1>
 
     <!-- Add Button (Admin or Lab Manager) -->
     <div
@@ -22,7 +22,7 @@
             d="M12 4v16m8-8H4"
           />
         </svg>
-        Add Lab Room
+        {{ $t("lab.addRoom") }}
       </button>
     </div>
 
@@ -45,7 +45,7 @@
             d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span>Error loading lab rooms: {{ error.message || error }}</span>
+        <span>{{ $t("lab.loadError", { msg: error.message || error }) }}</span>
       </div>
     </div>
 
@@ -54,16 +54,16 @@
       <table class="table table-zebra w-full">
         <thead>
           <tr>
-            <th>Room Code</th>
-            <th>Name</th>
-            <th>Manager</th>
-            <th>Actions</th>
+            <th>{{ $t("lab.roomCode") }}</th>
+            <th>{{ $t("lab.name") }}</th>
+            <th>{{ $t("lab.manager") }}</th>
+            <th>{{ $t("lab.actions") }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="labrooms.length === 0">
             <td colspan="5" class="text-center italic py-4">
-              No lab rooms found.
+              {{ $t("lab.noRooms") }}
             </td>
           </tr>
           <tr v-for="labroom in labrooms" :key="labroom.id">
@@ -89,7 +89,7 @@
                 >
                   <button
                     class="btn btn-xs btn-ghost btn-circle"
-                    title="Edit"
+                    :title="$t('lab.edit')"
                     @click="openEditModal(labroom)"
                   >
                     <svg
@@ -109,7 +109,7 @@
                   </button>
                   <button
                     class="btn btn-xs btn-ghost btn-circle text-error"
-                    title="Delete"
+                    :title="$t('lab.delete')"
                     @click="openDeleteModal(labroom)"
                   >
                     <svg
@@ -128,9 +128,9 @@
                     </svg>
                   </button>
                 </template>
-                <span v-else class="text-xs italic text-base-content/50"
-                  >No actions</span
-                >
+                <span v-else class="text-xs italic text-base-content/50">
+                  {{ $t("lab.noActions") }}
+                </span>
               </div>
             </td>
           </tr>
@@ -146,7 +146,7 @@
     >
       <div class="modal-box w-11/12 max-w-lg">
         <h3 class="font-bold text-lg">
-          {{ isEditing ? "Edit Lab Room" : "Add New Lab Room" }}
+          {{ isEditing ? $t("lab.editRoom") : $t("lab.addRoom") }}
         </h3>
         <LabroomForm
           :initial-data="currentItem"
@@ -170,8 +170,13 @@
     <ConfirmDialog
       :show="showDeleteModal"
       dialogId="labroom_delete_confirm_modal"
-      title="Delete Lab Room"
-      :message="`Are you sure you want to delete the lab room '${currentItem?.name}' (Room: ${currentItem?.room})?`"
+      :title="$t('lab.deleteRoom')"
+      :message="
+        $t('lab.deleteConfirm', {
+          name: currentItem?.name,
+          room: currentItem?.room,
+        })
+      "
       @confirm="handleDelete"
       @close="closeModal"
     />

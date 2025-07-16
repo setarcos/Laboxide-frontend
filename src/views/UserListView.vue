@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-2xl font-semibold mb-4">Manage Users</h1>
+    <h1 class="text-2xl font-semibold mb-4">{{ $t("user.manageUsers") }}</h1>
 
     <!-- Add Button (Admin only) -->
     <div class="mb-4 text-right" v-if="authStore.isAdmin">
@@ -19,7 +19,7 @@
             d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"
           />
         </svg>
-        Add User
+        {{ $t("user.addUser") }}
       </button>
     </div>
 
@@ -42,7 +42,7 @@
             d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span>Error loading users: {{ error.message || error }}</span>
+        <span>{{ $t("user.loadError", { msg: error.message || error }) }}</span>
       </div>
     </div>
 
@@ -51,16 +51,18 @@
       <table class="table table-zebra w-full">
         <thead>
           <tr>
-            <th>User ID</th>
-            <th>Real Name</th>
-            <th>Permissions</th>
-            <th>Roles</th>
-            <th>Actions</th>
+            <th>{{ $t("user.userId") }}</th>
+            <th>{{ $t("user.realName") }}</th>
+            <th>{{ $t("user.permissions") }}</th>
+            <th>{{ $t("user.roles") }}</th>
+            <th>{{ $t("user.actions") }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="users.length === 0">
-            <td colspan="5" class="text-center italic py-4">No users found.</td>
+            <td colspan="5" class="text-center italic py-4">
+              {{ $t("user.noUsers") }}
+            </td>
           </tr>
           <tr v-for="user in users" :key="user.user_id">
             <th>{{ user.user_id }}</th>
@@ -70,27 +72,25 @@
               <span
                 v-if="hasRole(user.permission, PERMISSION_ADMIN)"
                 class="badge badge-primary badge-outline mr-1"
-                >总管理员</span
+                >{{ $t("user.roleAdmin") }}</span
               >
               <span
                 v-if="hasRole(user.permission, PERMISSION_MEETING_MANAGER)"
                 class="badge badge-secondary badge-outline mr-1"
-                >会议室管理员</span
+                >{{ $t("user.roleMeetingManager") }}</span
               >
               <span
                 v-if="hasRole(user.permission, PERMISSION_LAB_MANAGER)"
                 class="badge badge-accent badge-outline mr-1"
-                >实验室管理员</span
+                >{{ $t("user.roleLabManager") }}</span
               >
             </td>
             <td>
-              <div class="flex gap-1">
-                <!-- Edit/Delete only for Admin -->
-                <!-- Prevent deleting/editing the currently logged-in admin? Optional -->
+              <div class="flex gap-1 items-center">
                 <template v-if="authStore.isAdmin">
                   <button
                     class="btn btn-xs btn-ghost btn-circle"
-                    title="Edit"
+                    :title="$t('user.edit')"
                     @click="openEditModal(user)"
                   >
                     <svg
@@ -110,7 +110,7 @@
                   </button>
                   <button
                     class="btn btn-xs btn-ghost btn-circle text-error"
-                    title="Delete"
+                    :title="$t('user.delete')"
                     @click="openDeleteModal(user)"
                     :disabled="authStore.user?.userId === user.user_id"
                   >
@@ -131,13 +131,14 @@
                   </button>
                   <span
                     v-if="authStore.user?.userId === user.user_id"
-                    class="text-xs italic text-base-content/50 self-center ml-2"
-                    >(Current User)</span
+                    class="text-xs italic text-base-content/50 ml-2"
                   >
+                    {{ $t("user.currentUserHint") }}
+                  </span>
                 </template>
-                <span v-else class="text-xs italic text-base-content/50"
-                  >No actions</span
-                >
+                <span v-else class="text-xs italic text-base-content/50">
+                  {{ $t("user.noActions") }}
+                </span>
               </div>
             </td>
           </tr>
@@ -149,7 +150,7 @@
     <dialog id="user_modal" class="modal" :open="showAddModal || showEditModal">
       <div class="modal-box w-11/12 max-w-lg">
         <h3 class="font-bold text-lg">
-          {{ isEditing ? "Edit User" : "Add New User" }}
+          {{ isEditing ? $t("user.editUser") : $t("user.addUser") }}
         </h3>
         <UserForm
           :initial-data="currentItem"
@@ -173,8 +174,13 @@
     <ConfirmDialog
       :show="showDeleteModal"
       dialogId="user_delete_confirm_modal"
-      title="Delete User"
-      :message="`Are you sure you want to delete the user '${currentItem?.username}' (ID: ${currentItem?.user_id})? This action is permanent.`"
+      :title="$t('user.deleteUser')"
+      :message="
+        $t('user.deleteConfirm', {
+          name: currentItem?.username,
+          id: currentItem?.user_id,
+        })
+      "
       @confirm="handleDelete"
       @close="closeModal"
     />

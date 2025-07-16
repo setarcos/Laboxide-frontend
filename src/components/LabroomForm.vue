@@ -2,52 +2,52 @@
   <form @submit.prevent="submitForm" class="space-y-4 p-2">
     <div>
       <label class="label" for="lab-room">
-        <span class="label-text">Room Number/Code</span>
+        <span class="label-text">{{ $t("lab.roomNumber") }}</span>
       </label>
       <input
         id="lab-room"
         type="text"
         v-model="formData.room"
-        placeholder="e.g., B101"
+        :placeholder="$t('lab.roomPlaceholder')"
         class="input input-bordered w-full"
         required
       />
     </div>
     <div>
       <label class="label" for="lab-name">
-        <span class="label-text">Lab Name</span>
+        <span class="label-text">{{ $t("lab.labName") }}</span>
       </label>
       <input
         id="lab-name"
         type="text"
         v-model="formData.name"
-        placeholder="e.g., Physics Lab"
+        :placeholder="$t('lab.namePlaceholder')"
         class="input input-bordered w-full"
         required
       />
     </div>
     <div>
       <label class="label" for="lab-manager">
-        <span class="label-text">Manager Name</span>
+        <span class="label-text">{{ $t("lab.managerName") }}</span>
       </label>
       <input
         id="lab-manager"
         type="text"
         v-model="formData.manager"
-        placeholder="Name of the lab manager"
+        :placeholder="$t('lab.managerNamePlaceholder')"
         class="input input-bordered w-full"
         required
       />
     </div>
     <div>
       <label class="label" for="lab-tea-id">
-        <span class="label-text">Manager ID</span>
+        <span class="label-text">{{ $t("lab.managerId") }}</span>
       </label>
       <input
         id="lab-tea-id"
         type="text"
         v-model="formData.tea_id"
-        placeholder="ID of the lab manager"
+        :placeholder="$t('lab.managerIdPlaceholder')"
         class="input input-bordered w-full"
         required
       />
@@ -55,9 +55,11 @@
 
     <div class="flex justify-end gap-2 pt-4">
       <button type="button" class="btn btn-ghost" @click="$emit('close')">
-        Cancel
+        {{ $t("button.cancel") }}
       </button>
-      <button type="submit" class="btn btn-primary">Save Labroom</button>
+      <button type="submit" class="btn btn-primary">
+        {{ $t("lab.saveLabroom") }}
+      </button>
     </div>
   </form>
 </template>

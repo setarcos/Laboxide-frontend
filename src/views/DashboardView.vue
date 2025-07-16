@@ -1,7 +1,7 @@
 <template>
   <div class="prose max-w-none">
     <!-- Use prose for nice typography -->
-    <p v-if="authStore.isLoading">Loading user information...</p>
+    <p v-if="authStore.isLoading">{{ $t("message.loading") }}...</p>
     <p v-else-if="authStore.user">
       {{ $t("message.welcome") }}, <strong>{{ authStore.user.realname }}</strong
       >!
@@ -15,7 +15,7 @@
         class="loading loading-dots loading-sm"
       ></span>
       <span v-else-if="semesterStore.semesterError" class="text-error"
-        >⚠️ Could not load semester info.</span
+        >⚠️ {{ $t("dashboard.semesterLoadError") }}</span
       >
       <span v-else>{{ semesterGreeting }}</span>
     </p>
@@ -31,8 +31,8 @@
 
         <!-- Loading State for Courses -->
         <div v-if="isLoadingMyCourses" class="text-center py-5">
-          <span class="loading loading-spinner text-primary"></span> Loading
-          your courses...
+          <span class="loading loading-spinner text-primary"></span>
+          {{ $t("dashboard.loadingCourses") }}
         </div>
 
         <!-- Error State for Courses -->
@@ -52,7 +52,7 @@
               />
             </svg>
             <span
-              >Could not load your courses:
+              >{{ $t("dashboard.coursesLoadError") }}:
               {{ myCoursesError.message || myCoursesError }}</span
             >
           </div>
@@ -63,8 +63,8 @@
           v-if="isLoadingFinalLogStatuses"
           class="text-center text-sm text-gray-500 my-2"
         >
-          <span class="loading loading-dots loading-xs"></span> Checking final
-          log statuses...
+          <span class="loading loading-dots loading-xs"></span>
+          {{ $t("dashboard.checkingFinalLog") }}
         </div>
 
         <!-- Error State for Final Log Statuses -->
@@ -72,7 +72,7 @@
           v-else-if="finalLogStatusesError"
           class="alert alert-error shadow-sm my-2 text-sm"
         >
-          Error checking final log statuses: {{ finalLogStatusesError }}
+          {{ $t("dashboard.finalLogError") }}: {{ finalLogStatusesError }}
         </div>
 
         <!-- Course List Table -->
@@ -95,7 +95,9 @@
                       params: { id: course.course_id },
                     }"
                     class="link link-hover link-primary"
-                    :title="`View details for ${course.course_name}`"
+                    :title="
+                      $t('dashboard.viewDetail', { name: course.course_name })
+                    "
                   >
                     {{ course.course_name }}
                   </router-link>
@@ -108,7 +110,7 @@
                       params: { id: course.id },
                     }"
                     class="link link-hover link-primary"
-                    title="View Students"
+                    :title="$t('dashboard.viewStudents')"
                   >
                     {{ getWeekdayName(course.weekday) }}
                   </router-link>
@@ -136,7 +138,7 @@
                         params: { id: course.id },
                       }"
                       class="btn btn-xs btn-outline btn-secondary"
-                      title="View Student Progress"
+                      :title="$t('dashboard.viewProgress')"
                     >
                       {{ $t("dashboard.progress") }}
                     </router-link>
@@ -149,44 +151,46 @@
 
         <!-- No Courses Message -->
         <div v-else class="text-center py-5 italic text-gray-500">
-          You are not currently assigned to any courses.
+          {{ $t("dashboard.noCourses") }}
         </div>
       </div>
     </div>
 
     <div class="divider" v-if="isSuper"></div>
     <div class="mt-6 p-4 bg-base-200 rounded-box" v-if="isSuper">
-      <h3 class="text-lg font-semibold mb-2">Quick Actions</h3>
+      <h3 class="text-lg font-semibold mb-2">
+        {{ $t("dashboard.quickActions") }}
+      </h3>
       <div class="flex flex-wrap gap-2">
         <router-link
           v-if="authStore.isAdmin | authStore.isTeacher"
           :to="{ name: 'Courses' }"
           class="btn btn-sm btn-outline"
-          >Manage Courses</router-link
+          >{{ $t("dashboard.manageCourses") }}</router-link
         >
         <router-link
           v-if="authStore.isAdmin | authStore.isLabManager"
           :to="{ name: 'Labrooms' }"
           class="btn btn-sm btn-outline"
-          >Manage Lab Rooms</router-link
+          >{{ $t("dashboard.manageLabRooms") }}</router-link
         >
         <router-link
           v-if="authStore.isAdmin"
           :to="{ name: 'Users' }"
           class="btn btn-sm btn-outline"
-          >Manage Users</router-link
+          >{{ $t("dashboard.manageUsers") }}</router-link
         >
         <router-link
           v-if="authStore.isAdmin"
           :to="{ name: 'Semesters' }"
           class="btn btn-sm btn-outline"
-          >Manage Semesters</router-link
+          >{{ $t("dashboard.manageSemesters") }}</router-link
         >
         <router-link
           v-if="authStore.isAdmin"
           :to="{ name: 'MeetingRoomView' }"
           class="btn btn-sm btn-outline"
-          >Manage Meeting Rooms</router-link
+          >{{ $t("dashboard.manageMeetingRooms") }}</router-link
         >
       </div>
     </div>
@@ -207,7 +211,7 @@
           @log-saved="handleTimelineLogSaved"
         />
         <div v-else class="p-4 text-center text-error">
-          Missing data required to open the timeline log.
+          {{ $t("dashboard.missingTimelineData") }}
         </div>
         <button
           class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -217,7 +221,7 @@
         </button>
       </div>
       <form method="dialog" class="modal-backdrop">
-        <button @click="closeTimelineModal">close</button>
+        <button @click="closeTimelineModal">{{ $t("button.close") }}</button>
       </form>
     </dialog>
 
@@ -232,10 +236,10 @@
 
         <div v-if="isLoadingFinishLogDefaults" class="text-center p-10">
           <span class="loading loading-lg loading-spinner text-info"></span>
-          <p>Loading final log data...</p>
+          <p>{{ $t("dashboard.loadingFinalLog") }}</p>
         </div>
         <div v-else-if="finishLogDefaultError" class="alert alert-error">
-          Could not load final log data: {{ finishLogDefaultError }}
+          {{ $t("dashboard.finalLogLoadError") }}: {{ finishLogDefaultError }}
         </div>
         <StudentLogForm
           v-else-if="finishLogDefaultData"
@@ -246,7 +250,7 @@
           @close="closeFinishLogModal"
         />
         <div v-else class="text-center p-5 text-warning">
-          Could not display final log form. Default data unavailable.
+          {{ $t("dashboard.finalLogUnavailable") }}
         </div>
 
         <button
@@ -257,7 +261,7 @@
         </button>
       </div>
       <form method="dialog" class="modal-backdrop">
-        <button @click="closeFinishLogModal">close</button>
+        <button @click="closeFinishLogModal">{{ $t("button.close") }}</button>
       </form>
     </dialog>
   </div>
