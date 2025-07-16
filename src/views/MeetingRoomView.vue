@@ -1,9 +1,10 @@
+<!-- MeetingRoomView.vue (template part only) -->
 <template>
   <div>
-    <h1 class="text-2xl font-semibold mb-4">Manage Meeting Rooms</h1>
+    <h1 class="text-2xl font-semibold mb-4">{{ $t("room.manageTitle") }}</h1>
     <div class="mb-4 text-right">
       <button class="btn btn-primary" @click="openAddModal">
-        Add Meeting Room
+        {{ $t("room.addButton") }}
       </button>
     </div>
 
@@ -11,22 +12,22 @@
       <span class="loading loading-lg loading-spinner text-primary"></span>
     </div>
     <div v-else-if="error" class="alert alert-error">
-      <span>Error: {{ error.message || error }}</span>
+      <span>{{ $t("room.errorPrefix") }}: {{ error.message || error }}</span>
     </div>
 
     <div v-else class="overflow-x-auto bg-base-100 rounded-box shadow">
       <table class="table table-zebra w-full">
         <thead>
           <tr>
-            <th>Room</th>
-            <th>Information</th>
-            <th>Actions</th>
+            <th>{{ $t("room.tableHeaders.room") }}</th>
+            <th>{{ $t("room.tableHeaders.information") }}</th>
+            <th>{{ $t("room.tableHeaders.actions") }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="meetingRooms.length === 0">
             <td colspan="3" class="text-center italic py-4">
-              No meeting rooms found.
+              {{ $t("room.emptyMessage") }}
             </td>
           </tr>
           <tr v-for="room in meetingRooms" :key="room.id">
@@ -46,7 +47,7 @@
               <div class="flex gap-1">
                 <button
                   class="btn btn-xs btn-ghost btn-circle"
-                  title="Edit"
+                  :title="$t('room.editTooltip')"
                   @click="openEditModal(room)"
                 >
                   <svg
@@ -66,7 +67,7 @@
                 </button>
                 <button
                   class="btn btn-xs btn-ghost btn-circle text-error"
-                  title="Delete"
+                  :title="$t('room.deleteTooltip')"
                   @click="openDeleteModal(room)"
                 >
                   <svg
@@ -99,7 +100,7 @@
     >
       <div class="modal-box w-11/12 max-w-lg">
         <h3 class="font-bold text-lg">
-          {{ isEditing ? "Edit Meeting Room" : "Add New Meeting Room" }}
+          {{ isEditing ? $t("room.editModalTitle") : $t("room.addModalTitle") }}
         </h3>
         <MeetingRoomForm
           :initial-data="currentItem"
@@ -115,7 +116,7 @@
         </button>
       </div>
       <form method="dialog" class="modal-backdrop">
-        <button @click="closeModal">close</button>
+        <button @click="closeModal">{{ $t("room.close") }}</button>
       </form>
     </dialog>
 
@@ -123,8 +124,8 @@
     <ConfirmDialog
       :show="showDeleteModal"
       dialogId="meeting_room_delete_confirm_modal"
-      title="Delete Meeting Room"
-      :message="`Are you sure you want to delete room '${currentItem?.room}'?`"
+      :title="$t('room.deleteConfirmTitle')"
+      :message="$t('room.deleteConfirmMessage', { room: currentItem?.room })"
       @confirm="handleDelete"
       @close="closeModal"
     />

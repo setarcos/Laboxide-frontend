@@ -2,7 +2,7 @@
   <dialog id="history_modal" class="modal" :open="show">
     <div class="modal-box w-11/12 max-w-4xl">
       <h3 class="font-bold text-lg">
-        Borrow History for: {{ equipment?.name }}
+        {{ $t("equip.historyModal.title", { name: equipment?.name }) }}
       </h3>
 
       <div class="py-4">
@@ -10,20 +10,22 @@
           <span class="loading loading-spinner text-primary"></span>
         </div>
         <div v-else-if="error" class="alert alert-warning">
-          <span>Could not load history: {{ error.message }}</span>
+          <span
+            >{{ $t("equip.historyModal.loadError") }}: {{ error.message }}</span
+          >
         </div>
         <div v-else-if="histories.length === 0" class="text-center italic">
-          No history records found for this item.
+          {{ $t("equip.historyModal.noData") }}
         </div>
         <div v-else class="overflow-x-auto max-h-96">
           <table class="table table-zebra table-pin-rows table-sm">
             <thead>
               <tr>
-                <th>User</th>
-                <th>Telephone</th>
-                <th>Borrowed Date</th>
-                <th>Returned Date</th>
-                <th>Note</th>
+                <th>{{ $t("equip.historyModal.headers.user") }}</th>
+                <th>{{ $t("equip.historyModal.headers.telephone") }}</th>
+                <th>{{ $t("equip.historyModal.headers.borrowed") }}</th>
+                <th>{{ $t("equip.historyModal.headers.returned") }}</th>
+                <th>{{ $t("equip.historyModal.headers.note") }}</th>
               </tr>
             </thead>
             <tbody>
@@ -46,7 +48,9 @@
       </div>
 
       <div class="modal-action">
-        <button class="btn" @click="$emit('close')">Close</button>
+        <button class="btn" @click="$emit('close')">
+          {{ $t("button.close") }}
+        </button>
       </div>
       <button
         class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -56,7 +60,7 @@
       </button>
     </div>
     <form method="dialog" class="modal-backdrop">
-      <button @click="$emit('close')">close</button>
+      <button @click="$emit('close')">{{ $t("button.close") }}</button>
     </form>
   </dialog>
 </template>

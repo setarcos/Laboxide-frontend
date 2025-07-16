@@ -1,32 +1,34 @@
 <template>
   <form @submit.prevent="submitForm">
     <div class="form-control">
-      <label class="label"
-        ><span class="label-text">Room Name/Code</span></label
-      >
+      <label class="label">
+        <span class="label-text">{{ $t("room.form.roomName") }}</span>
+      </label>
       <input
         type="text"
         v-model="form.room"
-        placeholder="e.g., Conference Room A"
+        :placeholder="$t('room.form.roomPlaceholder')"
         class="input input-bordered"
         required
       />
     </div>
     <div class="form-control mt-4">
-      <label class="label"
-        ><span class="label-text">Information / Description</span></label
-      >
+      <label class="label">
+        <span class="label-text">{{ $t("room.form.infoLabel") }}</span>
+      </label>
       <textarea
         v-model="form.info"
         class="textarea textarea-bordered"
-        placeholder="e.g., Seats 10, has projector"
+        :placeholder="$t('room.form.infoPlaceholder')"
       ></textarea>
     </div>
     <div class="modal-action">
       <button type="button" class="btn btn-ghost" @click="$emit('close')">
-        Cancel
+        {{ $t("button.cancel") }}
       </button>
-      <button type="submit" class="btn btn-primary">Save</button>
+      <button type="submit" class="btn btn-primary">
+        {{ $t("button.save") }}
+      </button>
     </div>
   </form>
 </template>

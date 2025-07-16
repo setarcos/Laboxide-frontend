@@ -11,14 +11,14 @@
         <form method="dialog" class="w-full flex justify-end gap-2">
           <!-- if there is a button in form, it will close the modal -->
           <button class="btn" @click.prevent="$emit('close')">
-            {{ cancelText }}
+            {{ $t("button.cancel") }}
           </button>
           <button
             class="btn"
             :class="confirmClass"
             @click.prevent="$emit('confirm')"
           >
-            {{ confirmText }}
+            {{ $t("button.confirm") }}
           </button>
         </form>
       </div>
@@ -47,14 +47,6 @@ const props = defineProps({
   message: {
     type: String,
     default: "Are you sure?",
-  },
-  confirmText: {
-    type: String,
-    default: "Confirm",
-  },
-  cancelText: {
-    type: String,
-    default: "Cancel",
   },
   confirmClass: {
     type: String,

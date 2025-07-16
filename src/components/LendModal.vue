@@ -1,17 +1,21 @@
 <template>
   <dialog id="lend_modal" class="modal" :open="show">
     <div class="modal-box w-11/12 max-w-md">
-      <h3 class="font-bold text-lg">Lend Equipment: {{ equipmentName }}</h3>
+      <h3 class="font-bold text-lg">
+        {{ $t("equip.lendModal.title", { name: equipmentName }) }}
+      </h3>
 
       <form @submit.prevent="submit" class="py-4 space-y-4">
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Borrower's Name (User)</span>
+            <span class="label-text">{{
+              $t("equip.lendModal.borrowerName")
+            }}</span>
           </label>
           <input
             type="text"
             v-model="user"
-            placeholder="e.g., John Doe"
+            :placeholder="$t('equip.lendModal.borrowerNamePlaceholder')"
             class="input input-bordered w-full"
             required
             ref="userInput"
@@ -20,12 +24,14 @@
 
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Borrower's Telephone</span>
+            <span class="label-text">{{
+              $t("equip.lendModal.telephone")
+            }}</span>
           </label>
           <input
             type="tel"
             v-model="telephone"
-            placeholder="e.g., 123-456-7890"
+            :placeholder="$t('equip.lendModal.telephonePlaceholder')"
             class="input input-bordered w-full"
             required
           />
@@ -33,21 +39,23 @@
 
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Note for this loan</span>
+            <span class="label-text">{{ $t("equip.lendModal.note") }}</span>
           </label>
           <textarea
             v-model="note"
             class="textarea textarea-bordered h-20"
-            placeholder="e.g., For project X, due next Friday"
+            :placeholder="$t('equip.lendModal.notePlaceholder')"
             required
           ></textarea>
         </div>
 
         <div class="modal-action">
           <button type="button" class="btn btn-ghost" @click="close">
-            Cancel
+            {{ $t("button.cancel") }}
           </button>
-          <button type="submit" class="btn btn-primary">Confirm Lend</button>
+          <button type="submit" class="btn btn-primary">
+            {{ $t("button.confirm") }}
+          </button>
         </div>
       </form>
 
@@ -58,8 +66,9 @@
         ✕
       </button>
     </div>
+
     <form method="dialog" class="modal-backdrop">
-      <button @click="close">close</button>
+      <button @click="close">{{ $t("button.close") }}</button>
     </form>
   </dialog>
 </template>

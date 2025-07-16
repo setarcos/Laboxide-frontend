@@ -55,6 +55,8 @@
     "submit": "提交",
     "upload": "上传",
     "confirm": "确认",
+    "save": "保存",
+    "close": "关闭",
     "cancel": "取消"
   },
   "course": {
@@ -370,6 +372,102 @@
     "saving": "保存中...",
     "save_subcourse": "保存课程",
     "fill_required_fields": "请正确填写所有必填字段。"
+  },
+  "room": {
+    "manageTitle": "管理会议室",
+    "addButton": "添加会议室",
+    "errorPrefix": "错误",
+    "tableHeaders": {
+      "room": "会议室",
+      "information": "信息",
+      "actions": "操作"
+    },
+    "form": {
+      "roomName": "会议室名称/房间号",
+      "roomPlaceholder": "例如：2233 会议室",
+      "infoLabel": "信息/描述",
+      "infoPlaceholder": "例如：可容纳10人，配投影仪"
+    },
+    "emptyMessage": "暂无会议室",
+    "editTooltip": "编辑",
+    "deleteTooltip": "删除",
+    "editModalTitle": "编辑会议室",
+    "addModalTitle": "新增会议室",
+    "close": "关闭",
+    "deleteConfirmTitle": "删除会议室",
+    "deleteConfirmMessage": "确定要删除会议室“{room}”吗？"
+  },
+  "equip": {
+    "title": "我的设备",
+    "addButton": "添加设备",
+    "loadError": "加载设备出错",
+    "headers": {
+      "name": "名称",
+      "serial": "序列号",
+      "location": "位置",
+      "status": "状态",
+      "actions": "操作"
+    },
+    "noData": "你还没有添加任何设备。",
+    "actions": {
+      "lend": "借出",
+      "return": "归还"
+    },
+    "tooltip": {
+      "history": "历史",
+      "edit": "编辑",
+      "delete": "删除"
+    },
+    "editModalTitle": "编辑设备",
+    "addModalTitle": "新增设备",
+    "deleteConfirmTitle": "删除设备",
+    "deleteConfirmMessage": "确定要删除设备“{name}”吗？",
+    "status": {
+      "available": "可用",
+      "borrowed": "已借出",
+      "maintenance": "维修中",
+      "decommissioned": "已报废",
+      "unknown": "未知"
+    },
+    "lendModal": {
+      "title": "借出设备：{name}",
+      "borrowerName": "借用人姓名",
+      "borrowerNamePlaceholder": "例如：张三",
+      "telephone": "联系电话",
+      "telephonePlaceholder": "例如：138-0000-0000",
+      "note": "备注",
+      "notePlaceholder": "例如：项目X使用，下周五归还"
+    },
+    "form": {
+      "name": "设备名称",
+      "namePlaceholder": "例如：示波器 X 型",
+      "serial": "序列号",
+      "serialPlaceholder": "例如：SN-12345ABC",
+      "value": "价值（价格）",
+      "valuePlaceholder": "例如：1500",
+      "position": "位置",
+      "positionPlaceholder": "例如：柜子 A，第 3 层",
+      "status": "状态",
+      "note": "备注",
+      "notePlaceholder": "任何额外说明"
+    },
+    "historyModal": {
+      "title": "借用历史：{name}",
+      "loadError": "无法加载历史记录",
+      "noData": "暂无该设备的历史记录。",
+      "headers": {
+        "user": "借用人",
+        "telephone": "联系电话",
+        "borrowed": "借出日期",
+        "returned": "归还日期",
+        "note": "备注"
+      }
+    },
+    "authError": "认证错误，无法保存设备。",
+    "saveError": "保存失败：{error}",
+    "deleteError": "删除失败：{error}",
+    "lendError": "借出失败：{error}",
+    "returnError": "归还失败：{error}"
   },
   "navbar": {
     "dashboard": "个人中心",

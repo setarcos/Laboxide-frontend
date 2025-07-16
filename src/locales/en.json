@@ -55,6 +55,8 @@
     "submit": "Submit",
     "upload": "Upload",
     "confirm": "Confirm",
+    "save": "Save",
+    "close": "Close",
     "cancel": "Cancel"
   },
   "course": {
@@ -370,6 +372,102 @@
     "saving": "Saving...",
     "save_subcourse": "Save Subcourse",
     "fill_required_fields": "Please fill in all required fields correctly."
+  },
+  "room": {
+    "manageTitle": "Manage Meeting Rooms",
+    "addButton": "Add Meeting Room",
+    "errorPrefix": "Error",
+    "tableHeaders": {
+      "room": "Room",
+      "information": "Information",
+      "actions": "Actions"
+    },
+    "form": {
+      "roomName": "Room Name/Code",
+      "roomPlaceholder": "e.g., Conference Room A",
+      "infoLabel": "Information / Description",
+      "infoPlaceholder": "e.g., Seats 10, has projector"
+    },
+    "emptyMessage": "No meeting rooms found.",
+    "editTooltip": "Edit",
+    "deleteTooltip": "Delete",
+    "editModalTitle": "Edit Meeting Room",
+    "addModalTitle": "Add New Meeting Room",
+    "close": "close",
+    "deleteConfirmTitle": "Delete Meeting Room",
+    "deleteConfirmMessage": "Are you sure you want to delete room '{room}'?"
+  },
+  "equip": {
+    "title": "My Equipment",
+    "addButton": "Add Equipment",
+    "loadError": "Error loading equipment",
+    "headers": {
+      "name": "Name",
+      "serial": "Serial No.",
+      "location": "Location",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "noData": "You have not added any equipment.",
+    "actions": {
+      "lend": "Lend",
+      "return": "Return"
+    },
+    "tooltip": {
+      "history": "History",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "editModalTitle": "Edit Equipment",
+    "addModalTitle": "Add New Equipment",
+    "deleteConfirmTitle": "Delete Equipment",
+    "deleteConfirmMessage": "Are you sure you want to delete '{name}'?",
+    "status": {
+      "available": "Available",
+      "borrowed": "Borrowed",
+      "maintenance": "Under Maintenance",
+      "decommissioned": "Decommissioned",
+      "unknown": "Unknown"
+    },
+    "lendModal": {
+      "title": "Lend Equipment: {name}",
+      "borrowerName": "Borrower's Name (User)",
+      "borrowerNamePlaceholder": "e.g., John Doe",
+      "telephone": "Borrower's Telephone",
+      "telephonePlaceholder": "e.g., 123-456-7890",
+      "note": "Note for this loan",
+      "notePlaceholder": "e.g., For project X, due next Friday"
+    },
+    "form": {
+      "name": "Equipment Name",
+      "namePlaceholder": "e.g., Oscilloscope Model X",
+      "serial": "Serial Number",
+      "serialPlaceholder": "e.g., SN-12345ABC",
+      "value": "Value (Price)",
+      "valuePlaceholder": "e.g., 1500",
+      "position": "Position / Location",
+      "positionPlaceholder": "e.g., Cabinet A, Shelf 3",
+      "status": "Status",
+      "note": "Note",
+      "notePlaceholder": "Any additional notes or details"
+    },
+    "historyModal": {
+      "title": "Borrow History for: {name}",
+      "loadError": "Could not load history",
+      "noData": "No history records found for this item.",
+      "headers": {
+        "user": "User",
+        "telephone": "Telephone",
+        "borrowed": "Borrowed Date",
+        "returned": "Returned Date",
+        "note": "Note"
+      }
+    },
+    "authError": "Authentication error. Cannot save equipment.",
+    "saveError": "Failed to save: {error}",
+    "deleteError": "Failed to delete: {error}",
+    "lendError": "Lending failed: {error}",
+    "returnError": "Return failed: {error}"
   },
   "navbar": {
     "dashboard": "Dashboard",
