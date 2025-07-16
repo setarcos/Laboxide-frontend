@@ -140,8 +140,8 @@
       "repeat_once": "One-time Event",
       "repeat_weekly": "Weekly",
       "date_label": "Booking Date",
-      "repeat_label": "Repeat End Date",
-      "repeat_hint": "The booking will repeat every {weekday} until this date.",
+      "repeat_label": "Repeat Start Date",
+      "repeat_hint": "The booking will repeat every {weekday} from this date.",
       "start_time": "Start Time",
       "end_time": "End Time",
       "cancel": "Cancel",
@@ -151,6 +151,7 @@
         "required_title": "Meeting title is required.",
         "required_time": "Start and End times are required.",
         "time_order": "End time must be after start time.",
+        "time_conflict": "This time conflicts with \"{title}\" ({startTime}-{endTime}).",
         "too_long": "Meeting duration cannot exceed 4 hours."
       }
     },

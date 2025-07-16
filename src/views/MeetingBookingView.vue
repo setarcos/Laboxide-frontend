@@ -220,7 +220,7 @@ import AgendaForm from "@/components/AgendaForm.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { useI18n } from "vue-i18n";
 
-const { d: formatDate } = useI18n();
+const { t, d: formatDate } = useI18n();
 const props = defineProps({
   roomId: [String, Number],
 });
@@ -299,6 +299,7 @@ const fetchAgendas = async (roomId) => {
 
 // --- CONFLICT CHECKING ---
 const checkForConflicts = (newAgendaData) => {
+  const newDate = parseISO(newAgendaData.date);
   const newStart = parseISO(
     `${newAgendaData.date}T${newAgendaData.start_time}`,
   );
@@ -306,34 +307,49 @@ const checkForConflicts = (newAgendaData) => {
 
   for (const existing of agendas.value) {
     if (editingAgenda.value && existing.id === editingAgenda.value.id) {
-      continue;
+      continue; // Skip self when editing
     }
 
-    if (existing.repeat === 0) {
-      if (existing.date !== newAgendaData.date) continue;
-      const existingStart = parseISO(`${existing.date}T${existing.start_time}`);
-      const existingEnd = parseISO(`${existing.date}T${existing.end_time}`);
-      if (newStart < existingEnd && newEnd > existingStart) return existing;
-    }
-
+    // Handle repeating agendas
     if (existing.repeat === 1) {
-      const existingRepeatDay = getDay(parseISO(existing.date));
-      const newDay = getDay(newStart);
+      const repeatStart = parseISO(existing.date);
+      const existingRepeatDay = getDay(repeatStart);
+      const newAgendaDay = getDay(newDate);
+
+      // Skip if weekday doesn't match or new date is before repeat start
       if (
-        existingRepeatDay !== newDay ||
-        isBefore(parseISO(existing.date), newStart)
+        existingRepeatDay !== newAgendaDay ||
+        isBefore(newDate, repeatStart)
       ) {
         continue;
       }
+
       const existingStart = parseISO(
         `${newAgendaData.date}T${existing.start_time}`,
       );
       const existingEnd = parseISO(
         `${newAgendaData.date}T${existing.end_time}`,
       );
-      if (newStart < existingEnd && newEnd > existingStart) return existing;
+
+      if (newStart < existingEnd && newEnd > existingStart) {
+        return existing;
+      }
+    }
+    // Handle one-time agendas
+    else {
+      if (existing.date !== newAgendaData.date) {
+        continue;
+      }
+
+      const existingStart = parseISO(`${existing.date}T${existing.start_time}`);
+      const existingEnd = parseISO(`${existing.date}T${existing.end_time}`);
+
+      if (newStart < existingEnd && newEnd > existingStart) {
+        return existing;
+      }
     }
   }
+
   return null;
 };
 
@@ -357,6 +373,7 @@ const openBookingModal = (slot) => {
 };
 
 const openViewModal = (agenda) => {
+  formError.value = "";
   modalMode.value = "view";
   viewingAgenda.value = agenda;
   document.getElementById("agenda_modal").showModal();
@@ -382,7 +399,11 @@ const handleSaveAgenda = async (formData) => {
   formError.value = "";
   const conflict = checkForConflicts(formData);
   if (conflict) {
-    formError.value = `This time conflicts with "${conflict.title}" (${conflict.start_time.slice(0, 5)}-${conflict.end_time.slice(0, 5)}).`;
+    formError.value = t("meeting.form.error.time_conflict", {
+      title: conflict.title,
+      startTime: conflict.start_time.slice(0, 5),
+      endTime: conflict.end_time.slice(0, 5),
+    });
     return;
   }
 

@@ -191,9 +191,8 @@ const getAgendaDay = (agenda) => {
     if (agenda.repeat === 1) {
       const repeatDayOfWeek = getDay(agendaKeyDate);
       const isCorrectDayOfWeek = getDay(day) === repeatDayOfWeek;
-      const isWithinDateRange =
-        isBefore(day, agendaKeyDate) || isEqual(day, agendaKeyDate);
-      if (isCorrectDayOfWeek && isWithinDateRange) return i;
+      const isAfterStart = !isBefore(day, agendaKeyDate);
+      if (isCorrectDayOfWeek && isAfterStart) return i;
     }
   }
   return -1; // Not in this week

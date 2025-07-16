@@ -119,8 +119,14 @@ const form = ref({
   startTime: "",
   endTime: "",
 });
-const errorMessage = ref("");
 
+// Use a local error message that gets updated from props
+const localErrorMessage = ref("");
+const isValidating = ref(false); // Flag to prevent clearing errors during validation
+const errorMessage = computed(() => {
+  const result = localErrorMessage.value || props.submissionError;
+  return result;
+});
 const isEditing = computed(() => !!props.initialData?.id);
 
 const weekDayName = computed(() => {
@@ -128,10 +134,19 @@ const weekDayName = computed(() => {
   return d(new Date(form.value.date + "T00:00:00"), { weekday: "long" });
 });
 
+// Watch for changes in submission error from parent
+watch(
+  () => props.submissionError,
+  (newError) => {
+    localErrorMessage.value = newError;
+  },
+  { immediate: true },
+);
+
+// Watch for initial data or booking slot
 watch(
   () => [props.initialData, props.bookingSlot],
   () => {
-    errorMessage.value = "";
     if (isEditing.value) {
       const data = props.initialData;
       form.value = {
@@ -161,36 +176,41 @@ watch(
         endTime: "",
       };
     }
+
+    // Clear local error when form is reset
+    localErrorMessage.value = "";
   },
   { immediate: true, deep: true },
 );
 
+// Clear error when form changes (but not during validation)
 watch(
-  () => props.submissionError,
-  (newError) => {
-    errorMessage.value = newError;
-  },
-);
-watch(
-  form,
+  () => ({ ...form.value }),
   () => {
-    if (errorMessage.value) errorMessage.value = "";
+    if (localErrorMessage.value && !isValidating.value) {
+      localErrorMessage.value = "";
+    }
   },
   { deep: true },
 );
 
 const submitForm = () => {
-  errorMessage.value = "";
+  isValidating.value = true;
+  localErrorMessage.value = "";
+
   if (!form.value.title.trim()) {
-    errorMessage.value = t("meeting.form.error.required_title");
+    localErrorMessage.value = t("meeting.form.error.required_title");
+    isValidating.value = false;
     return;
   }
   if (!form.value.startTime || !form.value.endTime) {
-    errorMessage.value = t("meeting.form.error.required_time");
+    localErrorMessage.value = t("meeting.form.error.required_time");
+    isValidating.value = false;
     return;
   }
   if (form.value.endTime <= form.value.startTime) {
-    errorMessage.value = t("meeting.form.error.time_order");
+    localErrorMessage.value = t("meeting.form.error.time_order");
+    isValidating.value = false;
     return;
   }
 
@@ -199,7 +219,8 @@ const submitForm = () => {
   const durationInMinutes = differenceInMinutes(end, start);
 
   if (durationInMinutes > 240) {
-    errorMessage.value = t("meeting.form.error.too_long");
+    localErrorMessage.value = t("meeting.form.error.too_long");
+    isValidating.value = false;
     return;
   }
 
@@ -210,6 +231,8 @@ const submitForm = () => {
     start_time: `${form.value.startTime}:00`,
     end_time: `${form.value.endTime}:00`,
   };
+
+  isValidating.value = false;
   emit("save", payload);
 };
 </script>

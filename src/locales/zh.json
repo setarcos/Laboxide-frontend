@@ -140,8 +140,8 @@
       "repeat_once": "单次会议",
       "repeat_weekly": "每周重复",
       "date_label": "预定日期",
-      "repeat_label": "重复结束日期",
-      "repeat_hint": "预定将每周重复（每周{weekday}）直到此日期。",
+      "repeat_label": "重复开始日期",
+      "repeat_hint": "预定将从此日期起，每周重复（每周{weekday}）。",
       "start_time": "开始时间",
       "end_time": "结束时间",
       "cancel": "取消",
@@ -151,6 +151,7 @@
         "required_title": "会议标题不能为空",
         "required_time": "必须填写开始和结束时间",
         "time_order": "结束时间必须晚于开始时间",
+        "time_conflict": "这个时间与 \"{title}\" ({startTime}-{endTime}) 冲突。",
         "too_long": "会议时长不能超过4小时"
       }
     },
