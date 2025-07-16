@@ -1,10 +1,9 @@
-// src/components/SubcourseForm.vue
 <template>
   <form @submit.prevent="submitForm">
     <!-- Weekday -->
     <div class="form-control mb-4">
       <label class="label" for="subcourse-weekday">
-        <span class="label-text">星期</span>
+        <span class="label-text">{{ $t("group.weekday") }}</span>
       </label>
       <select
         id="subcourse-weekday"
@@ -12,21 +11,23 @@
         v-model.number="formData.weekday"
         required
       >
-        <option disabled :value="undefined">星期</option>
-        <option :value="1">周一</option>
-        <option :value="2">周二</option>
-        <option :value="3">周三</option>
-        <option :value="4">周四</option>
-        <option :value="5">周五</option>
-        <option :value="6">周六</option>
-        <option :value="7">周日</option>
+        <option disabled :value="undefined">
+          {{ $t("group.weekday_placeholder") }}
+        </option>
+        <option :value="1">{{ $t("group.monday") }}</option>
+        <option :value="2">{{ $t("group.tuesday") }}</option>
+        <option :value="3">{{ $t("group.wednesday") }}</option>
+        <option :value="4">{{ $t("group.thursday") }}</option>
+        <option :value="5">{{ $t("group.friday") }}</option>
+        <option :value="6">{{ $t("group.saturday") }}</option>
+        <option :value="7">{{ $t("group.sunday") }}</option>
       </select>
     </div>
 
     <!-- Part of a day -->
     <div class="form-control mb-4">
-      <label class="label" for="subcourse-weekday">
-        <span class="label-text">时间</span>
+      <label class="label" for="subcourse-daypart">
+        <span class="label-text">{{ $t("group.time") }}</span>
       </label>
       <select
         id="subcourse-daypart"
@@ -34,19 +35,21 @@
         v-model.number="formData.partday"
         required
       >
-        <option disabled :value="undefined">时间</option>
-        <option :value="0">上午</option>
-        <option :value="1">下午</option>
-        <option :value="2">晚上</option>
-        <option :value="3">下午后段</option>
-        <option :value="4">晚上后段</option>
+        <option disabled :value="undefined">
+          {{ $t("group.time_placeholder") }}
+        </option>
+        <option :value="0">{{ $t("group.morning") }}</option>
+        <option :value="1">{{ $t("group.afternoon") }}</option>
+        <option :value="2">{{ $t("group.evening") }}</option>
+        <option :value="3">{{ $t("group.late_afternoon") }}</option>
+        <option :value="4">{{ $t("group.late_evening") }}</option>
       </select>
     </div>
 
     <!-- Room ID (Labroom) -->
     <div class="form-control mb-4">
       <label class="label" for="subcourse-room">
-        <span class="label-text">教室</span>
+        <span class="label-text">{{ $t("group.classroom") }}</span>
       </label>
       <select
         id="subcourse-room"
@@ -58,10 +61,10 @@
         <option disabled :value="undefined">
           {{
             isLoadingLabrooms
-              ? "Loading rooms..."
+              ? $t("group.loading_rooms")
               : labroomError
-                ? "Error loading rooms"
-                : "Select a room"
+                ? $t("group.error_loading_rooms")
+                : $t("group.select_room")
           }}
         </option>
         <option v-for="room in labrooms" :key="room.id" :value="room.id">
@@ -76,12 +79,12 @@
     <!-- Teacher Name -->
     <div class="form-control mb-4">
       <label class="label" for="subcourse-teacher">
-        <span class="label-text">教师姓名</span>
+        <span class="label-text">{{ $t("group.teacher_name") }}</span>
       </label>
       <input
         id="subcourse-teacher"
         type="text"
-        placeholder="Teacher responsible for this group"
+        :placeholder="$t('group.teacher_responsible')"
         class="input input-bordered w-full"
         v-model.trim="formData.tea_name"
         :disabled="!props.isAdmin"
@@ -91,13 +94,13 @@
 
     <!-- Teacher ID -->
     <div class="form-control mb-4">
-      <label class="label" for="subcourse-teacher">
-        <span class="label-text">教师ID</span>
+      <label class="label" for="subcourse-teacher-id">
+        <span class="label-text">{{ $t("group.teacher_id") }}</span>
       </label>
       <input
         id="subcourse-teacher-id"
         type="text"
-        placeholder="Teacher responsible for this group"
+        :placeholder="$t('group.teacher_responsible')"
         class="input input-bordered w-full"
         v-model.trim="formData.tea_id"
         :disabled="!props.isAdmin"
@@ -108,13 +111,13 @@
     <!-- Student Limit -->
     <div class="form-control mb-4">
       <label class="label" for="subcourse-limit">
-        <span class="label-text">人数上限</span>
+        <span class="label-text">{{ $t("group.student_limit") }}</span>
       </label>
       <input
         id="subcourse-limit"
         type="number"
         min="0"
-        placeholder="Max number of students"
+        :placeholder="$t('group.max_students')"
         class="input input-bordered w-full"
         v-model.number="formData.stu_limit"
         required
@@ -124,14 +127,16 @@
     <!-- Lag Week -->
     <div class="form-control mb-4">
       <label class="label" for="subcourse-lag">
-        <span class="label-text">落后课时</span>
-        <span class="label-text-alt">(Offset from semester start)</span>
+        <span class="label-text">{{ $t("group.lag_week") }}</span>
+        <span class="label-text-alt"
+          >({{ $t("group.offset_from_semester_start") }})</span
+        >
       </label>
       <input
         id="subcourse-lag"
         type="number"
         min="0"
-        placeholder="e.g., 0 for starts week 1"
+        :placeholder="$t('group.example_lag_week')"
         class="input input-bordered w-full"
         v-model.number="formData.lag_week"
         required
@@ -141,7 +146,7 @@
     <!-- Actions -->
     <div class="modal-action mt-6">
       <button type="button" class="btn btn-ghost" @click="$emit('close')">
-        Cancel
+        {{ $t("button.cancel") }}
       </button>
       <button
         type="submit"
@@ -152,7 +157,7 @@
           v-if="isSaving"
           class="loading loading-spinner loading-xs mr-2"
         ></span>
-        {{ isSaving ? "Saving..." : "Save Subcourse" }}
+        {{ isSaving ? $t("group.saving") : $t("group.save_subcourse") }}
       </button>
     </div>
   </form>
@@ -161,7 +166,9 @@
 <script setup>
 import { ref, watch, reactive, onMounted, computed } from "vue";
 import * as dataService from "@/services/dataService";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const props = defineProps({
   initialData: {
     type: Object,
@@ -244,11 +251,11 @@ const fetchLabrooms = async () => {
     const response = await dataService.getLabrooms();
     labrooms.value = response.data || [];
     if (labrooms.value.length === 0) {
-      labroomError.value = "No lab rooms found.";
+      labroomError.value = t("group.no_lab_rooms");
     }
   } catch (err) {
     console.error("Failed to fetch lab rooms:", err);
-    labroomError.value = `Error loading rooms: ${err.response?.data?.error || err.message}`;
+    labroomError.value = `${t("group.error_loading_rooms")} ${err.response?.data?.error || err.message}`;
   } finally {
     isLoadingLabrooms.value = false;
   }
@@ -273,7 +280,7 @@ const formDataIsValid = computed(() => {
 // --- Submit Logic ---
 const submitForm = () => {
   if (!formDataIsValid.value) {
-    alert("Please fill in all required fields correctly.");
+    alert(t("group.fill_required_fields"));
     return;
   }
 

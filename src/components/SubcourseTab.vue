@@ -488,7 +488,7 @@ const fetchSubcourses = async () => {
 
   const params = { course_id: props.courseId };
   if (semesterIdToFetch) {
-    params.year_id = semesterIdToFetch;
+    params.semester_id = semesterIdToFetch;
   } else {
     fetchSemesters();
   }

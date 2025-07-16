@@ -17,18 +17,18 @@
             d="M15.75 19.5L8.25 12l7.5-7.5"
           />
         </svg>
-        Back
+        {{ $t("stu.back") }}
       </button>
     </div>
 
     <!-- Loading State (Subcourse Info) -->
     <div v-if="isLoadingSubcourse" class="text-center py-5">
-      <span class="loading loading-spinner text-info"></span> Loading group
-      details...
+      <span class="loading loading-spinner text-info"></span>
+      {{ $t("stu.loading_group_details") }}
     </div>
     <!-- Error State (Subcourse Info) -->
     <div v-else-if="subcourseError" class="alert alert-warning shadow-sm mb-4">
-      Could not load group details:
+      {{ $t("stu.could_not_load_group_details") }}:
       {{ subcourseError.message || subcourseError }}
     </div>
     <!-- Subcourse Info Display -->
@@ -36,16 +36,21 @@
       <div class="grid grid-cols-2 gap-4">
         <div>
           <p class="mb-2">
-            <strong>Course:</strong> {{ subcourse.course_name || "N/A" }}
+            <strong>{{ $t("stu.course") }}:</strong>
+            {{ subcourse.course_name || $t("stu.n_a") }}
           </p>
-          <p class="mb-2"><strong>Teacher:</strong> {{ subcourse.tea_name }}</p>
+          <p class="mb-2">
+            <strong>{{ $t("stu.teacher") }}:</strong> {{ subcourse.tea_name }}
+          </p>
         </div>
         <div>
           <p class="mb-2">
-            <strong>Day:</strong> {{ getWeekdayName(subcourse.weekday) }}
+            <strong>{{ $t("stu.day") }}:</strong>
+            {{ getWeekdayName(subcourse.weekday) }}
           </p>
           <p class="mb-2">
-            <strong>Room:</strong> {{ subcourse.room_name || "N/A" }}
+            <strong>{{ $t("stu.room") }}:</strong>
+            {{ subcourse.room_name || $t("stu.n_a") }}
           </p>
         </div>
       </div>
@@ -54,13 +59,13 @@
     <!-- Loading State (Student List) -->
     <div v-if="isLoadingStudents" class="text-center py-10">
       <span class="loading loading-lg loading-spinner text-primary"></span>
-      <p class="mt-2">Loading student list...</p>
+      <p class="mt-2">{{ $t("stu.loading_student_list") }}</p>
     </div>
 
     <!-- Error State (Student List) -->
     <div v-else-if="studentsError" class="alert alert-error shadow-lg">
-      <!-- ... error display ... -->
-      Error loading students: {{ studentsError.message || studentsError }}
+      {{ $t("stu.error_loading_students") }}:
+      {{ studentsError.message || studentsError }}
     </div>
 
     <!-- Student Table -->
@@ -68,16 +73,16 @@
       <table class="table table-zebra w-full table-sm">
         <thead>
           <tr>
-            <th>Student ID</th>
-            <th>Student Name</th>
-            <th class="text-center">Seat</th>
-            <th v-if="isTeacher">Actions</th>
+            <th>{{ $t("stu.student_id") }}</th>
+            <th>{{ $t("stu.student_name") }}</th>
+            <th class="text-center">{{ $t("stu.seat") }}</th>
+            <th v-if="isTeacher">{{ $t("stu.actions") }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="!isLoadingStudents && students.length === 0">
             <td colspan="3" class="text-center italic py-4">
-              No students enrolled in this group yet.
+              {{ $t("stu.no_students_enrolled") }}
             </td>
           </tr>
           <tr v-for="student in students" :key="student.id">
@@ -95,7 +100,9 @@
                 }"
                 class="link link-hover link-primary"
                 :title="
-                  isTeacher ? 'View Student Timeline' : 'View Your Timeline'
+                  isTeacher
+                    ? $t('stu.view_student_timeline')
+                    : $t('stu.view_your_timeline')
                 "
               >
                 {{ student.stu_name }}
@@ -110,7 +117,7 @@
                 v-if="isTeacher"
                 @click="openSeatModal(student)"
                 class="btn btn-xs btn-ghost"
-                title="Change Seat"
+                :title="$t('stu.change_seat')"
               >
                 {{ student.seat ?? "-" }}
                 <svg
@@ -136,7 +143,7 @@
               <div class="flex gap-1 items-center justify-start">
                 <button
                   class="btn btn-xs btn-ghost text-error"
-                  title="Remove Student from Group"
+                  :title="$t('stu.remove_student_from_group')"
                   @click="openRemoveConfirm(student)"
                   :disabled="isRemovingStudent"
                   :class="{
@@ -160,7 +167,6 @@
                     />
                   </svg>
                 </button>
-                <!-- Add other actions here if needed -->
               </div>
             </td>
           </tr>
@@ -171,7 +177,7 @@
     <ConfirmDialog
       :show="showRemoveConfirmDialog"
       dialogId="student_remove_confirm_modal"
-      title="Remove Student"
+      :title="$t('stu.remove_student')"
       :message="removeConfirmationMessage"
       confirmButtonClass="btn-error"
       @confirm="handleRemoveStudent"
@@ -181,17 +187,16 @@
     <dialog id="change_seat_modal" class="modal" :open="showSeatModal">
       <div class="modal-box">
         <h3 class="font-bold text-lg">
-          Change Seat for {{ studentToEditSeat?.stu_name }}
+          {{ $t("stu.change_seat_for", { name: studentToEditSeat?.stu_name }) }}
         </h3>
         <p class="py-2 text-sm text-base-content text-opacity-80">
-          Student ID: {{ studentToEditSeat?.stu_id }}
+          {{ $t("stu.student_id") }}: {{ studentToEditSeat?.stu_id }}
         </p>
 
         <div class="form-control w-full max-w-xs py-4">
           <label class="label" for="seat_input">
-            <span class="label-text">New Seat Number</span>
+            <span class="label-text">{{ $t("stu.new_seat_number") }}</span>
           </label>
-          <!-- Changed input type to number -->
           <input
             id="seat_input"
             type="number"
@@ -201,16 +206,14 @@
             @keyup.enter="handleSaveSeat"
             ref="seatInputRef"
           />
-          <!-- Display validation errors for seat input -->
           <label class="label" v-if="seatInputError">
             <span class="label-text-alt text-error">{{ seatInputError }}</span>
           </label>
         </div>
 
-        <!-- Saving Seat Error Display (from API) -->
         <div v-if="seatSaveError" class="alert alert-error text-sm p-2 my-2">
           <span
-            >Failed to save seat:
+            >{{ $t("stu.failed_to_save_seat") }}:
             {{ seatSaveError.message || seatSaveError }}</span
           >
         </div>
@@ -222,14 +225,14 @@
             :disabled="isSavingSeat"
             :class="{ loading: isSavingSeat }"
           >
-            Save Seat
+            {{ $t("stu.save_seat") }}
           </button>
           <button
             class="btn btn-ghost"
             @click="closeSeatModal"
             :disabled="isSavingSeat"
           >
-            Cancel
+            {{ $t("button.cancel") }}
           </button>
         </div>
         <button
@@ -255,6 +258,9 @@ import * as dataService from "@/services/dataService";
 import { useAuthStore } from "@/stores/auth";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 // import { useLabroomStore } from '@/stores/labroom';
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 // --- Props, Router, Stores ---
 const props = defineProps({
@@ -290,7 +296,10 @@ const seatInputRef = ref(null); // Ref for the input element
 const isTeacher = computed(() => authStore.isTeacher || authStore.isAdmin);
 const removeConfirmationMessage = computed(() => {
   if (!studentToRemove.value) return "Are you sure?";
-  return `Remove student '${studentToRemove.value.stu_name}' (ID: ${studentToRemove.value.stu_id})?`;
+  return t("stu.remove_confirm", {
+    name: studentToRemove.value.stu_name,
+    id: studentToRemove.value.stu_id,
+  });
 });
 
 // --- Methods ---
