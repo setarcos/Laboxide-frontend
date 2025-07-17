@@ -347,53 +347,27 @@ const fetchAgendas = async (roomId) => {
 // --- CONFLICT CHECKING ---
 const checkForConflicts = (newAgendaData) => {
   const newDate = parseISO(newAgendaData.date);
-  const newStart = parseISO(
-    `${newAgendaData.date}T${newAgendaData.start_time}`,
-  );
+  const newStart = parseISO(`${newAgendaData.date}T${newAgendaData.start_time}`);
   const newEnd = parseISO(`${newAgendaData.date}T${newAgendaData.end_time}`);
+  const newWeekday = getDay(newDate); // 0 = Sunday, same as SQL
 
   for (const existing of agendas.value) {
     if (editingAgenda.value && existing.id === editingAgenda.value.id) {
-      continue; // Skip self when editing
+      continue; // Skip self
     }
 
-    // Handle repeating agendas
-    if (existing.repeat === 1) {
-      const repeatStart = parseISO(existing.date);
-      const existingRepeatDay = getDay(repeatStart);
-      const newAgendaDay = getDay(newDate);
+    const isSameDay = existing.date === newAgendaData.date;
+    const isRepeatingSameWeekday = existing.repeat === 1 && getDay(parseISO(existing.date)) === newWeekday;
 
-      // Skip if weekday doesn't match or new date is before repeat start
-      if (
-        existingRepeatDay !== newAgendaDay ||
-        isBefore(newDate, repeatStart)
-      ) {
-        continue;
-      }
-
-      const existingStart = parseISO(
-        `${newAgendaData.date}T${existing.start_time}`,
-      );
-      const existingEnd = parseISO(
-        `${newAgendaData.date}T${existing.end_time}`,
-      );
-
-      if (newStart < existingEnd && newEnd > existingStart) {
-        return existing;
-      }
+    if (!isSameDay && !isRepeatingSameWeekday) {
+      continue;
     }
-    // Handle one-time agendas
-    else {
-      if (existing.date !== newAgendaData.date) {
-        continue;
-      }
 
-      const existingStart = parseISO(`${existing.date}T${existing.start_time}`);
-      const existingEnd = parseISO(`${existing.date}T${existing.end_time}`);
+    const existingStart = parseISO(`${newAgendaData.date}T${existing.start_time}`);
+    const existingEnd = parseISO(`${newAgendaData.date}T${existing.end_time}`);
 
-      if (newStart < existingEnd && newEnd > existingStart) {
-        return existing;
-      }
+    if (newStart < existingEnd && newEnd > existingStart) {
+      return existing; // Conflict found
     }
   }
 
