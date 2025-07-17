@@ -259,7 +259,10 @@ import {
   isBefore,
   getDay,
 } from "date-fns";
-import { PERMISSION_MEETING_MANAGER } from "@/utils/permissions";
+import {
+  PERMISSION_MEETING_MANAGER,
+  PERMISSION_ADMIN,
+} from "@/utils/permissions";
 
 import WeeklyCalendar from "@/components/WeeklyCalendar.vue";
 import AgendaForm from "@/components/AgendaForm.vue";
@@ -304,7 +307,8 @@ const canEdit = (agenda) => {
   if (!agenda || !authStore.user) return false;
   return (
     (agenda.userid === authStore.user.userId && agenda.confirm === 0) ||
-    authStore.hasPermission(PERMISSION_MEETING_MANAGER)
+    authStore.hasPermission(PERMISSION_MEETING_MANAGER) ||
+    authStore.hasPermission(PERMISSION_ADMIN)
   );
 };
 
@@ -347,7 +351,9 @@ const fetchAgendas = async (roomId) => {
 // --- CONFLICT CHECKING ---
 const checkForConflicts = (newAgendaData) => {
   const newDate = parseISO(newAgendaData.date);
-  const newStart = parseISO(`${newAgendaData.date}T${newAgendaData.start_time}`);
+  const newStart = parseISO(
+    `${newAgendaData.date}T${newAgendaData.start_time}`,
+  );
   const newEnd = parseISO(`${newAgendaData.date}T${newAgendaData.end_time}`);
   const newWeekday = getDay(newDate); // 0 = Sunday, same as SQL
 
@@ -357,13 +363,16 @@ const checkForConflicts = (newAgendaData) => {
     }
 
     const isSameDay = existing.date === newAgendaData.date;
-    const isRepeatingSameWeekday = existing.repeat === 1 && getDay(parseISO(existing.date)) === newWeekday;
+    const isRepeatingSameWeekday =
+      existing.repeat === 1 && getDay(parseISO(existing.date)) === newWeekday;
 
     if (!isSameDay && !isRepeatingSameWeekday) {
       continue;
     }
 
-    const existingStart = parseISO(`${newAgendaData.date}T${existing.start_time}`);
+    const existingStart = parseISO(
+      `${newAgendaData.date}T${existing.start_time}`,
+    );
     const existingEnd = parseISO(`${newAgendaData.date}T${existing.end_time}`);
 
     if (newStart < existingEnd && newEnd > existingStart) {

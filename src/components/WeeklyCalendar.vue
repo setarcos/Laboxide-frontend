@@ -129,10 +129,13 @@
                   />
                 </svg>
               </span>
-              <span v-if="!agenda.confirm" class="badge badge-warning badge-xs">
+              <span
+                v-if="!agenda.confirm"
+                class="badge badge-warning badge-xs py-2"
+              >
                 {{ $t("meeting.pending") }}
               </span>
-              <span v-else class="badge badge-primary badge-xs">
+              <span v-else class="badge badge-success badge-xs py-2">
                 {{ $t("meeting.confirmed") }}
               </span>
             </div>
