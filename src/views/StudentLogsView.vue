@@ -16,22 +16,23 @@
             d="M15 19l-7-7 7-7"
           />
         </svg>
-        Back to Lab Rooms
+        {{ $t("log.back_to_labrooms") }}
       </router-link>
     </div>
 
     <h1 class="text-2xl font-semibold mb-4">
-      Student Logs for {{ fetchedRoomName || `Room ID: ${props.roomId}` }}
+      {{ $t("log.student_logs_for") }}
+      {{ fetchedRoomName || $t("log.room_id_prefix") + props.roomId }}
     </h1>
 
     <!-- Time Range Filter -->
     <div class="card bg-base-100 shadow-xl mb-6">
       <div class="card-body">
-        <h2 class="card-title">Filter by Time Range</h2>
+        <h2 class="card-title">{{ $t("log.filter_by_time_range") }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
           <div>
             <label class="label" for="start_time">
-              <span class="label-text">Start Time</span>
+              <span class="label-text">{{ $t("log.start_time") }}</span>
             </label>
             <input
               type="datetime-local"
@@ -42,7 +43,7 @@
           </div>
           <div>
             <label class="label" for="end_time">
-              <span class="label-text">End Time</span>
+              <span class="label-text">{{ $t("log.end_time") }}</span>
             </label>
             <input
               type="datetime-local"
@@ -60,11 +61,11 @@
               v-if="isLoading"
               class="loading loading-spinner loading-xs"
             ></span>
-            Fetch Logs
+            {{ $t("log.fetch_logs") }}
           </button>
         </div>
         <p v-if="filterError" class="text-error text-sm mt-2">
-          {{ filterError }}
+          {{ $t(filterError) }}
         </p>
       </div>
     </div>
@@ -72,7 +73,7 @@
     <!-- Loading and Error States -->
     <div v-if="isLoadingInitial" class="text-center py-10">
       <span class="loading loading-lg loading-spinner text-primary"></span>
-      <p>Loading logs...</p>
+      <p>{{ $t("log.loading_logs") }}</p>
     </div>
     <div v-else-if="fetchError" class="alert alert-error shadow-lg">
       <div>
@@ -90,7 +91,7 @@
           />
         </svg>
         <span
-          >Error loading student logs:
+          >{{ $t("log.error_loading_logs") }}
           {{ fetchError.message || fetchError }}</span
         >
       </div>
@@ -104,15 +105,15 @@
       <table class="table table-zebra w-full">
         <thead>
           <tr>
-            <th>Student ID</th>
-            <th>Student Name</th>
-            <th>Seat</th>
-            <th>Lab Name</th>
-            <th>Finish Time</th>
-            <th>Confirmed</th>
-            <th>Student Note</th>
-            <th>Teacher</th>
-            <th>Teacher Note</th>
+            <th>{{ $t("log.student_id") }}</th>
+            <th>{{ $t("log.student_name") }}</th>
+            <th>{{ $t("log.seat") }}</th>
+            <th>{{ $t("log.lab_name") }}</th>
+            <th>{{ $t("log.finish_time") }}</th>
+            <th>{{ $t("log.confirmed") }}</th>
+            <th>{{ $t("log.student_note") }}</th>
+            <th>{{ $t("log.teacher") }}</th>
+            <th>{{ $t("log.teacher_note") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -128,7 +129,7 @@
                   log.confirm ? 'badge badge-success' : 'badge badge-ghost'
                 "
               >
-                {{ log.confirm ? "Yes" : "No" }}
+                {{ log.confirm ? $t("log.yes") : $t("log.no") }}
               </span>
             </td>
             <td class="whitespace-pre-wrap max-w-xs truncate" :title="log.note">
@@ -149,10 +150,10 @@
       v-else-if="searchedOnce && logs.length === 0"
       class="text-center italic py-10"
     >
-      No student logs found for the selected criteria.
+      {{ $t("log.no_logs_found") }}
     </div>
     <div v-else class="text-center italic py-10">
-      Please select a start and end time to fetch logs.
+      {{ $t("log.select_time_prompt") }}
     </div>
   </div>
 </template>
@@ -213,13 +214,13 @@ const fetchRoomDetails = async () => {
 
 const fetchLogs = async () => {
   if (!startTime.value || !endTime.value) {
-    filterError.value = "Please select both start and end times.";
+    filterError.value = "log.select_both_times";
     return;
   }
   const start = new Date(startTime.value);
   const end = new Date(endTime.value);
   if (start >= end) {
-    filterError.value = "Start time must be before end time.";
+    filterError.value = "log.start_before_end";
     return;
   }
   filterError.value = "";
