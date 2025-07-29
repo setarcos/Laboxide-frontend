@@ -156,3 +156,6 @@ export const updateAgenda = (id, data) =>
 export const deleteAgenda = (id) => api.delete(`/teacher/meeting_agenda/${id}`);
 export const confirmAgenda = (id) =>
   api.put(`/teacher/meeting_agenda/${id}/confirm`);
+
+// --- Linux Page ---
+export const addLinuxUser = (data) => api.post("/stu/adduser", data);

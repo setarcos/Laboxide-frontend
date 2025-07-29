@@ -119,7 +119,7 @@
                 <td>{{ course.room_name }}</td>
                 <td>
                   <button
-                    v-if="authStore.isStudent"
+                    v-if="authStore.isStudent && !isLinuxCourse(course)"
                     class="btn btn-xs btn-outline btn-primary"
                     @click="handleLogButtonClick(course)"
                     :disabled="!currentWeekNumber || hasConfirmedLog(course.id)"
@@ -156,6 +156,10 @@
       </div>
     </div>
 
+    <div class="divider" v-if="linuxCourse"></div>
+    <div class="mt-6 p-4 bg-base-200 rounded-box" v-if="linuxCourse">
+      <LinuxPage />
+    </div>
     <div class="divider" v-if="isSuper"></div>
     <div class="mt-6 p-4 bg-base-200 rounded-box" v-if="isSuper">
       <h3 class="text-lg font-semibold mb-2">
@@ -276,6 +280,7 @@ import { getWeekdayName, calculateCurrentWeek } from "@/utils/weekday";
 import { useI18n } from "vue-i18n";
 import StudentLogForm from "@/components/StudentLogForm.vue";
 import TimelineLogModal from "@/components/TimelineLogModal.vue";
+import LinuxPage from "@/components/LinuxPage.vue";
 
 const { t } = useI18n();
 const authStore = useAuthStore();
@@ -289,6 +294,9 @@ const isSuper = computed(
   () => authStore.isTeacher | authStore.isAdmin | authStore.isLabManager,
 );
 
+const linuxCourse = computed(() => {
+  return myCourses.value.find((s) => s.course_name.startsWith("Linux")) || null;
+});
 // --- State for Student Final Log Statuses ---
 // Store the single log object for the current student, keyed by subcourse_id
 const studentFinalLogBySubcourse = ref({}); // { [subcourseId]: StudentLog | null }
@@ -308,6 +316,10 @@ const finishLogDefaultData = ref(null); // This will hold the single StudentLog 
 const finishLogDefaultError = ref(null);
 const isSavingFinishLog = ref(false);
 const finishLogFormKey = ref(0);
+
+const isLinuxCourse = (course) => {
+  return course.course_name.startsWith("Linux");
+};
 
 // --- Current Week Calculation ---
 const currentWeekNumber = computed(() => {

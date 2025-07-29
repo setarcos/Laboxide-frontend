@@ -601,6 +601,13 @@
     "select_both_times": "请同时选择开始和结束时间。",
     "start_before_end": "开始时间必须早于结束时间。"
   },
+  "linux": {
+    "linuxTitle": "Linux 课程工具箱",
+    "enterSSHKey": "请把你的 SSH 公钥粘贴到这里...",
+    "submitSSHKey": "创建 Linux 用户",
+    "sshError": "创建用户失败",
+    "sshSuccess": "创建用户成功"
+  },
   "navbar": {
     "dashboard": "个人中心",
     "course": "全部课程",

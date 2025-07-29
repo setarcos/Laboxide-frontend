@@ -601,6 +601,13 @@
     "select_both_times": "Please select both start and end times.",
     "start_before_end": "Start time must be before end time."
   },
+  "linux": {
+    "linuxTitle": "Linux Course Toolbox",
+    "enterSSHKey": "Paste your public SSH key here...",
+    "submitSSHKey": "Submit SSH Key",
+    "sshError": "Failed to create Linux user",
+    "sshSuccess": "User creation successful"
+  },
   "navbar": {
     "dashboard": "Dashboard",
     "course": "Courses",
