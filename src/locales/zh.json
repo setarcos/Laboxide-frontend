@@ -603,10 +603,17 @@
   },
   "linux": {
     "linuxTitle": "Linux 课程工具箱",
-    "enterSSHKey": "请把你的 SSH 公钥粘贴到这里...",
-    "submitSSHKey": "创建 Linux 用户",
-    "sshError": "创建用户失败",
-    "sshSuccess": "创建用户成功"
+    "enterSSHKey": "输入您的公共 SSH 密钥（例如：ssh-ed25519 AAA...）",
+    "sshError": "创建 Linux 用户失败",
+    "linuxSubtitle": "添加您的公共 SSH 密钥以获取远程服务器访问权限",
+    "submitSSHKey": "提交 SSH 密钥",
+    "gitTitle": "Git 账户管理",
+    "gitSubtitle": "为 Forgejo Git 服务创建或重置密码",
+    "createGitUser": "创建 Git 用户",
+    "resetGitPassword": "重置 Git 密码",
+    "yourNewPassword": "您的新密码是",
+    "savePasswordWarning": "请安全保存此密码，登录时需要用到",
+    "sshSuccess": "用户创建成功"
   },
   "navbar": {
     "dashboard": "个人中心",

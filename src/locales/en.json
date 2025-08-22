@@ -603,9 +603,16 @@
   },
   "linux": {
     "linuxTitle": "Linux Course Toolbox",
-    "enterSSHKey": "Paste your public SSH key here...",
-    "submitSSHKey": "Submit SSH Key",
+    "enterSSHKey": "Enter your public SSH key (e.g., ssh-ed25519 AAA...)",
     "sshError": "Failed to create Linux user",
+    "linuxSubtitle": "Add your public SSH key to get access to the remote server.",
+    "submitSSHKey": "Submit SSH Key",
+    "gitTitle": "Git Account Management",
+    "gitSubtitle": "Create or reset your password for the Forgejo Git service.",
+    "createGitUser": "Create Git User",
+    "resetGitPassword": "Reset Git Password",
+    "yourNewPassword": "Your new password is",
+    "savePasswordWarning": "Please save this password securely. You will need it to log in.",
     "sshSuccess": "User creation successful"
   },
   "navbar": {
