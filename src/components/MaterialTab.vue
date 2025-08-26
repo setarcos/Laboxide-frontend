@@ -77,7 +77,7 @@
             <th>{{ $t("course.filename") }}</th>
             <th>{{ $t("course.filedesc") }}</th>
             <!-- Add other relevant headers if backend provides (e.g., upload date) -->
-            <th>{{ $t("course.op") }}</th>
+            <th v-if="isTeacher">{{ $t("course.op") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -90,6 +90,7 @@
             <td>
               <!-- Direct download link -->
               <a
+                v-if="authStore.isAuthenticated"
                 :href="getDownloadUrl(file.id)"
                 :download="file.fname"
                 class="link link-hover link-primary"
@@ -99,9 +100,27 @@
               >
                 {{ file.fname }}
               </a>
+              <span v-else>
+                {{ file.fname }}
+              </span>
             </td>
-            <td>{{ file.finfo || "-" }}</td>
             <td>
+              <a
+                v-if="authStore.isAuthenticated"
+                :href="getDownloadUrl(file.id)"
+                :download="file.fname"
+                class="link link-hover link-primary"
+                target="_blank"
+                rel="noopener noreferrer"
+                :title="`Download ${file.fname}`"
+              >
+                {{ file.finfo || "-" }}
+              </a>
+              <span v-else>
+                {{ file.finfo }}
+              </span>
+            </td>
+            <td v-if="isTeacher">
               <div class="flex gap-1">
                 <!-- Download Button (Alternative) -->
                 <a
