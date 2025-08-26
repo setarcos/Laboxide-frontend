@@ -136,6 +136,8 @@
     "error_loading": "课程详情加载失败",
     "not_found": "未找到课程",
     "not_found_desc": "您查找的课程不存在或无法加载",
+    "delete_modal_title": "删除资料",
+    "delete_modal_message": "确定要删除'{title}'吗？此操作无法撤销。",
     "add": "新建课程"
   },
   "route": {

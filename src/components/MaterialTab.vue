@@ -160,8 +160,10 @@
     <ConfirmDialog
       :show="showDeleteModal"
       dialogId="coursefile_delete_confirm_modal"
-      title="Delete Material"
-      :message="`Are you sure you want to delete the file '${fileToDelete?.fname}'? This cannot be undone.`"
+      :title="$t('course.delete_modal_title')"
+      :message="
+        $t('course.delete_modal_message', { title: fileToDelete?.fname })
+      "
       @confirm="handleDeleteConfirm"
       @close="closeDeleteModal"
     />
