@@ -103,6 +103,12 @@
               <span v-else>
                 {{ file.fname }}
               </span>
+              <span
+                v-if="file.modified_time"
+                class="text-xs text-gray-500 ml-2 font-normal"
+              >
+                ({{ formatTimestamp(file.modified_time) }})
+              </span>
             </td>
             <td>
               <a
@@ -194,6 +200,7 @@ import { ref, computed, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import * as dataService from "@/services/dataService";
 import ConfirmDialog from "@/components/ConfirmDialog.vue"; // Use your existing dialog
+import { formatTimestamp } from "@/utils/weekday";
 
 const props = defineProps({
   courseId: {
