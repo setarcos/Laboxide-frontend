@@ -37,7 +37,7 @@
     <!-- Loading Subcourses State -->
     <div v-if="isLoading" class="text-center py-10">
       <span class="loading loading-lg loading-spinner text-primary"></span>
-      <p class="mt-2">Loading student groups...</p>
+      <p class="mt-2">{{ $t("course.loadingGroups") }}</p>
     </div>
 
     <!-- Error Fetching Subcourses State -->
@@ -56,7 +56,9 @@
             d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span>Error loading groups: {{ error.message || error }}</span>
+        <span>{{
+          $t("course.errorLoadingGroups", { msg: error.message || error })
+        }}</span>
       </div>
     </div>
 
@@ -67,14 +69,14 @@
         v-if="isStudent && !isLoadingMyEnrollment && myEnrollmentError"
         class="alert alert-warning text-xs p-2 m-2"
       >
-        Could not check your current enrollment status: {{ myEnrollmentError }}
+        {{ $t("course.enrollmentStatusError", { msg: myEnrollmentError }) }}
       </div>
       <div
         v-if="isStudent && isLoadingMyEnrollment"
         class="text-center text-xs p-2 text-info"
       >
-        <span class="loading loading-spinner loading-xs"></span> Checking your
-        enrollment...
+        <span class="loading loading-spinner loading-xs"></span>
+        {{ $t("course.checkingEnrollment") }}
       </div>
 
       <table class="table table-zebra w-full">
@@ -94,12 +96,11 @@
           <!-- No groups message -->
           <tr v-if="subcourses.length === 0">
             <td :colspan="tableColumnCount" class="text-center italic py-4">
-              <!-- Adjusted no groups message -->
-              No groups found for
+              {{ $t("course.noGroupsFoundFor") }}
               {{
                 showAllSemesters && (isTeacher || authStore.isAdmin)
-                  ? "any selected semester"
-                  : "the current semester"
+                  ? $t("course.anySelectedSemester")
+                  : $t("course.theCurrentSemester")
               }}.
             </td>
           </tr>
@@ -107,14 +108,14 @@
           <tr v-for="subcourse in subcourses" :key="subcourse.id">
             <td>{{ getWeekdayName(subcourse.weekday) }}</td>
             <td>
-              <span v-if="isLoadingLabrooms" class="text-xs italic"
-                >Loading room...</span
-              >
+              <span v-if="isLoadingLabrooms" class="text-xs italic">{{
+                $t("course.loadingRoom")
+              }}</span>
               <span
                 v-else-if="labroomError"
                 class="text-xs text-error"
                 :title="labroomError"
-                >Room Error</span
+                >{{ $t("course.roomError") }}</span
               >
               <span v-else>{{ getRoomName(subcourse.room_id) }}</span>
             </td>
@@ -123,14 +124,14 @@
 
             <!-- Teacher/Admin Column: Semester ID (if showing all) -->
             <td v-if="showAllSemesters && (isTeacher || authStore.isAdmin)">
-              <span v-if="isLoadingSemesters" class="text-xs italic"
-                >Loading Semesters...</span
-              >
+              <span v-if="isLoadingSemesters" class="text-xs italic">{{
+                $t("course.loadingSemesters")
+              }}</span>
               <span
                 v-else-if="semesterError"
                 class="text-xs text-error"
                 :title="semesterError"
-                >Semesters Error</span
+                >{{ $t("course.semestersError") }}</span
               >
               <span v-else>{{ getSemesterName(subcourse.year_id) }}</span>
             </td>
@@ -145,7 +146,7 @@
                     params: { id: subcourse.id },
                   }"
                   class="btn btn-xs btn-ghost btn-circle"
-                  title="View Students"
+                  :title="$t('course.viewStudents')"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -172,7 +173,7 @@
                 <template v-if="isTeacher || authStore.isAdmin">
                   <button
                     class="btn btn-xs btn-ghost btn-circle"
-                    title="Edit"
+                    :title="$t('common.edit')"
                     @click="openEditModal(subcourse)"
                   >
                     <svg
@@ -192,7 +193,7 @@
                   </button>
                   <button
                     class="btn btn-xs btn-ghost btn-circle text-error"
-                    title="Delete"
+                    :title="$t('common.delete')"
                     @click="openDeleteModal(subcourse)"
                   >
                     <svg
@@ -218,7 +219,7 @@
                   <button
                     v-if="myEnrolledSubcourseId === subcourse.id"
                     class="btn btn-xs btn-warning btn-circle"
-                    title="Leave Group"
+                    :title="$t('course.leaveGroup')"
                     @click="handleLeaveGroup(subcourse.id)"
                     :disabled="isProcessingAction"
                     :class="{
@@ -255,7 +256,7 @@
                   <button
                     v-else-if="myEnrolledSubcourseId === null"
                     class="btn btn-xs btn-success btn-circle"
-                    title="Join Group"
+                    :title="$t('course.joinGroup')"
                     @click="handleJoinGroup(subcourse.id)"
                     :disabled="isProcessingAction || isLoadingMyEnrollment"
                     :class="{
@@ -323,7 +324,7 @@
           class="py-4"
         />
         <p v-else class="text-error py-4">
-          Cannot determine semester ID for the form.
+          {{ $t("course.noSemesterIdForForm") }}
         </p>
         <button
           class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -333,7 +334,7 @@
         </button>
       </div>
       <form method="dialog" class="modal-backdrop">
-        <button @click="closeModal">close</button>
+        <button @click="closeModal">{{ $t("common.close") }}</button>
       </form>
     </dialog>
 
@@ -341,8 +342,12 @@
     <ConfirmDialog
       :show="showDeleteModal"
       dialogId="subcourse_delete_confirm_modal"
-      title="Delete Group"
-      :message="`Are you sure you want to delete the group for '${currentItem?.tea_name}'? This cannot be undone.`"
+      :title="$t('course.deleteGroupTitle')"
+      :message="
+        $t('course.deleteGroupConfirm', {
+          name: currentItem?.tea_name || '',
+        })
+      "
       @confirm="handleDelete"
       @close="closeModal"
     />
@@ -351,6 +356,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import { useAuthStore } from "@/stores/auth";
 import { useSemesterStore } from "@/stores/semester";
 import { getWeekdayName } from "@/utils/weekday";
@@ -367,6 +373,7 @@ const props = defineProps({
   },
 });
 
+const { t } = useI18n();
 const authStore = useAuthStore();
 const semesterStore = useSemesterStore();
 // const toast = useToast(); // If using vue-toastification
@@ -426,16 +433,20 @@ const fetchLabrooms = async () => {
     labrooms.value = response.data;
   } catch (err) {
     console.error("Failed to fetch lab rooms in Tab:", err);
-    labroomError.value = `Error loading rooms: ${err.response?.data?.error || err.message}`;
+    labroomError.value = t("course.errorLoadingRoomsGeneric", {
+      msg: err.response?.data?.error || err.message,
+    });
   } finally {
     isLoadingLabrooms.value = false;
   }
 };
 
 const getRoomName = (roomId) => {
-  if (!roomId || labrooms.value.length === 0) return "N/A";
+  if (!roomId || labrooms.value.length === 0) return t("common.notAvailable");
   const room = labrooms.value.find((r) => r.id === roomId);
-  return room ? `${room.name} (${room.room})` : `Unknown Room (ID: ${roomId})`;
+  return room
+    ? `${room.name} (${room.room})`
+    : t("course.unknownRoom", { id: roomId });
 };
 
 const fetchSemesters = async () => {
@@ -454,9 +465,9 @@ const fetchSemesters = async () => {
 };
 
 const getSemesterName = (semId) => {
-  if (!semId || semesters.value.length === 0) return "N/A";
+  if (!semId || semesters.value.length === 0) return t("common.notAvailable");
   const sem = semesters.value.find((r) => r.id === semId);
-  return sem ? sem.name : `Unknown Semester(ID: ${semId})`;
+  return sem ? sem.name : t("course.unknownSemester", { id: semId });
 };
 
 // Fetch subcourses logic (Slightly adjusted for clarity)
@@ -540,7 +551,7 @@ const fetchMyEnrollmentStatus = async () => {
     myEnrollmentError.value =
       err.response?.data?.error ||
       err.message ||
-      "Could not load enrollment status.";
+      t("course.couldNotLoadEnrollment");
     myEnrolledSubcourseId.value = null; // Ensure null on error
   } finally {
     isLoadingMyEnrollment.value = false;
@@ -551,8 +562,8 @@ const fetchMyEnrollmentStatus = async () => {
 const openAddModal = () => {
   // Allow add only if semester known (or admin/teacher override?) - Sticking to current semester for now
   if (!semesterStore.getCurrentSemesterId) {
-    alert("Current semester information is not available. Cannot add a group.");
-    // toast.warning("Current semester information is not available. Cannot add a group.");
+    alert(t("course.alertNoCurrentSemester"));
+    // toast.warning(t("course.alertNoCurrentSemester"));
     return;
   }
   currentItem.value = null;
@@ -589,8 +600,8 @@ const handleSave = async (formData) => {
   // Ensure essential IDs are present
   if (!formData.course_id || !formData.year_id) {
     console.error("Missing course_id or year_id in form data", formData);
-    alert("Internal error: Missing required information to save.");
-    // toast.error("Internal error: Missing required information to save.");
+    alert(t("common.alertInternalErrorSave"));
+    // toast.error(t("common.alertInternalErrorSave"));
     isSaving.value = false;
     return;
   }
@@ -605,7 +616,9 @@ const handleSave = async (formData) => {
     await fetchSubcourses(); // Refresh list
   } catch (err) {
     console.error("Failed to save subcourse:", err);
-    const errorMsg = `Failed to save: ${err.response?.data?.error || err.message}`;
+    const errorMsg = t("common.alertSaveFailed", {
+      msg: err.response?.data?.error || err.message,
+    });
     alert(errorMsg);
     error.value = errorMsg; // Can display this elsewhere if needed
   } finally {
@@ -622,7 +635,9 @@ const handleDelete = async () => {
     await fetchSubcourses(); // Refresh list
   } catch (err) {
     console.error("Failed to delete subcourse:", err);
-    const errorMsg = `Failed to delete: ${err.response?.data?.error || err.message}`;
+    const errorMsg = t("common.alertDeleteFailed", {
+      msg: err.response?.data?.error || err.message,
+    });
     alert(errorMsg);
     closeModal();
   }
@@ -644,7 +659,9 @@ const handleJoinGroup = async (subcourseId) => {
     // toast.success("Successfully joined the group!");
   } catch (err) {
     console.error("Failed to join group:", err);
-    const errorMsg = `Failed to join: ${err.response?.data?.error || err.message}`;
+    const errorMsg = t("course.alertJoinFailed", {
+      msg: err.response?.data?.error || err.message,
+    });
     // toast.error(errorMsg);
     alert(errorMsg);
     myEnrollmentError.value = errorMsg; // Show error near table potentially
@@ -669,7 +686,9 @@ const handleLeaveGroup = async (subcourseId) => {
     // toast.success("Successfully left the group.");
   } catch (err) {
     console.error("Failed to leave group:", err);
-    const errorMsg = `Failed to leave: ${err.response?.data?.error || err.message}`;
+    const errorMsg = t("course.alertLeaveFailed", {
+      msg: err.response?.data?.error || err.message,
+    });
     // toast.error(errorMsg);
     alert(errorMsg);
     myEnrollmentError.value = errorMsg;
