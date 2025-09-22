@@ -174,7 +174,7 @@
                   >
                     <!-- Progress bar - color is dynamic -->
                     <progress
-                      class="progress w-full"
+                      class="progress w-full min-w-[100px]"
                       :class="{
                         'progress-success': studentData.hasConfirmedFinalLog,
                         'progress-primary': !studentData.hasConfirmedFinalLog,
@@ -1179,7 +1179,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Add specific styles if needed */
 .tooltip:before {
   white-space: pre-wrap; /* Allow tooltip text to wrap */
 }
