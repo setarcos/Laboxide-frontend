@@ -163,7 +163,25 @@
             >
               <tr class="hover">
                 <td>{{ studentData.student.stu_id }}</td>
-                <td>{{ studentData.student.stu_name }}</td>
+                <td>
+                  <router-link
+                    :to="{
+                      name: 'StudentTimeline',
+                      params: {
+                        subcourseId: props.id,
+                        studentId: studentData.student.stu_id,
+                      }, // Pass IDs in params
+                      state: {
+                        studentName: studentData.student.stu_name,
+                        subcourseName: subcourseDetails?.course_name,
+                      }, // Pass extra info via state
+                    }"
+                    class="link link-hover link-primary"
+                    :title="$t('stu.view_student_timeline')"
+                  >
+                    {{ studentData.student.stu_name }}
+                  </router-link>
+                </td>
                 <td>{{ studentData.student.seat || "-" }}</td>
                 <td>
                   <!-- Tooltip shows progress count -->
