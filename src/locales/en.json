@@ -642,7 +642,6 @@
     "sshError": "Failed to create Linux user",
     "linuxSubtitle": "Add your public SSH key to get access to the remote server.",
     "submitSSHKey": "Submit SSH Key",
-    "gitTitle": "Git Account Management",
     "gitSubtitle": "Create or reset your password for the Forgejo Git service.",
     "createGitUser": "Create Git User",
     "resetGitPassword": "Reset Git Password",

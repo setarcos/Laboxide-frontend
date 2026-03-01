@@ -2,8 +2,8 @@
   <div class="space-y-6">
     <!-- Section for Linux User / SSH Key -->
     <div>
-      <h2 class="text-xl font-semibold mb-2">{{ $t("linux.linuxTitle") }}</h2>
-      <p class="text-sm text-gray-500 mb-4">{{ $t("linux.linuxSubtitle") }}</p>
+      <h2 class="card-title mb-6">{{ $t("linux.linuxTitle") }}</h2>
+      <p class="text-sm font-semibold mb-4">{{ $t("linux.linuxSubtitle") }}</p>
       <textarea
         v-model="sshKey"
         class="textarea textarea-bordered w-full"
@@ -28,8 +28,7 @@
 
     <!-- Section for Git (Forgejo) User -->
     <div>
-      <h2 class="text-xl font-semibold mb-2">{{ $t("linux.gitTitle") }}</h2>
-      <p class="text-sm text-gray-500 mb-4">{{ $t("linux.gitSubtitle") }}</p>
+      <p class="text-sm font-semibold mb-4">{{ $t("linux.gitSubtitle") }}</p>
       <div class="flex gap-4">
         <!-- Create Git User Button -->
         <button

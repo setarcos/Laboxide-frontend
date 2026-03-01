@@ -642,7 +642,6 @@
     "sshError": "创建 Linux 用户失败",
     "linuxSubtitle": "添加您的公共 SSH 密钥以获取远程服务器访问权限",
     "submitSSHKey": "提交 SSH 密钥",
-    "gitTitle": "Git 账户管理",
     "gitSubtitle": "为 Forgejo Git 服务创建或重置密码",
     "createGitUser": "创建 Git 用户",
     "resetGitPassword": "重置 Git 密码",
