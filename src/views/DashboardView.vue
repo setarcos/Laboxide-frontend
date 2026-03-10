@@ -295,6 +295,7 @@ const isSuper = computed(
 );
 
 const linuxCourse = computed(() => {
+  if (!authStore.isStudent) return null;
   return myCourses.value.find((s) => s.course_name.startsWith("Linux")) || null;
 });
 // --- State for Student Final Log Statuses ---
