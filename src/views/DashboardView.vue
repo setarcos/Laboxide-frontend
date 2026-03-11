@@ -119,7 +119,7 @@
                 <td>{{ course.room_name }}</td>
                 <td>
                   <button
-                    v-if="authStore.isStudent && !isLinuxCourse(course)"
+                    v-if="authStore.isStudent"
                     class="btn btn-xs btn-outline btn-primary"
                     @click="handleLogButtonClick(course)"
                     :disabled="!currentWeekNumber || hasConfirmedLog(course.id)"
