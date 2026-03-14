@@ -161,3 +161,5 @@ export const confirmAgenda = (id) =>
 export const addLinuxUser = (data) => api.post("/stu/adduser", data);
 export const addForgejoUser = () => api.post("/stu/gituser");
 export const resetForgejoPassword = () => api.patch("/stu/resetgituser");
+export const showDiff = () => api.get("/stu/showdiff");
+export const copyViHW = () => api.post("/stu/copyvihw");

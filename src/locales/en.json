@@ -647,7 +647,10 @@
     "resetGitPassword": "Reset Git Password",
     "yourNewPassword": "Your new password is",
     "savePasswordWarning": "Please save this password securely. You will need it to log in.",
-    "sshSuccess": "User creation successful"
+    "sshSuccess": "User creation successful",
+    "homeworkTitle": "VIM Homework Management",
+    "copyHomework": "Copy Homework",
+    "showDiff": "Show Diff"
   },
   "navbar": {
     "dashboard": "Dashboard",

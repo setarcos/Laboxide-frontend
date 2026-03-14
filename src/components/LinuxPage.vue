@@ -26,6 +26,40 @@
     <!-- Divider -->
     <div class="divider"></div>
 
+    <!-- Section for Homework Actions -->
+    <div>
+      <p class="text-sm font-semibold mb-4">{{ $t("linux.homeworkTitle") }}</p>
+      <div class="flex gap-4 mb-4">
+        <button
+          class="btn btn-primary"
+          @click="handleCopyViHW"
+          :disabled="isCopyLoading"
+        >
+          <span v-if="isCopyLoading" class="loading loading-spinner loading-sm"></span>
+          <span v-else>{{ $t("linux.copyHomework", "Copy Homework") }}</span>
+        </button>
+
+        <button
+          class="btn btn-secondary"
+          @click="handleShowDiff"
+          :disabled="isDiffLoading"
+        >
+          <span v-if="isDiffLoading" class="loading loading-spinner loading-sm"></span>
+          <span v-else>{{ $t("linux.showDiff", "Show Diff") }}</span>
+        </button>
+      </div>
+
+      <!-- Diff Output -->
+      <div v-if="diffOutput" class="mt-4 p-4 bg-gray-900 text-gray-100 rounded-lg overflow-x-auto font-mono text-sm">
+        <div v-for="(line, index) in diffLines" :key="index" :class="getLineClass(line)">
+          {{ line }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider"></div>
+
     <!-- Section for Git (Forgejo) User -->
     <div>
       <p class="text-sm font-semibold mb-4">{{ $t("linux.gitSubtitle") }}</p>
@@ -100,6 +134,11 @@ const isSshLoading = ref(false);
 const isGitCreateLoading = ref(false);
 const isGitResetLoading = ref(false);
 
+// State for Homework actions
+const isCopyLoading = ref(false);
+const isDiffLoading = ref(false);
+const diffOutput = ref("");
+
 // Unified notification state
 const notification = ref({
   type: null, // 'success' or 'error'
@@ -107,12 +146,66 @@ const notification = ref({
   password: null,
 });
 
+// Computed for diff lines
+import { computed } from "vue";
+const diffLines = computed(() => diffOutput.value.split("\n"));
+
+const getLineClass = (line) => {
+  if (line.startsWith("+")) return "text-green-400";
+  if (line.startsWith("-")) return "text-red-400";
+  if (line.startsWith("@")) return "text-blue-400";
+  return "text-gray-300";
+};
+
 // Clear notification helper
 const clearNotification = () => {
   notification.value = { type: null, message: null, password: null };
+  diffOutput.value = "";
 };
 
 // --- METHODS ---
+
+const handleCopyViHW = async () => {
+  isCopyLoading.value = true;
+  clearNotification();
+  try {
+    const response = await dataService.copyViHW();
+    notification.value = {
+      type: "success",
+      message: response.data.message || "Homework copied successfully!",
+    };
+  } catch (err) {
+    notification.value = {
+      type: "error",
+      message: err.response?.data?.error || err.message || "Failed to copy homework.",
+    };
+  } finally {
+    isCopyLoading.value = false;
+  }
+};
+
+const handleShowDiff = async () => {
+  isDiffLoading.value = true;
+  clearNotification();
+  try {
+    const response = await dataService.showDiff();
+    if (response.data.status === "success") {
+      notification.value = {
+        type: "success",
+        message: response.data.message,
+      };
+    } else if (response.data.status === "diff") {
+      diffOutput.value = response.data.output;
+    }
+  } catch (err) {
+    notification.value = {
+      type: "error",
+      message: err.response?.data?.error || err.message || "Failed to fetch diff.",
+    };
+  } finally {
+    isDiffLoading.value = false;
+  }
+};
 
 const submitSSHKey = async () => {
   isSshLoading.value = true;

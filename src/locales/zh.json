@@ -647,7 +647,10 @@
     "resetGitPassword": "重置 Git 密码",
     "yourNewPassword": "您的新密码是",
     "savePasswordWarning": "请安全保存此密码，登录时需要用到",
-    "sshSuccess": "用户创建成功"
+    "sshSuccess": "用户创建成功",
+    "homeworkTitle": "VIM 作业管理",
+    "copyHomework": "下发作业",
+    "showDiff": "查看差异"
   },
   "navbar": {
     "dashboard": "个人中心",
