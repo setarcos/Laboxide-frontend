@@ -112,6 +112,7 @@
 
       <!-- Mandatory Confirmation Checkboxes -->
       <div class="divider text-xs">{{ $t("stulog.post") }}</div>
+
       <div class="space-y-2 mt-2">
         <div class="form-control">
           <label
@@ -146,6 +147,50 @@
           </label>
         </div>
       </div>
+
+      <!-- Picture Upload -->
+      <div class="form-control mt-4">
+        <button
+          type="button"
+          class="btn btn-outline btn-info w-full gap-2"
+          @click="triggerFileInput"
+          :disabled="isUploading"
+        >
+          <span v-if="isUploading" class="loading loading-spinner"></span>
+          <svg
+            v-else
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+          {{ $t("stulog.picture") }}
+        </button>
+        <input
+          type="file"
+          ref="fileInputRef"
+          class="hidden"
+          accept="image/*"
+          @change="handleFileChange"
+        />
+        <p v-if="uploadStatus" class="mt-2 text-xs" :class="uploadStatusClass">
+          {{ uploadStatus }}
+        </p>
+      </div>
       <!-- End Confirmation Checkboxes -->
     </div>
 
@@ -176,6 +221,9 @@
 import { ref, watch, computed, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import * as dataService from "@/services/dataService"; // Assuming getLabrooms is in dataService
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps({
   initialData: {
@@ -194,6 +242,88 @@ const authStore = useAuthStore();
 // --- State for Checkboxes ---
 const isTableCleaned = ref(false);
 const isEquipmentOff = ref(false);
+
+// --- State for Picture Upload ---
+const fileInputRef = ref(null);
+const isUploading = ref(false);
+const hasUploadedPicture = ref(false);
+const uploadStatus = ref("");
+const uploadStatusClass = ref("");
+
+const triggerFileInput = () => {
+  fileInputRef.value?.click();
+};
+
+const handleFileChange = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Basic validation (similar to TimelineLogModal)
+  if (!file.type.startsWith("image/")) {
+    uploadStatus.value = t("tlform.error_file_type");
+    uploadStatusClass.value = "text-error";
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    uploadStatus.value = t("tlform.error_file_size");
+    uploadStatusClass.value = "text-error";
+    return;
+  }
+
+  isUploading.value = true;
+  uploadStatus.value = "";
+  try {
+    const studentId = authStore.user?.userId || "";
+    const subcourseId =
+      props.initialData?.subcourse_id || props.initialData?.cid || 0;
+    const scheduleId =
+      props.initialData?.schedule_id || props.initialData?.id || 0;
+
+    // Check for existing 'CleanedTable' entry and delete it
+    try {
+      const timelineResponse = await dataService.listTimelinesByStudent(
+        subcourseId,
+        studentId,
+      );
+      const existingEntries = timelineResponse.data || [];
+      const entryToDelete = existingEntries.find(
+        (entry) =>
+          entry.subschedule === "CleanedTable" &&
+          entry.schedule_id === scheduleId,
+      );
+
+      if (entryToDelete) {
+        await dataService.deleteTimeline(entryToDelete.id);
+      }
+    } catch (err) {
+      console.warn("Failed to check or delete existing timeline entry:", err);
+    }
+
+    const formDataUpload = new FormData();
+    formDataUpload.append("stu_id", studentId);
+    formDataUpload.append("tea_id", "-");
+    formDataUpload.append("schedule_id", scheduleId);
+    formDataUpload.append("subschedule", "CleanedTable");
+    formDataUpload.append("subcourse_id", subcourseId);
+    formDataUpload.append("notetype", 1);
+    formDataUpload.append("file", file, file.name);
+
+    await dataService.createTimeline(formDataUpload);
+
+    hasUploadedPicture.value = true;
+    isTableCleaned.value = true;
+    isEquipmentOff.value = true;
+    uploadStatus.value = t("stulog.uploadSuccess");
+    uploadStatusClass.value = "text-success";
+  } catch (err) {
+    console.error("Failed to upload picture:", err);
+    uploadStatus.value = t("stulog.uploadError");
+    uploadStatusClass.value = "text-error";
+  } finally {
+    isUploading.value = false;
+    if (fileInputRef.value) fileInputRef.value.value = "";
+  }
+};
 
 // --- State for Lab Rooms ---
 const labRooms = ref([]);
@@ -298,7 +428,8 @@ const isSubmitDisabled = computed(() => {
     !formData.value.note ||
     formData.value.note.trim() === "" ||
     !isTableCleaned.value ||
-    !isEquipmentOff.value
+    !isEquipmentOff.value ||
+    !hasUploadedPicture.value
   );
 });
 

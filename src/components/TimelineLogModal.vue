@@ -661,7 +661,7 @@ watch(selectedStepValue, (newValue) => {
       "for schedule",
       selectedScheduleId.value,
     );
-    emit("request-finish-log", props.subcourse);
+    emit("request-finish-log", props.subcourse, selectedScheduleId.value);
     // You might want to pass selectedScheduleObject.value or selectedScheduleId.value to the finish log event
     //emit('request-finish-log', { subcourse: props.subcourse, schedule: selectedScheduleObject.value });
   }

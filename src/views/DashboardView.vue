@@ -211,7 +211,7 @@
           :student-id="authStore.user.userId"
           :current-week="currentWeekNumber"
           @close="closeTimelineModal"
-          @request-finish-log="handleRequestFinishLog"
+          @request-finish-log="(subcourse, scheduleId) => handleRequestFinishLog(subcourse, scheduleId)"
           @log-saved="handleTimelineLogSaved"
         />
         <div v-else class="p-4 text-center text-error">
@@ -570,8 +570,8 @@ const handleTimelineLogSaved = () => {
 };
 
 // --- Methods for FINAL Student Log (Finish Step) ---
-const handleRequestFinishLog = (subcourse) => {
-  console.log("Request received to open final log form for:", subcourse.id);
+const handleRequestFinishLog = (subcourse, scheduleId) => {
+  console.log("Request received to open final log form for:", subcourse.id, "Schedule:", scheduleId);
   // Check if already confirmed before opening the final log modal
   // This check is technically redundant if called only from handleLogButtonClick,
   // but leaving it provides safety if handleRequestFinishLog is ever called directly.
@@ -584,15 +584,15 @@ const handleRequestFinishLog = (subcourse) => {
   }
 
   closeTimelineModal(); // Close the timeline modal first
-  openFinishLogModal(subcourse); // Open the final log modal
+  openFinishLogModal(subcourse, scheduleId); // Open the final log modal
 };
 
 // Fetches the specific student's final log for the given subcourse
-const openFinishLogModal = async (subcourse) => {
+const openFinishLogModal = async (subcourse, scheduleId) => {
   // Renamed from openLogModal
   if (!authStore.isStudent || !authStore.user?.userId) return; // Redundant check, but safe
 
-  console.log("Opening FINAL log modal for subcourse:", subcourse.id);
+  console.log("Opening FINAL log modal for subcourse:", subcourse.id, "Schedule:", scheduleId);
   selectedSubcourseForFinishLog.value = subcourse; // Use renamed state
   isLoadingFinishLogDefaults.value = true; // Use renamed state
   finishLogDefaultError.value = null; // Use renamed state
@@ -622,6 +622,10 @@ const openFinishLogModal = async (subcourse) => {
         fin_time: null,
         confirm: 0,
       };
+    }
+    // Explicitly set or override schedule_id from the selection in TimelineLogModal
+    if (scheduleId) {
+      finishLogDefaultData.value.schedule_id = scheduleId;
     }
     finishLogFormKey.value++; // Use renamed state
   } catch (err) {
