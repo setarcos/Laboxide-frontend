@@ -68,6 +68,7 @@
     "clean": "清理桌面",
     "off": "关闭所有设备",
     "picture": "拍照/上传图片",
+    "pictureHint": "拍一张清理后桌面的照片",
     "uploadSuccess": "图片上传成功",
     "uploadError": "图片上传失败",
     "save": "保存日志",

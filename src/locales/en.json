@@ -68,6 +68,7 @@
     "clean": "Clean the table",
     "off": "Turn off all equipments",
     "picture": "Picture",
+    "pictureHint": "Take a picture of cleaned table",
     "uploadSuccess": "Picture uploaded successfully",
     "uploadError": "Failed to upload picture",
     "save": "Save Log",

@@ -150,6 +150,7 @@
 
       <!-- Picture Upload -->
       <div class="form-control mt-4">
+        <p class="text-sm text-gray-500 mb-2">{{ $t("stulog.pictureHint") }}</p>
         <button
           type="button"
           class="btn btn-outline btn-info w-full gap-2"
