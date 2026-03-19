@@ -35,7 +35,10 @@
           @click="handleCopyViHW"
           :disabled="isCopyLoading"
         >
-          <span v-if="isCopyLoading" class="loading loading-spinner loading-sm"></span>
+          <span
+            v-if="isCopyLoading"
+            class="loading loading-spinner loading-sm"
+          ></span>
           <span v-else>{{ $t("linux.copyHomework", "Copy Homework") }}</span>
         </button>
 
@@ -44,14 +47,24 @@
           @click="handleShowDiff"
           :disabled="isDiffLoading"
         >
-          <span v-if="isDiffLoading" class="loading loading-spinner loading-sm"></span>
+          <span
+            v-if="isDiffLoading"
+            class="loading loading-spinner loading-sm"
+          ></span>
           <span v-else>{{ $t("linux.showDiff", "Show Diff") }}</span>
         </button>
       </div>
 
       <!-- Diff Output -->
-      <div v-if="diffOutput" class="mt-4 p-4 bg-gray-900 text-gray-100 rounded-lg overflow-x-auto font-mono text-sm">
-        <div v-for="(line, index) in diffLines" :key="index" :class="getLineClass(line)">
+      <div
+        v-if="diffOutput"
+        class="mt-4 p-4 bg-gray-900 text-gray-100 rounded-lg overflow-x-auto font-mono text-sm"
+      >
+        <div
+          v-for="(line, index) in diffLines"
+          :key="index"
+          :class="getLineClass(line)"
+        >
           {{ line }}
         </div>
       </div>
@@ -177,7 +190,8 @@ const handleCopyViHW = async () => {
   } catch (err) {
     notification.value = {
       type: "error",
-      message: err.response?.data?.error || err.message || "Failed to copy homework.",
+      message:
+        err.response?.data?.error || err.message || "Failed to copy homework.",
     };
   } finally {
     isCopyLoading.value = false;
@@ -200,7 +214,8 @@ const handleShowDiff = async () => {
   } catch (err) {
     notification.value = {
       type: "error",
-      message: err.response?.data?.error || err.message || "Failed to fetch diff.",
+      message:
+        err.response?.data?.error || err.message || "Failed to fetch diff.",
     };
   } finally {
     isDiffLoading.value = false;

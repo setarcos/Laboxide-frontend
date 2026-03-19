@@ -122,7 +122,10 @@
                     <router-link
                       :to="{
                         name: 'StudentTimeline',
-                        params: { subcourseId: course.id, studentId: authStore.user.userId },
+                        params: {
+                          subcourseId: course.id,
+                          studentId: authStore.user.userId,
+                        },
                         state: {
                           studentName: authStore.user.realname,
                           subcourseName: course.course_name,
@@ -136,7 +139,9 @@
                     <button
                       class="btn btn-xs btn-outline btn-primary"
                       @click="handleLogButtonClick(course)"
-                      :disabled="!currentWeekNumber || hasConfirmedLog(course.id)"
+                      :disabled="
+                        !currentWeekNumber || hasConfirmedLog(course.id)
+                      "
                       :title="getLogButtonTitle(course.id)"
                     >
                       <span>{{
@@ -226,7 +231,10 @@
           :student-id="authStore.user.userId"
           :current-week="currentWeekNumber"
           @close="closeTimelineModal"
-          @request-finish-log="(subcourse, scheduleId) => handleRequestFinishLog(subcourse, scheduleId)"
+          @request-finish-log="
+            (subcourse, scheduleId) =>
+              handleRequestFinishLog(subcourse, scheduleId)
+          "
           @log-saved="handleTimelineLogSaved"
         />
         <div v-else class="p-4 text-center text-error">
@@ -586,7 +594,12 @@ const handleTimelineLogSaved = () => {
 
 // --- Methods for FINAL Student Log (Finish Step) ---
 const handleRequestFinishLog = (subcourse, scheduleId) => {
-  console.log("Request received to open final log form for:", subcourse.id, "Schedule:", scheduleId);
+  console.log(
+    "Request received to open final log form for:",
+    subcourse.id,
+    "Schedule:",
+    scheduleId,
+  );
   // Check if already confirmed before opening the final log modal
   // This check is technically redundant if called only from handleLogButtonClick,
   // but leaving it provides safety if handleRequestFinishLog is ever called directly.
@@ -607,7 +620,12 @@ const openFinishLogModal = async (subcourse, scheduleId) => {
   // Renamed from openLogModal
   if (!authStore.isStudent || !authStore.user?.userId) return; // Redundant check, but safe
 
-  console.log("Opening FINAL log modal for subcourse:", subcourse.id, "Schedule:", scheduleId);
+  console.log(
+    "Opening FINAL log modal for subcourse:",
+    subcourse.id,
+    "Schedule:",
+    scheduleId,
+  );
   selectedSubcourseForFinishLog.value = subcourse; // Use renamed state
   isLoadingFinishLogDefaults.value = true; // Use renamed state
   finishLogDefaultError.value = null; // Use renamed state
