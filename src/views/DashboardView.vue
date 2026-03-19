@@ -118,19 +118,34 @@
                 </td>
                 <td>{{ course.room_name }}</td>
                 <td>
-                  <button
-                    v-if="authStore.isStudent"
-                    class="btn btn-xs btn-outline btn-primary"
-                    @click="handleLogButtonClick(course)"
-                    :disabled="!currentWeekNumber || hasConfirmedLog(course.id)"
-                    :title="getLogButtonTitle(course.id)"
-                  >
-                    <span>{{
-                      hasConfirmedLog(course.id)
-                        ? $t("dashboard.confirm")
-                        : $t("dashboard.log")
-                    }}</span>
-                  </button>
+                  <div v-if="authStore.isStudent" class="flex gap-1">
+                    <router-link
+                      :to="{
+                        name: 'StudentTimeline',
+                        params: { subcourseId: course.id, studentId: authStore.user.userId },
+                        state: {
+                          studentName: authStore.user.realname,
+                          subcourseName: course.course_name,
+                        },
+                      }"
+                      class="btn btn-xs btn-outline btn-secondary"
+                      :title="$t('dashboard.view')"
+                    >
+                      {{ $t("dashboard.view") }}
+                    </router-link>
+                    <button
+                      class="btn btn-xs btn-outline btn-primary"
+                      @click="handleLogButtonClick(course)"
+                      :disabled="!currentWeekNumber || hasConfirmedLog(course.id)"
+                      :title="getLogButtonTitle(course.id)"
+                    >
+                      <span>{{
+                        hasConfirmedLog(course.id)
+                          ? $t("dashboard.confirm")
+                          : $t("dashboard.log")
+                      }}</span>
+                    </button>
+                  </div>
                   <div v-if="authStore.isTeacher" class="flex gap-1">
                     <router-link
                       :to="{
