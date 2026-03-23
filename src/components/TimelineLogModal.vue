@@ -60,7 +60,7 @@
             :key="sched.id"
             :value="sched.id"
           >
-            {{ $t("tlform.week_label", { week: sched.week }) }}
+            {{ $t("tlform.week_label", { week: sched.week + lagWeek }) }}
             <span v-if="sched.id === scheduleForWeek?.id">
               ({{ $t("tlform.current_week") }})
             </span>
@@ -92,7 +92,7 @@
           class="text-info text-sm italic"
         >
           {{
-            $t("tlform.no_steps_defined", { week: selectedScheduleObject.week })
+            $t("tlform.no_steps_defined", { week: selectedScheduleObject.week + lagWeek })
           }}
         </div>
 
@@ -302,6 +302,7 @@ const props = defineProps({
   subcourse: { type: Object, required: true },
   studentId: { type: String, required: true },
   currentWeek: { type: Number, required: true },
+  lagWeek: { type: Number, default: 0 },
 });
 
 const emit = defineEmits(["close", "request-finish-log", "log-saved"]);
@@ -315,7 +316,7 @@ const saveError = ref(null);
 const isSaving = ref(false);
 
 const allAvailableSchedules = ref([]); // All schedules for the course
-const scheduleForWeek = ref(null); // The schedule object for props.currentWeek (context)
+const scheduleForWeek = ref(null); // The schedule object for the current week (adjusted by lag_week)
 const selectedScheduleId = ref(null); // ID of the schedule selected in the dropdown
 const subSchedules = ref([]); // Steps for the selectedScheduleId
 const existingTimelineEntries = ref([]); // All entries for this student & subcourse
@@ -377,7 +378,8 @@ const fetchSubSchedulesForSelectedSchedule = async () => {
       err,
     );
     // Potentially set a more specific error message here if needed
-    error.value = `Failed to load steps for Week ${selectedScheduleObject.value?.week || "selected"}: ${err.response?.data?.error || err.message || "Unknown error"}`;
+    const displayWeek = selectedScheduleObject.value?.week ? selectedScheduleObject.value.week + props.lagWeek : "selected";
+    error.value = `Failed to load steps for Week ${displayWeek}: ${err.response?.data?.error || err.message || "Unknown error"}`;
     subSchedules.value = [];
   } finally {
     isFetchingSubSchedules.value = false;
@@ -407,14 +409,14 @@ const fetchData = async () => {
       (a, b) => a.week - b.week,
     );
 
-    // 2. Find the schedule corresponding to the current context week
+    // 2. Find the schedule corresponding to the current context week (adjusted by lag_week)
     scheduleForWeek.value = allAvailableSchedules.value.find(
-      (s) => s.week === props.currentWeek,
+      (s) => s.week === props.currentWeek - props.lagWeek,
     );
 
-    // 3. Set the default selected schedule ID to the current context week's schedule
+    // 3. Set the default selected schedule ID to the current context week's schedule (adjusted by lag_week)
     selectedScheduleId.value = scheduleForWeek.value?.id || null;
-    // If no schedule for currentWeek, selectedScheduleId remains null, user must pick from dropdown.
+    // If no schedule for the adjusted current week, selectedScheduleId remains null, user must pick from dropdown.
 
     // 4. Fetch sub-schedules for the initially selected schedule (if any)
     if (selectedScheduleId.value) {

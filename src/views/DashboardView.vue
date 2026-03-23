@@ -230,6 +230,7 @@
           :subcourse="selectedSubcourseForTimeline"
           :student-id="authStore.user.userId"
           :current-week="currentWeekNumber"
+          :lag-week="selectedSubcourseForTimeline.lag_week"
           @close="closeTimelineModal"
           @request-finish-log="
             (subcourse, scheduleId) =>
@@ -340,10 +341,6 @@ const finishLogDefaultData = ref(null); // This will hold the single StudentLog 
 const finishLogDefaultError = ref(null);
 const isSavingFinishLog = ref(false);
 const finishLogFormKey = ref(0);
-
-const isLinuxCourse = (course) => {
-  return course.course_name.startsWith("Linux");
-};
 
 // --- Current Week Calculation ---
 const currentWeekNumber = computed(() => {
