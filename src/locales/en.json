@@ -125,6 +125,7 @@
     "filename": "Filename",
     "filedesc": "Description",
     "allterm": "Show All Semesters",
+    "importgroup": "Import Groups",
     "addgroup": "Add Group",
     "editgroup": "Edit Group",
     "weekday": "Week Day",

@@ -125,6 +125,7 @@
     "filename": "文件名",
     "filedesc": "文件描述",
     "allterm": "显示全部学期",
+    "importgroup": "导入分组",
     "addgroup": "增加分组",
     "editgroup": "修改分组",
     "coursetime": "上课时间",

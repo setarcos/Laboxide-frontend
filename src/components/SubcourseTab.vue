@@ -15,23 +15,56 @@
           />
         </label>
       </div>
-      <button class="btn btn-sm btn-primary" @click="openAddModal">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+      <div class="flex gap-2">
+        <button
+          v-if="subcourses.length === 0 && !showAllSemesters"
+          class="btn btn-sm btn-outline btn-primary"
+          @click="handleImport"
+          :disabled="isImporting"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
-        {{ $t("course.addgroup") }}
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            :class="{ 'animate-spin': isImporting }"
+          >
+            <path
+              v-if="!isImporting"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+            />
+            <path
+              v-else
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+          {{ isImporting ? $t("button.saving") : $t("course.importgroup") }}
+        </button>
+        <button class="btn btn-sm btn-primary" @click="openAddModal">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          {{ $t("course.addgroup") }}
+        </button>
+      </div>
     </div>
 
     <!-- Loading Subcourses State -->
@@ -380,6 +413,7 @@ const semesterStore = useSemesterStore();
 
 const subcourses = ref([]);
 const isLoading = ref(true);
+const isImporting = ref(false);
 const error = ref(null);
 const isSaving = ref(false); // For form submission state
 
@@ -623,6 +657,68 @@ const handleSave = async (formData) => {
     error.value = errorMsg; // Can display this elsewhere if needed
   } finally {
     isSaving.value = false;
+  }
+};
+
+const handleImport = async () => {
+  if (!isTeacher.value && !isAdmin.value) return;
+
+  const currentSemesterId = semesterStore.getCurrentSemesterId;
+  if (!currentSemesterId) {
+    alert(t("course.alertNoCurrentSemester"));
+    return;
+  }
+
+  isImporting.value = true;
+  try {
+    // 1. Fetch all semesters to find the previous one with data
+    await fetchSemesters();
+    const sortedSemesters = [...semesters.value].sort((a, b) => b.id - a.id);
+    const currentIndex = sortedSemesters.findIndex(
+      (s) => s.id === currentSemesterId,
+    );
+
+    // 2. Iterate backwards from current semester to find one that has subcourses
+    let sourceSubcourses = [];
+    for (let i = currentIndex + 1; i < sortedSemesters.length; i++) {
+      const sourceSemesterId = sortedSemesters[i].id;
+      const response = await dataService.getSubcourses({
+        course_id: props.courseId,
+        semester_id: sourceSemesterId,
+      });
+      if (response.data && response.data.length > 0) {
+        sourceSubcourses = response.data;
+        break;
+      }
+    }
+
+    if (sourceSubcourses.length === 0) {
+      alert(
+        t("course.noGroupsFoundFor") + " " + t("course.anySelectedSemester"),
+      );
+      return;
+    }
+
+    // 3. Import each group into the current semester
+    const importPromises = sourceSubcourses.map((sc) => {
+      // Create a new subcourse object, excluding the old ID and updating the year_id
+      const newSubcourseData = { ...sc };
+      newSubcourseData.id = 0; // Use placeholder ID for new subcourse
+      newSubcourseData.year_id = currentSemesterId;
+      return dataService.createSubcourse(newSubcourseData);
+    });
+
+    await Promise.all(importPromises);
+    await fetchSubcourses();
+  } catch (err) {
+    console.error("Failed to import subcourses:", err);
+    alert(
+      t("common.alertSaveFailed", {
+        msg: err.response?.data?.error || err.message,
+      }),
+    );
+  } finally {
+    isImporting.value = false;
   }
 };
 
