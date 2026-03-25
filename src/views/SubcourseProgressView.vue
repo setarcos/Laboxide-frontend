@@ -264,20 +264,9 @@
                           week: selectedWeek + lagWeek,
                         })
                       }}:
-                      <span
-                        v-if="isLoading.timelines[studentData.student.stu_id]"
-                        class="loading loading-dots loading-xs ml-2"
-                      ></span>
                     </h4>
-                    <div
-                      v-if="error.timelines[studentData.student.stu_id]"
-                      class="text-error text-xs italic"
-                    >
-                      {{ $t("progress.error_loading_logs") }}:
-                      {{ error.timelines[studentData.student.stu_id] }}
-                    </div>
                     <ul
-                      v-else-if="
+                      v-if="
                         studentData.weeklyTimelines &&
                         studentData.weeklyTimelines.length > 0
                       "
@@ -661,20 +650,17 @@ const showForceConfirm = ref(false);
 const studentToForceLog = ref(null); // The student object for the force action
 
 const isLoading = reactive({
-  initial: true, // Loading students, schedules
-  weekly: false, // Loading subschedules, timelines for the selected week
-  timelines: {}, // Per-student timeline loading: { stu_id: boolean } - might not be needed if fetching all at once
-  recentLogs: false, // Loading recent student logs
-  confirmLog: false, // Confirming a specific student log
-  forceLog: null, // Forcing a specific student log: null or the stu_id being forced
+  initial: true,
+  weekly: false,
+  recentLogs: false,
+  confirmLog: false,
+  forceLog: null, // null or the stu_id being forced
 });
 const error = reactive({
   initial: null,
   weekly: null,
-  timelines: {}, // Per-student timeline errors: { stu_id: string }
-  recentLogs: null, // Error fetching recent student logs
-  confirmLog: null, // Error confirming student log
-  forceLog: null, // Error forcing student log
+  recentLogs: null,
+  confirmLog: null,
 });
 
 const expandedStudentId = ref(null); // Track individually expanded student
@@ -742,15 +728,13 @@ const studentProgressData = computed(() => {
       (a, b) => new Date(a.timestamp) - new Date(b.timestamp),
     );
 
-    // Count logged entries whose 'subschedule' title is in the valid set for the week
-    let loggedStepsCount = 0;
-    const loggedTitles = new Set(); // Use a set to count unique valid titles logged
+    const loggedTitles = new Set();
     weeklyTimelines.forEach((entry) => {
       if (entry.subschedule && validStepTitles.has(entry.subschedule)) {
         loggedTitles.add(entry.subschedule);
       }
     });
-    loggedStepsCount = loggedTitles.size; // Count unique valid titles logged
+    const loggedStepsCount = loggedTitles.size;
 
     const total = totalStepsForWeek.value;
     const progressPercent =
@@ -1032,7 +1016,6 @@ const confirmForceLog = (student) => {
     alert("Cannot force log: No schedule loaded for the selected week.");
     return;
   }
-  error.forceLog = null; // Clear previous error
   studentToForceLog.value = student;
   showForceConfirm.value = true;
 };
@@ -1040,7 +1023,6 @@ const confirmForceLog = (student) => {
 const cancelForceLog = () => {
   showForceConfirm.value = false;
   studentToForceLog.value = null;
-  error.forceLog = null; // Clear error on cancel
 };
 
 const handleForceLog = async () => {
@@ -1056,8 +1038,7 @@ const handleForceLog = async () => {
   // Close the confirm dialog immediately
   showForceConfirm.value = false;
 
-  isLoading.forceLog = studentToForceLog.value.stu_id; // Set loading state for this specific student
-  error.forceLog = null; // Clear previous error
+  isLoading.forceLog = studentToForceLog.value.stu_id;
 
   try {
     // Call the new force API
@@ -1073,12 +1054,8 @@ const handleForceLog = async () => {
       `Failed to force log for student ${studentToForceLog.value.stu_id}:`,
       err,
     );
-    error.forceLog =
-      err.response?.data?.error || err.message || "Unknown error forcing log.";
-    // Display error - maybe alert or a specific error message area
-    alert(
-      `Failed to force log for ${studentToForceLog.value.stu_name}: ${error.forceLog}`,
-    );
+    const msg = err.response?.data?.error || err.message || "Unknown error forcing log.";
+    alert(`Failed to force log for ${studentToForceLog.value.stu_name}: ${msg}`);
   } finally {
     isLoading.forceLog = null; // Reset loading state
     studentToForceLog.value = null; // Clear student reference

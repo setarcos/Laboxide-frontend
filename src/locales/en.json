@@ -335,7 +335,6 @@
     "force_final_log_entry": "Force a 'Final Log' entry for this student for the current week",
     "force_log": "Force Log",
     "timeline_logs_for": "Timeline Logs for {name} (Week {week})",
-    "error_loading_logs": "Error loading logs",
     "general_note": "General Note",
     "download_or_preview": "Download or Preview",
     "delete_log_entry": "Delete this log entry",

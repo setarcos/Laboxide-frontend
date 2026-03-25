@@ -335,7 +335,6 @@
     "force_final_log_entry": "强制为当前周次生成'最终日志'条目",
     "force_log": "强制下课",
     "timeline_logs_for": "{name}的时间轴（第{week}周）",
-    "error_loading_logs": "记录加载错误",
     "general_note": "常规备注",
     "download_or_preview": "下载或预览",
     "delete_log_entry": "删除此记录条目",
