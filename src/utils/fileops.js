@@ -53,18 +53,28 @@ export function useFileHandling(downloadTimelineFileFunction) {
       const contentDisposition = response.headers["content-disposition"];
       let downloadFilename = filename || `download_${timelineId}`;
       if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
-        if (filenameMatch && filenameMatch[1]) {
-          // Decode URI component for filenames with special characters
+        // Try to match filename* first (RFC 6266)
+        const filenameStarMatch = contentDisposition.match(/filename\*=([^;']+)'[^']*'([^;]+)/);
+        if (filenameStarMatch && filenameStarMatch[2]) {
           try {
-            downloadFilename = decodeURIComponent(filenameMatch[1]);
+            downloadFilename = decodeURIComponent(filenameStarMatch[2]);
           } catch (e) {
-            console.warn(
-              "[useFileHandling] Could not decode filename from header, using fallback.",
-              filenameMatch[1],
-              e,
-            );
-            downloadFilename = filenameMatch[1]; // Use raw name if decoding fails
+            console.warn("[useFileHandling] Could not decode filename* from header", e);
+          }
+        } else {
+          const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+          if (filenameMatch && filenameMatch[1]) {
+            // Decode URI component for filenames with special characters
+            try {
+              downloadFilename = decodeURIComponent(filenameMatch[1]);
+            } catch (e) {
+              console.warn(
+                "[useFileHandling] Could not decode filename from header, using fallback.",
+                filenameMatch[1],
+                e,
+              );
+              downloadFilename = filenameMatch[1]; // Use raw name if decoding fails
+            }
           }
         }
       }
