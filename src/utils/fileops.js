@@ -17,13 +17,38 @@ export const isImageFile = (filename) => {
   return imageExtensions.some((ext) => lowerFilename.endsWith(ext));
 };
 
+export const isTextFile = (filename) => {
+  if (!filename || typeof filename !== "string") return false;
+  const textExtensions = [
+    ".txt",
+    ".c",
+    ".cpp",
+    ".h",
+    ".ino",
+    ".js",
+    ".ts",
+    ".py",
+    ".java",
+    ".json",
+    ".xml",
+    ".html",
+    ".css",
+    ".md",
+    ".log",
+  ];
+  const lowerFilename = filename.toLowerCase();
+  return textExtensions.some((ext) => lowerFilename.endsWith(ext));
+};
+
 export function useFileHandling(downloadTimelineFileFunction) {
   // --- State ---
   const isPreviewModalVisible = ref(false);
   const previewImageUrl = ref(null);
+  const previewTextContent = ref(null);
   const previewImageFilename = ref(null);
   const isPreviewLoading = ref(false);
   const previewError = ref(null);
+  const previewMode = ref(null); // 'image' | 'text' | null
 
   // --- Methods ---
 
@@ -54,15 +79,21 @@ export function useFileHandling(downloadTimelineFileFunction) {
       let downloadFilename = filename || `download_${timelineId}`;
       if (contentDisposition) {
         // Try to match filename* first (RFC 6266)
-        const filenameStarMatch = contentDisposition.match(/filename\*=([^;']+)'[^']*'([^;]+)/);
+        const filenameStarMatch = contentDisposition.match(
+          /filename\*=([^;']+)'[^']*'([^;]+)/,
+        );
         if (filenameStarMatch && filenameStarMatch[2]) {
           try {
             downloadFilename = decodeURIComponent(filenameStarMatch[2]);
           } catch (e) {
-            console.warn("[useFileHandling] Could not decode filename* from header", e);
+            console.warn(
+              "[useFileHandling] Could not decode filename* from header",
+              e,
+            );
           }
         } else {
-          const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+          const filenameMatch =
+            contentDisposition.match(/filename="?([^"]+)"?/);
           if (filenameMatch && filenameMatch[1]) {
             // Decode URI component for filenames with special characters
             try {
@@ -131,24 +162,32 @@ export function useFileHandling(downloadTimelineFileFunction) {
       downloadFileFromBlob(blob, filename); // Reuse existing blob download logic
     } catch (error) {
       console.error(
-        "[useFileHandling] Error downloading image from Blob URL:",
+        "[useFileHandling] Error downloading from Blob URL:",
         error,
       );
-      alert("Failed to download image.");
+      alert("Failed to download file.");
     }
   };
 
-  const openPreviewModal = (filename) => {
+  // Download text content as a file
+  const downloadTextContent = (text, filename) => {
+    const blob = new Blob([text], { type: "text/plain" });
+    downloadFileFromBlob(blob, filename);
+  };
+
+  const openPreviewModal = (filename, mode = "image") => {
     // Reset state for the new preview
     previewImageUrl.value = null; // Clear previous URL first
+    previewTextContent.value = null;
     previewImageFilename.value = filename;
+    previewMode.value = mode;
     isPreviewLoading.value = true;
     previewError.value = null;
     isPreviewModalVisible.value = true; // Open the modal
   };
 
   const closePreviewModal = () => {
-    console.log(`[useFileHandling] Closing image preview modal.`);
+    console.log(`[useFileHandling] Closing preview modal.`);
     isPreviewModalVisible.value = false;
     // Revoke the previous Blob URL if it exists to free up memory
     if (previewImageUrl.value) {
@@ -157,7 +196,9 @@ export function useFileHandling(downloadTimelineFileFunction) {
     }
     // Reset state
     previewImageUrl.value = null;
+    previewTextContent.value = null;
     previewImageFilename.value = null;
+    previewMode.value = null;
     isPreviewLoading.value = false;
     previewError.value = null;
   };
@@ -178,7 +219,7 @@ export function useFileHandling(downloadTimelineFileFunction) {
       console.log(
         `[useFileHandling] Attempting image preview for file: ${filename} (ID: ${timelineId})`,
       );
-      openPreviewModal(filename); // Open modal and set loading state
+      openPreviewModal(filename, "image");
 
       try {
         // Fetch the file content using the provided function
@@ -209,9 +250,30 @@ export function useFileHandling(downloadTimelineFileFunction) {
       } finally {
         isPreviewLoading.value = false; // Turn off loading state
       }
+    } else if (isTextFile(filename)) {
+      openPreviewModal(filename, "text");
+
+      try {
+        const response = await downloadTimelineFileFunction(timelineId);
+
+        if (response.data instanceof Blob) {
+          const text = await response.data.text();
+          previewTextContent.value = text;
+        } else if (typeof response.data === "string") {
+          previewTextContent.value = response.data;
+        } else {
+          closePreviewModal();
+          downloadFile(timelineId, filename);
+        }
+      } catch (err) {
+        previewError.value = `Failed to load text: ${err.response?.data?.error || err.message || "Unknown error"}`;
+        previewTextContent.value = null;
+      } finally {
+        isPreviewLoading.value = false;
+      }
     } else {
       console.log(
-        `[useFileHandling] File is not an image: ${filename} (ID: ${timelineId}). Proceeding with standard download.`,
+        `[useFileHandling] File is not an image or text: ${filename} (ID: ${timelineId}). Proceeding with standard download.`,
       );
       downloadFile(timelineId, filename);
     }
@@ -221,13 +283,14 @@ export function useFileHandling(downloadTimelineFileFunction) {
   return {
     isPreviewModalVisible,
     previewImageUrl,
+    previewTextContent,
     previewImageFilename,
+    previewMode,
     isPreviewLoading,
     previewError,
     handleFileClick, // The main function components will call
     closePreviewModal, // Function to close the modal
     downloadFileFromBlobUrl, // Expose if needed for download button inside modal
-    // We don't necessarily need to expose isImageFile, downloadFile, etc.
-    // unless components need them directly for some other reason.
+    downloadTextContent,
   };
 }

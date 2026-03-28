@@ -162,7 +162,7 @@
       </div>
     </div>
 
-    <!-- Image Preview Modal -->
+    <!-- Preview Modal -->
     <dialog
       id="image_preview_modal"
       class="modal"
@@ -170,7 +170,11 @@
     >
       <div class="modal-box w-11/12 max-w-5xl">
         <h3 class="font-bold text-lg mb-4">
-          {{ $t("timeline.preview") }}: {{ previewImageFilename }}
+          {{
+            previewMode === "text"
+              ? $t("progress.text_preview")
+              : $t("timeline.preview")
+          }}: {{ previewImageFilename }}
         </h3>
 
         <div v-if="isPreviewLoading" class="text-center py-10">
@@ -183,24 +187,44 @@
         >
           <span>{{ previewError }}</span>
         </div>
-        <div v-else-if="previewImageUrl">
+        <!-- Image Display -->
+        <div v-else-if="previewMode === 'image' && previewImageUrl">
           <img
             :src="previewImageUrl"
             alt="Image Preview"
             class="max-w-full max-h-[70vh] mx-auto object-contain"
           />
         </div>
+        <!-- Text Display -->
+        <div
+          v-else-if="previewMode === 'text' && previewTextContent"
+          class="max-h-[70vh] overflow-auto bg-base-300 rounded p-4"
+        >
+          <pre class="whitespace-pre-wrap break-words text-sm font-mono">{{
+            previewTextContent
+          }}</pre>
+        </div>
 
         <div class="modal-action mt-4">
           <button
-            v-if="previewImageUrl && !previewError"
+            v-if="
+              ((previewMode === 'image' && previewImageUrl) ||
+                (previewMode === 'text' && previewTextContent)) &&
+              !previewError
+            "
             class="btn btn-secondary"
             @click="
-              downloadFileFromBlobUrl(previewImageUrl, previewImageFilename)
+              previewMode === 'text'
+                ? downloadTextContent(previewTextContent, previewImageFilename)
+                : downloadFileFromBlobUrl(previewImageUrl, previewImageFilename)
             "
             :disabled="isPreviewLoading"
           >
-            {{ $t("timeline.download_image") }}
+            {{
+              previewMode === "text"
+                ? $t("progress.download_text")
+                : $t("timeline.download_image")
+            }}
           </button>
           <button
             class="btn btn-ghost"
@@ -232,7 +256,7 @@ import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import * as dataService from "@/services/dataService";
 import { formatTimestamp } from "@/utils/weekday";
-import { isImageFile, useFileHandling } from "@/utils/fileops";
+import { useFileHandling, isImageFile } from "@/utils/fileops";
 // --- Props, Router, Route ---
 const props = defineProps({
   subcourseId: { type: [String, Number], required: true },
@@ -257,12 +281,15 @@ const subcourseNameDisplay = ref(route.meta?.state?.subcourseName || "");
 const {
   isPreviewModalVisible,
   previewImageUrl,
+  previewTextContent,
   previewImageFilename,
+  previewMode,
   isPreviewLoading,
   previewError,
-  handleFileClick, // Get the handler function
-  closePreviewModal, // Get the close function
-  downloadFileFromBlobUrl, // Get download helper if needed
+  handleFileClick,
+  closePreviewModal,
+  downloadFileFromBlobUrl,
+  downloadTextContent,
 } = useFileHandling(dataService.downloadTimelineFile);
 
 // --- Computed ---

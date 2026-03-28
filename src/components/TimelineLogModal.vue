@@ -92,7 +92,9 @@
           class="text-info text-sm italic"
         >
           {{
-            $t("tlform.no_steps_defined", { week: selectedScheduleObject.week + lagWeek })
+            $t("tlform.no_steps_defined", {
+              week: selectedScheduleObject.week + lagWeek,
+            })
           }}
         </div>
 
@@ -378,7 +380,9 @@ const fetchSubSchedulesForSelectedSchedule = async () => {
       err,
     );
     // Potentially set a more specific error message here if needed
-    const displayWeek = selectedScheduleObject.value?.week ? selectedScheduleObject.value.week + props.lagWeek : "selected";
+    const displayWeek = selectedScheduleObject.value?.week
+      ? selectedScheduleObject.value.week + props.lagWeek
+      : "selected";
     error.value = `Failed to load steps for Week ${displayWeek}: ${err.response?.data?.error || err.message || "Unknown error"}`;
     subSchedules.value = [];
   } finally {
@@ -484,9 +488,33 @@ const handleFileChange = (event) => {
       "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
       "application/vnd.ms-powerpoint", // .ppt
     ];
-    const isFileTypeAllowed = allowedTypes.some(
-      (type) => file.type.startsWith(type) || file.type === type,
+    const allowedExtensions = [
+      ".txt",
+      ".c",
+      ".cpp",
+      ".h",
+      ".ino",
+      ".js",
+      ".ts",
+      ".py",
+      ".java",
+      ".json",
+      ".xml",
+      ".html",
+      ".css",
+      ".md",
+      ".log",
+      ".svg",
+    ];
+    const lowerFilename = file.name.toLowerCase();
+    const hasAllowedExtension = allowedExtensions.some((ext) =>
+      lowerFilename.endsWith(ext),
     );
+
+    const isFileTypeAllowed =
+      allowedTypes.some(
+        (type) => file.type.startsWith(type) || file.type === type,
+      ) || hasAllowedExtension;
 
     if (!isFileTypeAllowed && file.size > 0) {
       // Added file.size > 0 check for empty type files

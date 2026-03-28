@@ -97,7 +97,11 @@
       >
         <span class="loading loading-md loading-spinner text-secondary"></span>
         <p>
-          {{ $t("progress.loading_data_for_week", { week: selectedWeek + lagWeek }) }}
+          {{
+            $t("progress.loading_data_for_week", {
+              week: selectedWeek + lagWeek,
+            })
+          }}
         </p>
       </div>
       <div
@@ -520,7 +524,11 @@
     >
       <div class="modal-box w-11/12 max-w-3xl p-6">
         <h3 class="font-bold text-lg mb-4 break-all">
-          {{ $t("progress.image_preview") }}: {{ previewImageFilename }}
+          {{
+            previewMode === "text"
+              ? $t("progress.text_preview")
+              : $t("progress.image_preview")
+          }}: {{ previewImageFilename }}
         </h3>
         <!-- Loading State -->
         <div v-if="isPreviewLoading" class="text-center py-10">
@@ -551,7 +559,7 @@
         </div>
         <!-- Image Display -->
         <div
-          v-else-if="previewImageUrl"
+          v-else-if="previewMode === 'image' && previewImageUrl"
           class="w-full max-h-[70vh] overflow-auto flex justify-center items-center bg-base-300 rounded"
         >
           <img
@@ -560,7 +568,16 @@
             class="max-w-full max-h-full object-contain"
           />
         </div>
-        <!-- Fallback if no image URL -->
+        <!-- Text Display -->
+        <div
+          v-else-if="previewMode === 'text' && previewTextContent"
+          class="w-full max-h-[70vh] overflow-auto bg-base-300 rounded p-4"
+        >
+          <pre class="whitespace-pre-wrap break-words text-sm font-mono">{{
+            previewTextContent
+          }}</pre>
+        </div>
+        <!-- Fallback if no content -->
         <div v-else class="text-center text-warning p-4">
           {{ $t("progress.could_not_load_image_preview") }}
         </div>
@@ -575,14 +592,24 @@
         </button>
         <div class="modal-action mt-4">
           <button
-            v-if="previewImageUrl && !previewError"
+            v-if="
+              ((previewMode === 'image' && previewImageUrl) ||
+                (previewMode === 'text' && previewTextContent)) &&
+              !previewError
+            "
             class="btn btn-secondary"
             @click="
-              downloadFileFromBlobUrl(previewImageUrl, previewImageFilename)
+              previewMode === 'text'
+                ? downloadTextContent(previewTextContent, previewImageFilename)
+                : downloadFileFromBlobUrl(previewImageUrl, previewImageFilename)
             "
             :disabled="isPreviewLoading"
           >
-            {{ $t("progress.download_image") }}
+            {{
+              previewMode === "text"
+                ? $t("progress.download_text")
+                : $t("progress.download_image")
+            }}
           </button>
           <button
             class="btn btn-ghost"
@@ -678,13 +705,16 @@ const entryToDelete = ref(null);
 const {
   isPreviewModalVisible,
   previewImageUrl,
+  previewTextContent,
   previewImageFilename,
+  previewMode,
   isPreviewLoading,
   previewError,
   handleFileClick,
   closePreviewModal,
   downloadFileFromBlobUrl,
-} = useFileHandling(dataService.downloadTimelineFile); // Pass the download function
+  downloadTextContent,
+} = useFileHandling(dataService.downloadTimelineFile);
 
 // --- Computed Properties ---
 const lagWeek = computed(() => {
@@ -805,7 +835,10 @@ const fetchInitialData = async () => {
     // Always recalculate with correct lag_week if currentWeekNumber is available
     // (the watcher might have set it with lag_week=0 before subcourseDetails loaded)
     if (currentWeekNumber.value) {
-      selectedWeek.value = Math.max(1, currentWeekNumber.value - subcourseLagWeek);
+      selectedWeek.value = Math.max(
+        1,
+        currentWeekNumber.value - subcourseLagWeek,
+      );
     } else if (selectedWeek.value === null && schedules.value.length > 0) {
       selectedWeek.value =
         schedules.value.map((s) => s.week).sort((a, b) => a - b)[0] || 1; // Fallback to first week if schedules exist
@@ -1054,8 +1087,11 @@ const handleForceLog = async () => {
       `Failed to force log for student ${studentToForceLog.value.stu_id}:`,
       err,
     );
-    const msg = err.response?.data?.error || err.message || "Unknown error forcing log.";
-    alert(`Failed to force log for ${studentToForceLog.value.stu_name}: ${msg}`);
+    const msg =
+      err.response?.data?.error || err.message || "Unknown error forcing log.";
+    alert(
+      `Failed to force log for ${studentToForceLog.value.stu_name}: ${msg}`,
+    );
   } finally {
     isLoading.forceLog = null; // Reset loading state
     studentToForceLog.value = null; // Clear student reference
