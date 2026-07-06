@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <!-- Back Button -->
-    <div class="mb-6">
+    <!-- Back Button & Progress Link -->
+    <div class="mb-6 flex items-center gap-2">
       <button @click="goBack" class="btn btn-ghost">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -19,6 +19,17 @@
         </svg>
         {{ $t("stu.back") }}
       </button>
+      <router-link
+        v-if="isTeacher"
+        :to="{
+          name: 'SubcourseProgress',
+          params: { id: props.id },
+        }"
+        class="btn btn-outline btn-sm btn-secondary"
+        :title="$t('dashboard.viewProgress')"
+      >
+        {{ $t("dashboard.progress") }}
+      </router-link>
     </div>
 
     <!-- Loading State (Subcourse Info) -->
