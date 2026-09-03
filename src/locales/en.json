@@ -541,7 +541,12 @@
     "saveError": "Failed to save: {error}",
     "deleteError": "Failed to delete: {error}",
     "lendError": "Lending failed: {error}",
-    "returnError": "Return failed: {error}"
+    "returnError": "Return failed: {error}",
+    "pagination": {
+      "prev": "Prev",
+      "next": "Next",
+      "info": "Page {page}"
+    }
   },
   "lab": {
     "manageRooms": "Manage Lab Rooms",

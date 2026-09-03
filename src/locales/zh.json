@@ -541,7 +541,12 @@
     "saveError": "保存失败：{error}",
     "deleteError": "删除失败：{error}",
     "lendError": "借出失败：{error}",
-    "returnError": "归还失败：{error}"
+    "returnError": "归还失败：{error}",
+    "pagination": {
+      "prev": "上一页",
+      "next": "下一页",
+      "info": "第 {page} 页"
+    }
   },
   "lab": {
     "manageRooms": "实验室房间管理",

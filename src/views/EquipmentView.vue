@@ -137,6 +137,33 @@
           </tr>
         </tbody>
       </table>
+
+      <!-- Pagination: the backend returns a DESC-ordered slice without a
+           total count, so the last page is the one with < PAGE_SIZE rows. -->
+      <div
+        v-if="equipments.length > 0"
+        class="flex items-center justify-between px-4 py-3 border-t border-base-300"
+      >
+        <span class="text-sm opacity-70">{{
+          $t("equip.pagination.info", { page })
+        }}</span>
+        <div class="join">
+          <button
+            class="join-item btn btn-sm"
+            :disabled="page <= 1 || isLoading"
+            @click="goToPage(page - 1)"
+          >
+            {{ $t("equip.pagination.prev") }}
+          </button>
+          <button
+            class="join-item btn btn-sm"
+            :disabled="!hasNext || isLoading"
+            @click="goToPage(page + 1)"
+          >
+            {{ $t("equip.pagination.next") }}
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Add / Edit -->
@@ -221,6 +248,12 @@ const equipments = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
 
+// Pagination: the backend endpoint returns a slice ordered by id DESC and
+// never reports a total, so the "next" page exists iff we got a full page.
+const PAGE_SIZE = 10;
+const page = ref(1);
+const hasNext = computed(() => equipments.value.length === PAGE_SIZE);
+
 const showAddModal = ref(false);
 const showEditModal = ref(false);
 const showDeleteModal = ref(false);
@@ -244,7 +277,10 @@ const fetchEquipments = async () => {
   isLoading.value = true;
   error.value = null;
   try {
-    const response = await dataService.listEquipments();
+    const response = await dataService.listEquipments({
+      page: page.value,
+      page_size: PAGE_SIZE,
+    });
     equipments.value = response.data;
   } catch (err) {
     console.error("Failed to fetch equipment:", err);
@@ -252,6 +288,12 @@ const fetchEquipments = async () => {
   } finally {
     isLoading.value = false;
   }
+};
+
+const goToPage = async (p) => {
+  if (p < 1 || isLoading.value) return;
+  page.value = p;
+  await fetchEquipments();
 };
 
 onMounted(fetchEquipments);
@@ -332,6 +374,12 @@ const handleDelete = async () => {
     await dataService.deleteEquipment(currentItem.value.id);
     closeModal();
     await fetchEquipments();
+    // Deleting the only row of a non-first page leaves an empty page: step
+    // back so the user always lands on a non-empty page.
+    if (equipments.value.length === 0 && page.value > 1) {
+      page.value -= 1;
+      await fetchEquipments();
+    }
   } catch (err) {
     console.error("Failed to delete equipment:", err);
     error.value = t("equip.deleteError", {
