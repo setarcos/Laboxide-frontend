@@ -69,9 +69,10 @@
               :value="weekNum"
             >
               {{ $t("progress.week", { week: weekLabel(weekNum, lagWeek) }) }}
-              <span v-if="weekNum === teachingWeekOf(currentWeekNumber, lagWeek)">{{
-                ` (${$t("progress.current")})`
-              }}</span>
+              <span
+                v-if="weekNum === teachingWeekOf(currentWeekNumber, lagWeek)"
+                >{{ ` (${$t("progress.current")})` }}</span
+              >
             </option>
           </select>
         </div>
@@ -154,7 +155,9 @@
               <th>{{ $t("progress.seat") }}</th>
               <th class="w-1/4">
                 {{ $t("progress.progress") }} ({{
-                  $t("progress.week", { week: weekLabel(selectedWeek, lagWeek) })
+                  $t("progress.week", {
+                    week: weekLabel(selectedWeek, lagWeek),
+                  })
                 }})
               </th>
               <th>{{ $t("progress.actions") }}</th>
@@ -1166,7 +1169,10 @@ watch(
         "Setting selectedWeek adjusted by lag_week.",
       );
       // Adjust the store week by lag_week to get the schedule week
-      selectedWeek.value = Math.max(1, teachingWeekOf(newStoreWeek, lagWeek.value));
+      selectedWeek.value = Math.max(
+        1,
+        teachingWeekOf(newStoreWeek, lagWeek.value),
+      );
       // No need to trigger fetchWeeklyData here; onMounted will do it after initial data.
     }
   },

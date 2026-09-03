@@ -54,7 +54,6 @@ export function useFileHandling(downloadTimelineFileFunction) {
 
   const downloadFile = async (timelineId, filename) => {
     try {
-      ;
       // Use the function passed as an argument
       const response = await downloadTimelineFileFunction(timelineId);
 
@@ -112,7 +111,6 @@ export function useFileHandling(downloadTimelineFileFunction) {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      ;
     } catch (error) {
       console.error("[useFileHandling] Error downloading file:", error);
       alert(
@@ -131,7 +129,6 @@ export function useFileHandling(downloadTimelineFileFunction) {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      ;
     } catch (error) {
       console.error(
         "[useFileHandling] Error triggering download from blob:",
@@ -145,7 +142,6 @@ export function useFileHandling(downloadTimelineFileFunction) {
   const downloadFileFromBlobUrl = async (blobUrl, filename) => {
     if (!blobUrl) return;
     try {
-      ;
       const response = await fetch(blobUrl);
       if (!response.ok) {
         throw new Error(`Failed to fetch blob: ${response.statusText}`);
@@ -179,12 +175,10 @@ export function useFileHandling(downloadTimelineFileFunction) {
   };
 
   const closePreviewModal = () => {
-    ;
     isPreviewModalVisible.value = false;
     // Revoke the previous Blob URL if it exists to free up memory
     if (previewImageUrl.value) {
       URL.revokeObjectURL(previewImageUrl.value);
-      ;
     }
     // Reset state
     previewImageUrl.value = null;
@@ -208,7 +202,6 @@ export function useFileHandling(downloadTimelineFileFunction) {
     const timelineId = entry.id;
 
     if (isImageFile(filename)) {
-      ;
       openPreviewModal(filename, "image");
 
       try {
@@ -221,7 +214,6 @@ export function useFileHandling(downloadTimelineFileFunction) {
         ) {
           const url = URL.createObjectURL(response.data);
           previewImageUrl.value = url; // Set the URL for the <img> tag
-          ;
         } else {
           console.warn(
             `[useFileHandling] Fetched file for ID ${timelineId} is not an image Blob (type: ${response.data?.type}). Falling back to download.`,
@@ -262,7 +254,6 @@ export function useFileHandling(downloadTimelineFileFunction) {
         isPreviewLoading.value = false;
       }
     } else {
-      ;
       downloadFile(timelineId, filename);
     }
   };

@@ -60,7 +60,9 @@
             :key="sched.id"
             :value="sched.id"
           >
-            {{ $t("tlform.week_label", { week: weekLabel(sched.week, lagWeek) }) }}
+            {{
+              $t("tlform.week_label", { week: weekLabel(sched.week, lagWeek) })
+            }}
             <span v-if="sched.id === scheduleForWeek?.id">
               ({{ $t("tlform.current_week") }})
             </span>

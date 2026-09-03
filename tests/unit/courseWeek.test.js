@@ -29,13 +29,19 @@ describe("naturalWeekOf", () => {
   it("returns null for missing or invalid semester data", () => {
     expect(naturalWeekOf(null)).toBeNull();
     expect(naturalWeekOf({})).toBeNull();
-    expect(naturalWeekOf({ start: "not-a-date", end: "2025-07-06" })).toBeNull();
+    expect(
+      naturalWeekOf({ start: "not-a-date", end: "2025-07-06" }),
+    ).toBeNull();
   });
 
   it("defaults to 'today' when no date is given (wide range)", () => {
     const now = new Date();
-    const in30 = iso(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 30));
-    const minus30 = iso(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30));
+    const in30 = iso(
+      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 30),
+    );
+    const minus30 = iso(
+      new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30),
+    );
     const week = naturalWeekOf({ start: minus30, end: in30 });
     expect(week).toBeGreaterThanOrEqual(1);
     expect(week).toBeLessThanOrEqual(9);
@@ -67,7 +73,11 @@ describe("resolveSchedule", () => {
   ];
 
   it("finds the schedule for a teaching week", () => {
-    expect(resolveSchedule(schedules, 3)).toEqual({ id: 20, week: 3, name: "week3" });
+    expect(resolveSchedule(schedules, 3)).toEqual({
+      id: 20,
+      week: 3,
+      name: "week3",
+    });
   });
 
   it("returns null when no schedule exists for the week", () => {
