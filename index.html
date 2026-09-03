@@ -5,6 +5,16 @@
     <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>电子信息科学基础实验中心</title>
+    <!-- Apply the saved daisyUI theme before the app renders so the sidebar
+         theme picker (AppNavbar) never causes a flash of the default theme. -->
+    <script>
+      try {
+        var savedTheme = localStorage.getItem("daisyui-theme");
+        if (savedTheme) {
+          document.documentElement.setAttribute("data-theme", savedTheme);
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="app"></div>
