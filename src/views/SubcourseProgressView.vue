@@ -68,8 +68,8 @@
               :key="weekNum"
               :value="weekNum"
             >
-              {{ $t("progress.week", { week: weekNum + lagWeek }) }}
-              <span v-if="weekNum === currentWeekNumber - lagWeek">{{
+              {{ $t("progress.week", { week: weekLabel(weekNum, lagWeek) }) }}
+              <span v-if="weekNum === teachingWeekOf(currentWeekNumber, lagWeek)">{{
                 ` (${$t("progress.current")})`
               }}</span>
             </option>
@@ -99,7 +99,7 @@
         <p>
           {{
             $t("progress.loading_data_for_week", {
-              week: selectedWeek + lagWeek,
+              week: weekLabel(selectedWeek, lagWeek),
             })
           }}
         </p>
@@ -154,7 +154,7 @@
               <th>{{ $t("progress.seat") }}</th>
               <th class="w-1/4">
                 {{ $t("progress.progress") }} ({{
-                  $t("progress.week", { week: selectedWeek + lagWeek })
+                  $t("progress.week", { week: weekLabel(selectedWeek, lagWeek) })
                 }})
               </th>
               <th>{{ $t("progress.actions") }}</th>
@@ -265,7 +265,7 @@
                       {{
                         $t("progress.timeline_logs_for", {
                           name: studentData.student.stu_name,
-                          week: selectedWeek + lagWeek,
+                          week: weekLabel(selectedWeek, lagWeek),
                         })
                       }}:
                     </h4>
@@ -384,7 +384,7 @@
           {{
             $t("progress.add_log_for", {
               name: studentForTeacherLog?.stu_name,
-              week: selectedWeek + lagWeek,
+              week: weekLabel(selectedWeek, lagWeek),
             })
           }}
         </h3>
@@ -512,7 +512,7 @@
       :show="showForceConfirm"
       dialogId="force_log_confirm_modal"
       :title="$t('progress.force_final_log')"
-      :message="`${$t('progress.confirm_force_final_log_msg', { name: studentToForceLog?.stu_name || $t('progress.this_student'), week: selectedWeek + lagWeek })}`"
+      :message="`${$t('progress.confirm_force_final_log_msg', { name: studentToForceLog?.stu_name || $t('progress.this_student'), week: weekLabel(selectedWeek, lagWeek) })}`"
       confirmButtonText="{{ $t('progress.force_log') }}"
       @confirm="handleForceLog"
       @close="cancelForceLog"
@@ -635,11 +635,8 @@ import { ref, computed, watch, onMounted, reactive } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useSemesterStore } from "@/stores/semester";
 import * as dataService from "@/services/dataService";
-import {
-  getWeekdayName,
-  calculateCurrentWeek,
-  formatTimestamp,
-} from "@/utils/weekday";
+import { getWeekdayName, formatTimestamp } from "@/utils/weekday";
+import { teachingWeekOf, weekLabel } from "@/utils/courseWeek";
 import TeacherTimelineLogForm from "@/components/TeacherTimelineLogForm.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { useFileHandling } from "@/utils/fileops";
@@ -721,16 +718,7 @@ const lagWeek = computed(() => {
   return subcourseDetails.value?.lag_week || 0;
 });
 
-const currentWeekNumber = computed(() => {
-  // Reuse logic from DashboardView if available, or recalculate
-  if (
-    semesterStore.isSemesterLoading ||
-    semesterStore.semesterError ||
-    !semesterStore.currentSemester
-  )
-    return null;
-  return calculateCurrentWeek(semesterStore.currentSemester);
-});
+const currentWeekNumber = computed(() => semesterStore.currentWeekNumber);
 
 const totalStepsForWeek = computed(() => subSchedulesForWeek.value.length);
 
@@ -837,7 +825,7 @@ const fetchInitialData = async () => {
     if (currentWeekNumber.value) {
       selectedWeek.value = Math.max(
         1,
-        currentWeekNumber.value - subcourseLagWeek,
+        teachingWeekOf(currentWeekNumber.value, subcourseLagWeek),
       );
     } else if (selectedWeek.value === null && schedules.value.length > 0) {
       selectedWeek.value =
@@ -888,7 +876,7 @@ const fetchWeeklyData = async () => {
       // This is not necessarily an error if a course has gaps in weeks
       console.warn(`No schedule found for Week ${selectedWeek.value}.`);
       error.weekly = t("progress.no_schedule_for_week", {
-        week: selectedWeek.value + lagWeek.value,
+        week: weekLabel(selectedWeek.value, lagWeek.value),
       });
       subSchedulesForWeek.value = []; // Ensure steps are empty
       timelineEntries.value = {}; // Ensure timelines are empty
@@ -1178,7 +1166,7 @@ watch(
         "Setting selectedWeek adjusted by lag_week.",
       );
       // Adjust the store week by lag_week to get the schedule week
-      selectedWeek.value = Math.max(1, newStoreWeek - lagWeek.value);
+      selectedWeek.value = Math.max(1, teachingWeekOf(newStoreWeek, lagWeek.value));
       // No need to trigger fetchWeeklyData here; onMounted will do it after initial data.
     }
   },

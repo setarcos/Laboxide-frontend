@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import * as dataService from "@/services/dataService";
+import { naturalWeekOf } from "@/utils/courseWeek";
 // No auth store import needed
 
 export const useSemesterStore = defineStore("semester", () => {
@@ -16,6 +17,12 @@ export const useSemesterStore = defineStore("semester", () => {
   );
   const hasCurrentSemester = computed(
     () => !!currentSemester.value && !semesterError.value,
+  );
+  // 1-based natural week of today inside the current semester (null when the
+  // semester is missing/invalid or today is out of range). Single source of
+  // truth shared by Dashboard and SubcourseProgressView.
+  const currentWeekNumber = computed(() =>
+    naturalWeekOf(currentSemester.value),
   );
 
   // --- Actions ---
@@ -58,6 +65,7 @@ export const useSemesterStore = defineStore("semester", () => {
     // Computed
     getCurrentSemesterId,
     hasCurrentSemester,
+    currentWeekNumber,
 
     // Actions
     fetchCurrentSemester,

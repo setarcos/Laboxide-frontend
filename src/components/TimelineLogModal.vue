@@ -60,7 +60,7 @@
             :key="sched.id"
             :value="sched.id"
           >
-            {{ $t("tlform.week_label", { week: sched.week + lagWeek }) }}
+            {{ $t("tlform.week_label", { week: weekLabel(sched.week, lagWeek) }) }}
             <span v-if="sched.id === scheduleForWeek?.id">
               ({{ $t("tlform.current_week") }})
             </span>
@@ -93,7 +93,7 @@
         >
           {{
             $t("tlform.no_steps_defined", {
-              week: selectedScheduleObject.week + lagWeek,
+              week: weekLabel(selectedScheduleObject.week, lagWeek),
             })
           }}
         </div>
@@ -295,6 +295,7 @@
 <script setup>
 import { ref, watch, computed, onMounted, onUnmounted } from "vue";
 import * as dataService from "@/services/dataService";
+import { resolveSchedule, teachingWeekOf, weekLabel } from "@/utils/courseWeek";
 import { useAuthStore } from "@/stores/auth";
 import { useI18n } from "vue-i18n";
 
@@ -381,7 +382,7 @@ const fetchSubSchedulesForSelectedSchedule = async () => {
     );
     // Potentially set a more specific error message here if needed
     const displayWeek = selectedScheduleObject.value?.week
-      ? selectedScheduleObject.value.week + props.lagWeek
+      ? weekLabel(selectedScheduleObject.value.week, props.lagWeek)
       : "selected";
     error.value = `Failed to load steps for Week ${displayWeek}: ${err.response?.data?.error || err.message || "Unknown error"}`;
     subSchedules.value = [];
@@ -414,8 +415,9 @@ const fetchData = async () => {
     );
 
     // 2. Find the schedule corresponding to the current context week (adjusted by lag_week)
-    scheduleForWeek.value = allAvailableSchedules.value.find(
-      (s) => s.week === props.currentWeek - props.lagWeek,
+    scheduleForWeek.value = resolveSchedule(
+      allAvailableSchedules.value,
+      teachingWeekOf(props.currentWeek, props.lagWeek),
     );
 
     // 3. Set the default selected schedule ID to the current context week's schedule (adjusted by lag_week)

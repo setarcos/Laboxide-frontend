@@ -300,7 +300,7 @@ import { ref, computed, watch } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useSemesterStore } from "@/stores/semester";
 import * as dataService from "@/services/dataService";
-import { getWeekdayName, calculateCurrentWeek } from "@/utils/weekday";
+import { getWeekdayName } from "@/utils/weekday";
 import { useI18n } from "vue-i18n";
 import StudentLogForm from "@/components/StudentLogForm.vue";
 import TimelineLogModal from "@/components/TimelineLogModal.vue";
@@ -343,16 +343,9 @@ const isSavingFinishLog = ref(false);
 const finishLogFormKey = ref(0);
 
 // --- Current Week Calculation ---
-const currentWeekNumber = computed(() => {
-  if (
-    semesterStore.isSemesterLoading ||
-    semesterStore.semesterError ||
-    !semesterStore.currentSemester
-  ) {
-    return null;
-  }
-  return calculateCurrentWeek(semesterStore.currentSemester);
-});
+// The natural week is owned by the semester store (single source of truth
+// shared with SubcourseProgressView); keep the local alias used elsewhere.
+const currentWeekNumber = computed(() => semesterStore.currentWeekNumber);
 
 // --- Fetch My Courses Logic ---
 const fetchMyCourses = async () => {
