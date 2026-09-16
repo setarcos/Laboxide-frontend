@@ -1,4 +1,3 @@
-// src/components/CourseMaterialsTab.vue
 <template>
   <div>
     <!-- Upload Section (Teacher Only) -->
@@ -76,7 +75,7 @@
           <tr>
             <th>{{ $t("course.filename") }}</th>
             <th>{{ $t("course.filedesc") }}</th>
-            <!-- Add other relevant headers if backend provides (e.g., upload date) -->
+            <!-- Operations column is teacher-only -->
             <th v-if="isTeacher">{{ $t("course.op") }}</th>
           </tr>
         </thead>
@@ -199,7 +198,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import * as dataService from "@/services/dataService";
-import ConfirmDialog from "@/components/ConfirmDialog.vue"; // Use your existing dialog
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { formatTimestamp } from "@/utils/weekday";
 
 const props = defineProps({
@@ -313,22 +312,17 @@ const handleDeleteConfirm = async () => {
     await dataService.deleteCourseFile(fileToDelete.value.id);
     closeDeleteModal();
     await fetchFiles(); // Refresh the list
-    // TODO: Add success notification (optional)
+    // TODO: Add success notification
   } catch (err) {
     console.error("Failed to delete file:", err);
-    // Display error to user (e.g., as toast or alert)
     alert(`Failed to delete: ${err.response?.data?.error || err.message}`);
-    // Keep modal open or close on error? Closing for now.
     closeDeleteModal();
   }
 };
 
 // Helper to construct download URL
 const getDownloadUrl = (fileId) => {
-  // Adjust the base path '/api' if your API is served elsewhere
-  // Ensure your backend download route is GET /coursefile/download/{id}
-  // This avoids exposing potential API keys if using api.defaults.baseURL directly
-  const baseApiUrl = "/api"; // Or process.env.VUE_APP_API_BASE_URL if configured
+  const baseApiUrl = "/api";
   return `${baseApiUrl}/member/coursefile/download/${fileId}`;
 };
 
@@ -338,6 +332,4 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-/* Add specific styles if needed */
-</style>
+<style scoped></style>

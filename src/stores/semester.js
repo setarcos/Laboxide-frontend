@@ -29,11 +29,9 @@ export const useSemesterStore = defineStore("semester", () => {
   async function fetchCurrentSemester() {
     // Avoid redundant fetching
     if (isSemesterLoading.value || hasCurrentSemester.value) {
-      // console.log("Semester already loading or successfully loaded.");
       return;
     }
 
-    console.log("Fetching current semester...");
     isSemesterLoading.value = true;
     semesterError.value = null;
     try {
@@ -49,13 +47,6 @@ export const useSemesterStore = defineStore("semester", () => {
     }
   }
 
-  // clearSemester might still be useful if you need to manually reset it
-  function clearSemester() {
-    currentSemester.value = null;
-    semesterError.value = null;
-    isSemesterLoading.value = false;
-  }
-
   return {
     // State
     currentSemester,
@@ -69,6 +60,5 @@ export const useSemesterStore = defineStore("semester", () => {
 
     // Actions
     fetchCurrentSemester,
-    clearSemester,
   };
 });

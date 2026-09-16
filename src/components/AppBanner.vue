@@ -1,5 +1,5 @@
 <template>
-  <!-- Assume banner height is h-16 (64px). Change if needed -->
+  <!-- Banner height is h-16 (4rem); the drawer offsets in DefaultLayout match it. -->
   <div class="navbar h-16 bg-base-300 shadow-md">
     <div class="navbar-start">
       <!-- Hamburger menu for mobile -->
@@ -113,6 +113,4 @@ router.afterEach((to) => {
 });
 </script>
 
-<style scoped>
-/* Add any specific banner styles if needed */
-</style>
+<style scoped></style>

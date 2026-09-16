@@ -331,7 +331,7 @@ const finalLogStatusesError = ref(null);
 // --- State for Timeline Log Modal ---
 const showTimelineModal = ref(false);
 const selectedSubcourseForTimeline = ref(null);
-const timelineModalKey = ref(0); // To potentially force remount
+const timelineModalKey = ref(0); // Changing the key remounts the modal
 
 // --- State for FINAL Student Log Modal (Finish Step) ---
 const showFinishLogModal = ref(false);
@@ -430,12 +430,9 @@ const fetchStudentFinalLogStatusesForMyCourses = async (subcourseIds) => {
     results.forEach((result) => {
       if (result.error) {
         hasErrors = true;
-        // Store an indicator of the error, or just log it.
-        // Let's store null/undefined for simplicity and rely on general error message.
         console.warn(
           `Student log status fetch failed for subcourse ${result.subcourseId}: ${result.error}`,
         );
-        // Optionally: successfullyFetchedStatuses[result.subcourseId] = { error: result.error };
       } else {
         // Store the single log object (or null if none exists)
         successfullyFetchedStatuses[result.subcourseId] = result.log;
@@ -479,7 +476,7 @@ const getLogButtonTitle = (subcourseId) => {
     return "Cannot open log: Current semester week could not be determined.";
   }
   if (hasConfirmedLog(subcourseId)) {
-    // Optionally add teacher note to tooltip if available in the log object
+    // Append the teacher's note to the tooltip when present.
     const log = studentFinalLogBySubcourse.value[subcourseId];
     const teacherNote = log?.tea_note ? `\nTeacher Note: ${log.tea_note}` : "";
     return `Your final log for this course has been confirmed by a teacher.${teacherNote}`;
@@ -509,10 +506,6 @@ const semesterGreeting = computed(() => {
 const handleLogButtonClick = async (subcourse) => {
   // Prevent action if already confirmed or if check is already running for this button
   if (hasConfirmedLog(subcourse.id)) {
-    console.log(
-      "Log already confirmed or check running, ignoring button click.",
-    );
-    // Optional: provide feedback if needed
     return;
   }
 
@@ -536,11 +529,8 @@ const handleLogButtonClick = async (subcourse) => {
 
 // --- Methods for Timeline Log ---
 const openTimelineModal = (subcourse) => {
-  // Prevent opening if already confirmed
-  // This check is technically redundant if called only from handleLogButtonClick,
-  // but leaving it provides safety if openTimelineModal is ever called directly.
+  // Reject if the log was already confirmed (guards direct calls too).
   if (hasConfirmedLog(subcourse.id)) {
-    console.log("Log already confirmed, cannot open timeline modal.");
     return;
   }
 
@@ -559,43 +549,24 @@ const openTimelineModal = (subcourse) => {
     console.error("Subcourse object missing course_id or tea_name:", subcourse);
     return;
   }
-  console.log(
-    "Opening timeline modal for subcourse:",
-    subcourse.id,
-    "Week:",
-    currentWeekNumber.value,
-  );
   selectedSubcourseForTimeline.value = subcourse;
-  timelineModalKey.value++; // Increment key to ensure modal internals refresh if needed
+  timelineModalKey.value++; // Remount the modal with fresh internal state.
   showTimelineModal.value = true;
 };
 
 const closeTimelineModal = () => {
   showTimelineModal.value = false;
   selectedSubcourseForTimeline.value = null;
-  // Reset other related states if necessary
 };
 
 const handleTimelineLogSaved = () => {
-  // Optional: Add feedback to the user on the dashboard
-  console.log("Timeline log was saved (event received in Dashboard).");
-  // Maybe refresh some dashboard data if needed, though the modal updates itself.
+  // The modal updates itself; the dashboard needs no refresh.
 };
 
 // --- Methods for FINAL Student Log (Finish Step) ---
 const handleRequestFinishLog = (subcourse, scheduleId) => {
-  console.log(
-    "Request received to open final log form for:",
-    subcourse.id,
-    "Schedule:",
-    scheduleId,
-  );
-  // Check if already confirmed before opening the final log modal
-  // This check is technically redundant if called only from handleLogButtonClick,
-  // but leaving it provides safety if handleRequestFinishLog is ever called directly.
+  // Reject if the log was already confirmed (guards direct calls too).
   if (hasConfirmedLog(subcourse.id)) {
-    console.log("Log already confirmed, cannot open final log modal.");
-    // Optional: Show a message to the user
     alert("Your final log for this course has already been confirmed.");
     closeTimelineModal(); // Ensure timeline modal is closed
     return;
@@ -608,14 +579,8 @@ const handleRequestFinishLog = (subcourse, scheduleId) => {
 // Fetches the specific student's final log for the given subcourse
 const openFinishLogModal = async (subcourse, scheduleId) => {
   // Renamed from openLogModal
-  if (!authStore.isStudent || !authStore.user?.userId) return; // Redundant check, but safe
+  if (!authStore.isStudent || !authStore.user?.userId) return;
 
-  console.log(
-    "Opening FINAL log modal for subcourse:",
-    subcourse.id,
-    "Schedule:",
-    scheduleId,
-  );
   selectedSubcourseForFinishLog.value = subcourse; // Use renamed state
   isLoadingFinishLogDefaults.value = true; // Use renamed state
   finishLogDefaultError.value = null; // Use renamed state
@@ -628,7 +593,7 @@ const openFinishLogModal = async (subcourse, scheduleId) => {
       subcourse.id,
       authStore.user.userId,
     );
-    finishLogDefaultData.value = response.data?.data || response.data; // Adjust based on API
+    finishLogDefaultData.value = response.data?.data || response.data;
     if (!finishLogDefaultData.value) {
       // Create default structure if none exists
       finishLogDefaultData.value = {
@@ -669,22 +634,17 @@ const closeFinishLogModal = () => {
 };
 
 const handleFinishLogSave = async (logData) => {
-  console.log("Attempting to save FINAL log:", logData);
   isSavingFinishLog.value = true;
   finishLogDefaultError.value = null;
 
   try {
-    let response;
     // Use the *original* dataService calls for create/update StudentLog
     if (logData.id) {
-      // Update existing log
-      // The StudentLogForm likely sends the whole object it received (potentially with null/empty tea_note, confirm etc.)
-      // The backend update endpoint should handle ignoring fields a student isn't allowed to change.
-      response = await dataService.updateStudentLog(logData.id, logData);
-      console.log("Final log updated:", response.data);
+      // The form submits the full log object; the backend ignores
+      // fields a student is not allowed to change.
+      await dataService.updateStudentLog(logData.id, logData);
     } else {
-      response = await dataService.createStudentLog(logData);
-      console.log("New final log created:", response.data);
+      await dataService.createStudentLog(logData);
     }
 
     closeFinishLogModal();
@@ -701,8 +661,6 @@ const handleFinishLogSave = async (logData) => {
     const errorMsg =
       err.response?.data?.error || err.message || "Unknown error during save";
     finishLogDefaultError.value = errorMsg;
-    // Decide if you want to show an alert or just the error in the modal
-    // alert(`Error saving final log: ${errorMsg}`);
   } finally {
     isSavingFinishLog.value = false;
   }
@@ -712,7 +670,6 @@ const handleFinishLogSave = async (logData) => {
 watch(
   () => authStore.isAuthenticated,
   async (isAuth) => {
-    console.log(`Auth state changed: ${isAuth}`);
     if (isAuth) {
       if (authStore.isTeacher || authStore.isStudent) {
         await fetchMyCourses(); // Wait for courses to fetch
@@ -725,14 +682,10 @@ watch(
       studentFinalLogBySubcourse.value = {}; // Clear log statuses state
       isLoadingFinalLogStatuses.value = false; // Clear log loading state
       finalLogStatusesError.value = null; // Clear log error state
-      // Optionally reset semester info if needed, but store might handle it
-      console.log("User logged out, cleared courses and logs.");
     }
   },
   { immediate: true },
 ); // Run immediately on component mount and auth state change
 </script>
 
-<style scoped>
-/* Add specific styles for the dashboard view if needed */
-</style>
+<style scoped></style>

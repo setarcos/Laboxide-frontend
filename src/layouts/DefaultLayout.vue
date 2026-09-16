@@ -66,20 +66,17 @@ import { RouterView } from "vue-router";
 }
 
 /*
- * Custom overrides for mobile drawer positioning (below lg breakpoint).
- * Adjust '4rem' if your banner height (h-16) changes.
+ * Mobile drawer positioning overrides (below the lg breakpoint).
+ * The banner is h-16, i.e. 4rem.
  */
 @media (max-width: 1023px) {
   /*
-   * Define the transition *outside* the :checked state so it applies
-   * when transitioning *both* in and out.
-   * Apply it to the element that DaisyUI actually animates (often the drawer content).
+   * The transition lives outside the :checked state so it applies in both directions.
    */
   .drawer-side > .menu {
-    /* Or adjust selector if DaisyUI animates drawer-side itself */
-    transition-property: transform; /* Add other properties if needed (e.g., opacity) */
-    transition-duration: 0.3s; /* Match DaisyUI's default or set your own */
-    transition-timing-function: ease-out; /* Match DaisyUI's default */
+    transition-property: transform;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-out;
   }
 
   /* Overlay positioning when drawer is open */
@@ -89,51 +86,38 @@ import { RouterView } from "vue-router";
     left: 0;
     height: calc(100vh - 4rem); /* Fill remaining height */
     width: 100%; /* Cover full width */
-    z-index: 40; /* Below menu, above main content (adjust if needed) */
-    /* Ensure it's visible and clickable (optional background for debug) */
-    /* background-color: rgba(0, 0, 0, 0.4); */
-    pointer-events: auto; /* Explicitly ensure it can receive clicks */
-    /* Fade in/out the overlay slightly */
+    z-index: 40; /* Below menu, above main content */
+    pointer-events: auto;
     opacity: 1;
     transition: opacity 0.3s ease-out;
   }
-  /* Default state for overlay (when drawer is closed/closing) */
+  /* Overlay hidden while the drawer is closed */
   .drawer-side > .mobile-drawer-overlay {
     opacity: 0;
-    pointer-events: none; /* Ensure it's not clickable when hidden */
+    pointer-events: none;
   }
 
-  /* Target the AppNavbar component (its root element has class 'menu') */
+  /* AppNavbar root (class "menu") while the drawer is open */
   .drawer-toggle:checked ~ .drawer-side > .menu {
-    /* Targets AppNavbar's root */
-    position: fixed; /* Position relative to viewport */
-    top: 4rem; /* Start below banner */
-    left: 0; /* Align left (transform handles slide-in) */
-    height: calc(100vh - 4rem); /* Fill height below banner */
-    z-index: 50; /* Above overlay (adjust if needed) */
-    /* DaisyUI handles width/transform, but ensure it doesn't break */
-    /* Reset transform if position:fixed overrides DaisyUI's slide-in */
-    transform: translateX(0%) !important; /* Force it visible if needed */
-    pointer-events: auto; /* Ensure menu items are clickable */
-    /* Add overflow-y-auto here if needed, since drawer-side might not scroll correctly now */
+    position: fixed;
+    top: 4rem;
+    left: 0;
+    height: calc(100vh - 4rem);
+    z-index: 50;
+    transform: translateX(0%) !important;
+    pointer-events: auto;
     overflow-y: auto;
-    /* Explicitly set transform for the open state */
-    transform: translateX(0%);
-    /* The transition defined above will handle the slide */
   }
-  /* Default state for menu (when drawer is closed/closing) */
+  /* AppNavbar root while the drawer is closed */
   .drawer-side > .menu {
-    /* Ensure it respects the top offset even in its 'closed' transform state */
-    /* Note: Fixed position isn't ideal here, but needed for the overlay interaction.
-        Let transform handle the hiding. */
-    position: fixed; /* Keep fixed so top offset applies */
+    position: fixed;
     top: 4rem;
     height: calc(100vh - 4rem);
-    left: 0; /* Important */
-    transform: translateX(-100%); /* Default DaisyUI closed state */
-    z-index: 50; /* Keep z-index consistent */
-    pointer-events: none; /* Not interactive when closed */
-    overflow-y: auto; /* Allow scrolling if content was tall */
+    left: 0;
+    transform: translateX(-100%);
+    z-index: 50;
+    pointer-events: none;
+    overflow-y: auto;
   }
 }
 </style>

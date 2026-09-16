@@ -269,7 +269,7 @@ export function useFileHandling(downloadTimelineFileFunction) {
     previewError,
     handleFileClick, // The main function components will call
     closePreviewModal, // Function to close the modal
-    downloadFileFromBlobUrl, // Expose if needed for download button inside modal
+    downloadFileFromBlobUrl, // Used by the preview modal's download button
     downloadTextContent,
   };
 }

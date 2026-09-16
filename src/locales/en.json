@@ -42,21 +42,6 @@
     "finalLogLoadError": "Could not load final log data",
     "finalLogUnavailable": "Could not display final log form. Default data unavailable."
   },
-  "tlmodal": {
-    "title": "Log Progress for {course} (Week {week}):",
-    "week": "Target Week for this log:",
-    "noweek": "Please select a target week from the dropdown above to see available steps.",
-    "others": "Ohters/ Custom Log Entry",
-    "finish": "Finish Experiment / Final Log",
-    "custom": "Custom Log Entry Title:",
-    "add": "Add Note/File for Log Entry:",
-    "note": "Text Note",
-    "file": "File Upload",
-    "type": "Type:",
-    "save": "Save Log Entry",
-    "weekday": "Week {week}",
-    "target": "Select Step or Action to Log:"
-  },
   "stulog": {
     "na": "N/A",
     "student": "Student:",
@@ -85,7 +70,6 @@
   "button": {
     "login": "Login",
     "logout": "Logout",
-    "submit": "Submit",
     "upload": "Upload",
     "confirm": "Confirm",
     "save": "Save",
@@ -128,7 +112,7 @@
     "importgroup": "Import Groups",
     "addgroup": "Add Group",
     "editgroup": "Edit Group",
-    "weekday": "Week Day",
+    "coursetime": "Class Time",
     "room": "Room",
     "limit": "Seats",
     "step": "Steps:",
@@ -231,7 +215,6 @@
     "select_room_placeholder": "Please select a room",
     "prev_week": "« Prev Week",
     "next_week": "Next Week »",
-    "loading": "Loading...",
     "no_room_selected": "Please select a meeting room to see the schedule.",
     "time": "Time",
     "pending": "(Pending)",
@@ -280,13 +263,7 @@
     "delete_modal": {
       "title": "Delete Booking",
       "message": "Are you sure you want to delete the booking '{title}'? This action cannot be undone."
-    },
-    "conflict": "This time conflicts with \"{title}\" ({start}-{end}).",
-    "save_failed": "Failed to save: {error}",
-    "confirm_failed": "Failed to confirm: {error}",
-    "delete_failed": "Failed to delete: {error}",
-    "load_rooms_failed": "Failed to load meeting rooms.",
-    "load_agendas_failed": "Failed to load agendas."
+    }
   },
   "timeline": {
     "back": "Back",
@@ -651,7 +628,6 @@
   "linux": {
     "linuxTitle": "Linux Course Toolbox",
     "enterSSHKey": "Enter your public SSH key (e.g., ssh-ed25519 AAA...)",
-    "sshError": "Failed to create Linux user",
     "linuxSubtitle": "Add your public SSH key to get access to the remote server.",
     "submitSSHKey": "Submit SSH Key",
     "gitSubtitle": "Create or reset your password for the Forgejo Git service.",
@@ -659,7 +635,6 @@
     "resetGitPassword": "Reset Git Password",
     "yourNewPassword": "Your new password is",
     "savePasswordWarning": "Please save this password securely. You will need it to log in.",
-    "sshSuccess": "User creation successful",
     "homeworkTitle": "VIM Homework Management",
     "copyHomework": "Copy Homework",
     "showDiff": "Show Diff"

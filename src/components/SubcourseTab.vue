@@ -396,8 +396,6 @@ import { getWeekdayName } from "@/utils/weekday";
 import * as dataService from "@/services/dataService";
 import SubcourseForm from "@/components/SubcourseForm.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-// Import a notification library if you use one (e.g., vue-toastification)
-// import { useToast } from 'vue-toastification';
 
 const props = defineProps({
   courseId: {
@@ -409,7 +407,6 @@ const props = defineProps({
 const { t } = useI18n();
 const authStore = useAuthStore();
 const semesterStore = useSemesterStore();
-// const toast = useToast(); // If using vue-toastification
 
 const subcourses = ref([]);
 const isLoading = ref(true);
@@ -504,7 +501,7 @@ const getSemesterName = (semId) => {
   return sem ? sem.name : t("course.unknownSemester", { id: semId });
 };
 
-// Fetch subcourses logic (Slightly adjusted for clarity)
+// Fetch subcourses
 const fetchSubcourses = async () => {
   isLoading.value = true;
   error.value = null;
@@ -516,7 +513,7 @@ const fetchSubcourses = async () => {
     if (!showAllSemesters.value) {
       semesterIdToFetch = semesterStore.getCurrentSemesterId;
       if (!semesterIdToFetch) {
-        // Might be in vacation.
+        // No current semester (e.g. semester break).
         isLoading.value = false;
         return;
       }
@@ -571,13 +568,7 @@ const fetchMyEnrollmentStatus = async () => {
     if (enrollmentForThisCourse) {
       // Assuming the enrollment object has the subcourse ID, often just 'id' or 'subcourse_id'
       myEnrolledSubcourseId.value = enrollmentForThisCourse.id;
-      console.log(
-        `Student enrolled in subcourse ${myEnrolledSubcourseId.value} for course ${props.courseId}`,
-      );
     } else {
-      console.log(
-        `Student not enrolled in any subcourse for course ${props.courseId}`,
-      );
       myEnrolledSubcourseId.value = null;
     }
   } catch (err) {
@@ -594,10 +585,9 @@ const fetchMyEnrollmentStatus = async () => {
 
 // --- Modal Operations ---
 const openAddModal = () => {
-  // Allow add only if semester known (or admin/teacher override?) - Sticking to current semester for now
+  // A current semester is required when adding a group.
   if (!semesterStore.getCurrentSemesterId) {
     alert(t("course.alertNoCurrentSemester"));
-    // toast.warning(t("course.alertNoCurrentSemester"));
     return;
   }
   currentItem.value = null;
@@ -635,7 +625,6 @@ const handleSave = async (formData) => {
   if (!formData.course_id || !formData.year_id) {
     console.error("Missing course_id or year_id in form data", formData);
     alert(t("common.alertInternalErrorSave"));
-    // toast.error(t("common.alertInternalErrorSave"));
     isSaving.value = false;
     return;
   }
@@ -654,7 +643,7 @@ const handleSave = async (formData) => {
       msg: err.response?.data?.error || err.message,
     });
     alert(errorMsg);
-    error.value = errorMsg; // Can display this elsewhere if needed
+    error.value = errorMsg;
   } finally {
     isSaving.value = false;
   }
@@ -750,17 +739,15 @@ const handleJoinGroup = async (subcourseId) => {
   try {
     await dataService.joinGroup(subcourseId);
     myEnrolledSubcourseId.value = subcourseId; // Update state immediately
-    // Optionally refetch subcourses if 'current_students' needs updating visually
+    // Refresh so the seat counts reflect the change.
     await fetchSubcourses();
-    // toast.success("Successfully joined the group!");
   } catch (err) {
     console.error("Failed to join group:", err);
     const errorMsg = t("course.alertJoinFailed", {
       msg: err.response?.data?.error || err.message,
     });
-    // toast.error(errorMsg);
     alert(errorMsg);
-    myEnrollmentError.value = errorMsg; // Show error near table potentially
+    myEnrollmentError.value = errorMsg; // Surface the error near the group table
   } finally {
     isProcessingAction.value = false;
     processingSubcourseId.value = null;
@@ -777,15 +764,13 @@ const handleLeaveGroup = async (subcourseId) => {
   try {
     await dataService.leaveGroup(subcourseId);
     myEnrolledSubcourseId.value = null; // Update state immediately
-    // Optionally refetch subcourses if 'current_students' needs updating visually
+    // Refresh so the seat counts reflect the change.
     await fetchSubcourses();
-    // toast.success("Successfully left the group.");
   } catch (err) {
     console.error("Failed to leave group:", err);
     const errorMsg = t("course.alertLeaveFailed", {
       msg: err.response?.data?.error || err.message,
     });
-    // toast.error(errorMsg);
     alert(errorMsg);
     myEnrollmentError.value = errorMsg;
   } finally {
@@ -808,7 +793,6 @@ watch(
   () => props.courseId,
   (newCourseId, oldCourseId) => {
     if (newCourseId !== oldCourseId && newCourseId) {
-      console.log(`Course ID changed to ${newCourseId}, refetching data.`);
       fetchSubcourses();
       if (isStudent.value) {
         fetchMyEnrollmentStatus(); // Also refresh enrollment status for the new course
@@ -829,12 +813,4 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-/* Add any specific styles */
-.loading {
-  /* Ensure loading spinner replaces text or adjust layout */
-  /* Example: */
-  /* display: inline-block; */
-  /* vertical-align: middle; */
-}
-</style>
+<style scoped></style>

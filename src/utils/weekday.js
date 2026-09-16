@@ -18,7 +18,7 @@ export function formatTimestamp(timestamp) {
 
     // Use localeCompare and options for more robust formatting
     return new Date(timestamp).toLocaleString("en-CA", {
-      // 'en-CA' gives YYYY-MM-DD, adjust locale as needed
+      // 'en-CA' yields YYYY-MM-DD.
       year: "numeric",
       month: "2-digit",
       day: "2-digit",

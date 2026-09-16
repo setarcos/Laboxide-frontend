@@ -90,8 +90,7 @@
             <td>{{ course.tea_name }}</td>
             <td>
               <div class="flex gap-1">
-                <!-- Edit Button (Admin or Teacher - API check might be needed for specific course) -->
-                <!-- Using Admin PUT for now, adjust if /teacher/course PUT has different fields -->
+                <!-- Edit Button (Admin or Teacher; backend re-checks the course) -->
                 <button
                   v-if="
                     authStore.isAdmin ||
@@ -250,7 +249,6 @@ const handleSave = async (formData) => {
         await dataService.updateCourse(currentItem.value.id, formData);
       else
         await dataService.teacherUpdateCourse(currentItem.value.id, formData);
-      // Add logic here if you need to distinguish Teacher edit (teacherUpdateCourse)
     } else {
       // Create API
       await dataService.createCourse(formData);

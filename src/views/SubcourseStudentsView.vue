@@ -268,7 +268,6 @@ import { getWeekdayName } from "@/utils/weekday";
 import * as dataService from "@/services/dataService";
 import { useAuthStore } from "@/stores/auth";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-// import { useLabroomStore } from '@/stores/labroom';
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -337,10 +336,6 @@ const fetchStudents = async () => {
   try {
     const response = await dataService.getGroup(props.id);
     const fetchedData = response.data?.data || response.data || [];
-    console.log(
-      `Fetched ${fetchedData.length} students for group ${props.id}.`,
-    ); // Basic log
-    // Add more detailed key validation logs here if the "invalid character" error returns
     students.value = fetchedData;
   } catch (err) {
     console.error(`Failed to fetch students for group ${props.id}:`, err);

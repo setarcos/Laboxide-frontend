@@ -13,31 +13,7 @@ const i18n = createI18n({
   legacy: false,
   locale: defaultLocale,
   fallbackLocale: "en",
-  datetimeFormats: {
-    en: {
-      short: { month: "short", day: "numeric" },
-      long: { month: "short", day: "numeric", year: "numeric" },
-    },
-    zh: {
-      short: { month: "numeric", day: "numeric" },
-      long: { year: "numeric", month: "numeric", day: "numeric" },
-    },
-  },
   messages: { en, zh },
 });
 
-async function loadLocale(locale) {
-  if (i18n.global.availableLocales.includes(locale)) {
-    return;
-  }
-
-  try {
-    const messages = await import(`./locales/${locale}.json`);
-    i18n.global.setLocaleMessage(locale, messages.default);
-  } catch (e) {
-    console.error(`Failed to load ${locale} locale:`, e);
-  }
-}
-
-export { loadLocale };
 export default i18n;

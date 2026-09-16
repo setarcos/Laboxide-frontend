@@ -382,7 +382,6 @@ const fetchSubSchedulesForSelectedSchedule = async () => {
       `Failed to load sub-schedules for schedule ID ${selectedScheduleId.value}:`,
       err,
     );
-    // Potentially set a more specific error message here if needed
     const displayWeek = selectedScheduleObject.value?.week
       ? weekLabel(selectedScheduleObject.value.week, props.lagWeek)
       : "selected";
@@ -593,9 +592,6 @@ const submitTimelineEntry = async () => {
     );
 
     if (entryToDeleteId) {
-      console.log(
-        `Previous entry found (title: "${logTitleToSave}", schedule ID: ${targetScheduleId}, entry ID: ${entryToDeleteId}). Deleting.`,
-      );
       try {
         await dataService.deleteTimeline(entryToDeleteId);
         existingTimelineEntries.value = existingTimelineEntries.value.filter(
@@ -627,8 +623,7 @@ const submitTimelineEntry = async () => {
     }
     // isLoggable ensures one of these is present
 
-    const response = await dataService.createTimeline(formData);
-    console.log("New timeline entry created:", response.data);
+    await dataService.createTimeline(formData);
 
     // Refetch entries to update local list and checkmarks
     const timelineResponse = await dataService.listTimelinesByStudent(
@@ -638,9 +633,6 @@ const submitTimelineEntry = async () => {
     existingTimelineEntries.value = timelineResponse.data || [];
 
     resetFormFields();
-    // selectedStepValue.value = null; // Keep this commented if you want the selection to persist after save for quick re-log to same step for different week
-    // customTitle.value = '';
-    // If you want to fully reset the step selection after a successful save:
     selectedStepValue.value = null;
     customTitle.value = "";
 
@@ -663,7 +655,6 @@ watch(selectedScheduleId, async (newId, oldId) => {
   )
     return; // Avoid redundant fetches if ID is same and steps loaded
 
-  console.log("Selected Schedule ID changed to:", newId);
   // Reset form parts related to step selection and content
   selectedStepValue.value = null;
   customTitle.value = "";
@@ -677,27 +668,18 @@ watch(selectedScheduleId, async (newId, oldId) => {
 });
 
 watch(selectedStepValue, (newValue) => {
-  console.log("Timeline Modal Watcher: selectedStepValue changed to", newValue);
   resetFormFields(); // Always reset note/file when step selection changes
   customTitle.value = ""; // Explicitly reset custom title input
   saveError.value = null;
 
   if (newValue === "finish") {
     if (!selectedScheduleId.value) {
-      // This should ideally not happen if UI is structured well
+      // Finish step selected without a week: revert and surface the error.
       saveError.value = t("tlform.error_finish_no_week");
       selectedStepValue.value = null; // Revert selection
       return;
     }
-    console.log(
-      "Timeline Modal Watcher: Emitting request-finish-log for subcourse",
-      props.subcourse?.id,
-      "for schedule",
-      selectedScheduleId.value,
-    );
     emit("request-finish-log", props.subcourse, selectedScheduleId.value);
-    // You might want to pass selectedScheduleObject.value or selectedScheduleId.value to the finish log event
-    //emit('request-finish-log', { subcourse: props.subcourse, schedule: selectedScheduleObject.value });
   }
 });
 
@@ -708,9 +690,6 @@ watch(
   () => [props.subcourse.id, props.currentWeek],
   ([newSubcourseId, newWeek], [oldSubcourseId, oldWeek]) => {
     if (newSubcourseId !== oldSubcourseId || newWeek !== oldWeek) {
-      console.log(
-        `Props changed: subcourse ${oldSubcourseId} -> ${newSubcourseId}, week ${oldWeek} -> ${newWeek}. Refetching data.`,
-      );
       fetchData();
     }
   },
@@ -723,7 +702,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Styles are primarily handled by Tailwind/DaisyUI classes */
 .has-\[:checked\]\:border-primary:has(input[type="radio"]:checked) {
   border-color: hsl(var(--p));
 }

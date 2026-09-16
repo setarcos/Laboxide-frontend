@@ -15,7 +15,6 @@
       <div class="form-control">
         <label for="room_id" class="label">
           <span class="label-text">{{ $t("stulog.room") }}</span>
-          <!-- Add <span class="text-error">*</span> if room selection is mandatory -->
         </label>
         <div v-if="isLoadingRooms" class="text-sm text-gray-500 py-2">
           {{ $t("stulog.loadingRooms") }}
@@ -353,18 +352,6 @@ const fetchLabRooms = async () => {
     // Assuming dataService.getLabrooms() is defined and returns { data: [...] }
     const response = await dataService.getLabrooms();
     labRooms.value = response.data || [];
-
-    // If initialData has a room_id, ensure it's still valid.
-    // If not, the dropdown will show "Select a lab room" or the first option.
-    // If a selected initialData.room_id is no longer in labRooms,
-    // formData.value.room_id will retain that old ID, and the select
-    // will likely show the placeholder or the first item.
-    // If this behavior is not desired, add logic here to check if
-    // formData.value.room_id exists in labRooms.value and reset if not.
-    // Example:
-    // if (formData.value.room_id && !labRooms.value.some(room => room.id === formData.value.room_id)) {
-    //   formData.value.room_id = null; // Or set to a default if applicable
-    // }
   } catch (err) {
     console.error("Failed to fetch lab rooms:", err);
     roomError.value = "Could not load lab rooms.";
@@ -402,10 +389,7 @@ watch(
     isTableCleaned.value = false;
     isEquipmentOff.value = false;
 
-    // If lab rooms are already loaded and initialData.room_id is set,
-    // but that room_id is not in the list, you might want to clear it.
-    // This is more robust if done after fetchLabRooms completes or in conjunction.
-    // For simplicity, current behavior is that an invalid initial room_id won't match.
+    // Warn if the initial room_id is not in the loaded room list.
     if (
       labRooms.value.length > 0 &&
       formData.value.room_id &&
@@ -414,7 +398,6 @@ watch(
       console.warn(
         `Initial room_id ${formData.value.room_id} not found in available rooms. User may need to re-select.`,
       );
-      // formData.value.room_id = null; // Optionally reset if an invalid ID is provided initially
     }
   },
   { immediate: true, deep: true },
@@ -422,8 +405,6 @@ watch(
 
 // --- Computed property to control submit button disabled state ---
 const isSubmitDisabled = computed(() => {
-  // If room selection is mandatory, add this condition:
-  // if (formData.value.room_id === null && labRooms.value.length > 0) return true;
   return (
     props.isSaving ||
     !formData.value.note ||
@@ -457,22 +438,13 @@ const handleSubmit = () => {
 
     if (!dataToSave.stu_id) {
       console.error("Cannot save log: Missing student ID.");
-      // Potentially show a user-facing error
       alert("Error: Could not determine student ID. Please check your login.");
       return;
     }
-
-    // Optional: Add validation for room_id if it's mandatory but not covered by isSubmitDisabled
-    // if (labRooms.value.length > 0 && dataToSave.room_id === null) {
-    //   alert("Please select a lab room.");
-    //   return;
-    // }
 
     emit("save", dataToSave);
   }
 };
 </script>
 
-<style scoped>
-/* Add any specific styles if needed */
-</style>
+<style scoped></style>

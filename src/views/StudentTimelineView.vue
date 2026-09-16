@@ -312,17 +312,12 @@ const groupedTimelines = computed(() => {
     if (groups[entry.schedule_id]) {
       groups[entry.schedule_id].entries.push(entry);
     } else {
-      // Handle entries whose schedule might not be in the list (optional)
       console.warn(
         `Timeline entry ${entry.id} references unknown schedule ID ${entry.schedule_id}`,
       );
-      // You could create a fallback group here if needed
     }
   });
 
-  // Filter out schedule groups with no entries if desired
-  // return Object.fromEntries(Object.entries(groups).filter(([_, group]) => group.entries.length > 0));
-  // Or keep all schedule groups:
   return groups;
 });
 
@@ -371,19 +366,11 @@ const fetchTimelineData = async () => {
       schedulesResponse.data?.data || schedulesResponse.data || [];
     timelines.value =
       timelinesResponse.data?.data || timelinesResponse.data || [];
-
-    // Basic validation/logging
-    console.log(
-      `Fetched ${schedules.value.length} schedules for course ${courseId}`,
-    );
-    console.log(
-      `Fetched ${timelines.value.length} timeline entries for student ${props.studentId} in group ${props.subcourseId}`,
-    );
   } catch (err) {
     console.error("Failed to load timeline data:", err);
     error.value.page =
       err.message || err.response?.data?.error || "An unknown error occurred.";
-    // Clear potentially partial data
+    // Clear data from the failed load
     schedules.value = [];
     timelines.value = [];
   } finally {
@@ -406,7 +393,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Add specific styles if needed */
 .collapse-title {
   cursor: pointer;
 }

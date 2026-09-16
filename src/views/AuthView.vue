@@ -21,7 +21,7 @@ onMounted(async () => {
 
   if (!token) {
     error.value = "Authentication failed: No token provided.";
-    // Optionally redirect back to login after a delay
+    // Return to the login page after a short delay.
     setTimeout(() => router.push({ name: "login" }), 3000);
     return;
   }

@@ -163,7 +163,6 @@
           {{ $t("navbar.semester") }}
         </router-link>
       </li>
-      <!-- Add more menu items as needed -->
     </ul>
 
     <!--
@@ -266,17 +265,14 @@
 
 <script setup>
 import { useAuthStore } from "@/stores/auth";
-// Make sure your path to permissions is correct
 import { PERMISSION_ADMIN, PERMISSION_LAB_MANAGER } from "@/utils/permissions";
 import { ref, onMounted } from "vue";
-// Import RouterLink if not globally registered and using exact-active-class
-// import { RouterLink } from 'vue-router'
 
 const authStore = useAuthStore();
 
 // --- Theme Switcher Logic ---
 const availableThemes = ref([
-  // Make sure these are in tailwind.config.js and html data-theme attribute
+  // Keep in sync with the themes declared in tailwind.config.js.
   "light",
   "dark",
   "cupcake",
@@ -292,8 +288,6 @@ const applyTheme = (themeName) => {
     selectedTheme.value = themeName;
   } else {
     console.warn(`Theme "${themeName}" not available.`);
-    // Optionally apply a default theme if the requested one is invalid
-    // applyTheme(availableThemes.value[0]);
   }
 };
 
@@ -314,28 +308,23 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Add specific styles for the navbar if needed */
-
 /* Style for the active RouterLink */
 .menu li > a.active {
   @apply bg-primary text-primary-content; /* DaisyUI active menu item style */
 }
 .menu li > a.router-link-exact-active {
-  /* Fallback or alternative if exact-active-class prop isn't working as expected */
+  /* RouterLink exact-match active state. */
   @apply bg-primary text-primary-content;
 }
 
 /* Style for the active theme button in the dropdown */
 .dropdown-content button.active {
-  /* You can use DaisyUI's btn-active or define custom styles */
   @apply bg-primary text-primary-content; /* Matches menu active style */
-  /* or */
-  /* @apply btn-active; */
 }
 
 /* Ensure dropdown menu scrolls if it has many themes */
 .dropdown-content.menu {
-  max-height: 15rem; /* Example max-height (adjust as needed) */
+  max-height: 15rem;
   overflow-y: auto;
 }
 .github-corner:hover .octo-arm {

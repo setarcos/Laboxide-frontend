@@ -23,7 +23,7 @@
         </form>
       </div>
     </div>
-    <!-- Optional: Click outside to close -->
+    <!-- Click outside the dialog to close it. -->
     <form method="dialog" class="modal-backdrop">
       <button @click="$emit('close')">close</button>
     </form>
@@ -33,7 +33,6 @@
 <script setup>
 import { ref, watch } from "vue";
 
-// Define props as before, but it's better practice to type them
 const props = defineProps({
   show: Boolean,
   dialogId: {
@@ -77,6 +76,4 @@ watch(
 );
 </script>
 
-<style scoped>
-/* Add specific styles for the dialog if needed */
-</style>
+<style scoped></style>

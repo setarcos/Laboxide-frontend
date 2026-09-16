@@ -14,7 +14,6 @@
         required
         min="1"
       />
-      <!-- Add validation error display if needed -->
     </div>
 
     <div class="form-control mb-4">
@@ -29,7 +28,6 @@
         v-model.trim="formData.title"
         required
       />
-      <!-- Add validation error display if needed -->
     </div>
 
     <!-- Hidden field for schedule_id -->
@@ -106,7 +104,6 @@ watch(
 );
 
 const submitForm = () => {
-  // Basic validation example (add more as needed)
   if (
     !formData.value.step ||
     formData.value.step < 1 ||

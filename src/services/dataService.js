@@ -121,7 +121,6 @@ export const listTimelinesBySchedule = (subcourse_id, schedule_id) =>
 // --- Equipment functions ---
 export const listEquipments = (params) =>
   api.get("/teacher/equipment", { params }); // params: { page, page_size }
-export const getEquipment = (id) => api.get(`/teacher/equipment/${id}`);
 export const createEquipment = (data) => api.post("/teacher/equipment", data);
 export const updateEquipment = (id, data) =>
   api.put(`/teacher/equipment/${id}`, data);

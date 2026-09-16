@@ -127,7 +127,7 @@
         </div>
       </div>
 
-      <!-- Recent Logs Loading/Error (Optional - display here or elsewhere) -->
+      <!-- Recent logs loading / error state -->
       <div
         v-if="isLoading.recentLogs"
         class="text-center text-sm text-gray-500"
@@ -853,13 +853,9 @@ const fetchInitialData = async () => {
 };
 
 const fetchWeeklyData = async () => {
-  console.log("Fetching weekly data for week:", selectedWeek.value);
   // Prevent fetching if selectedWeek is still null OR initial load is still running
   // (The check in onMounted handles the initial call after initial load)
   if (selectedWeek.value === null || isLoading.initial) {
-    console.log(
-      "Skipping weekly fetch: selectedWeek is null or initial load is pending.",
-    );
     return;
   }
 
@@ -933,10 +929,6 @@ const fetchRecentLogs = async () => {
     const res = await dataService.getRecentLog(props.id);
     // Store the full result; filtering by confirm status happens in the computed property
     allRecentStudentLogs.value = res.data || [];
-    console.log(
-      "Fetched all recent logs (filtered by backend time window):",
-      allRecentStudentLogs.value,
-    );
   } catch (err) {
     console.error("Error fetching recent student logs:", err);
     error.recentLogs =
@@ -972,11 +964,10 @@ const closeTeacherLogModal = () => {
   studentForTeacherLog.value = null;
 };
 
-const handleTeacherLogSave = async (/* Maybe receive feedback? */) => {
+const handleTeacherLogSave = async () => {
   // formData was handled by the child component
   closeTeacherLogModal();
   // Refresh weekly data to show the new log entry
-  // Note: This refresh might cause the table to scroll depending on browser behavior
   await fetchWeeklyData();
   // TODO: Add success notification (e.g., toast)
 };
@@ -1017,11 +1008,8 @@ const handleConfirmLog = async () => {
 
     // Confirmation successful
     closeConfirmModalForLog();
-    // Refresh the list of *all* recent logs to update the confirmed status
-    // and potentially remove the unconfirmed log/button
+    // Refresh recent logs so the confirmed status is up to date.
     await fetchRecentLogs();
-    // Optional: Show a success message
-    // alert(`Final log for ${currentLogToConfirm.value.stu_name} confirmed.`); // Or use a toast
   } catch (err) {
     console.error("Failed to confirm student log:", err);
     error.confirmLog =
@@ -1069,7 +1057,7 @@ const handleForceLog = async () => {
     await dataService.forceStudentLog(props.id, studentToForceLog.value.stu_id);
 
     // Force successful!
-    // Refresh recent logs to update UI (hide Force button, potentially change bar color)
+    // Refresh recent logs to update the Force button and status colour.
     await fetchRecentLogs();
 
     // TODO: Add success notification (e.g., toast) - "Forced final log for [student name]"
@@ -1111,7 +1099,7 @@ const getTimelineEntryDescription = (entry) => {
 const deleteTimelineEntry = async () => {
   if (!entryToDelete.value) return;
 
-  isLoading.weekly = true; // Reusing weekly loader for simplicity during this operation
+  isLoading.weekly = true; // Reuse the weekly loader while the entry is deleted.
   showDeleteConfirm.value = false; // Close the confirm dialog immediately
   const entryIdToDelete = entryToDelete.value.id; // Store ID before clearing entryToDelete
   entryToDelete.value = null; // Clear entryToDelete immediately
@@ -1137,13 +1125,9 @@ watch(
     // but *only if* initial load is finished (!isLoading.initial).
     // The *initial* fetch after load is handled below in onMounted.
     if (newWeek !== null && newWeek !== oldWeek && !isLoading.initial) {
-      console.log(
-        `selectedWeek changed from ${oldWeek} to ${newWeek}. Triggering weekly data fetch.`,
-      );
       fetchWeeklyData();
     } else if (newWeek === null && oldWeek !== null) {
-      // Handle case where week might be unset, clear data
-      console.log("selectedWeek unset. Clearing weekly data.");
+      // Week cleared: drop the week-specific data.
       selectedSchedule.value = null;
       subSchedulesForWeek.value = [];
       timelineEntries.value = {};
@@ -1163,11 +1147,6 @@ watch(
     // or if the component is still in its initial loading phase.
     // The goal is to set the *initial* week preference.
     if (selectedWeek.value === null && newStoreWeek !== null) {
-      console.log(
-        "Current week from store loaded:",
-        newStoreWeek,
-        "Setting selectedWeek adjusted by lag_week.",
-      );
       // Adjust the store week by lag_week to get the schedule week
       selectedWeek.value = Math.max(
         1,
@@ -1189,10 +1168,6 @@ onMounted(async () => {
   //    trigger the fetch for the *first* week's detailed data.
   //    The selectedWeek watcher handles subsequent changes from the dropdown.
   if (selectedWeek.value !== null) {
-    console.log(
-      "Initial data fetch complete. Triggering first weekly data fetch for week:",
-      selectedWeek.value,
-    );
     // Await this to ensure data is there before table renders fully for the first time
     await fetchWeeklyData();
   } else if (students.value.length > 0) {

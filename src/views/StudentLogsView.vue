@@ -260,8 +260,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Add any specific styles if needed */
 .max-w-xs {
-  max-width: 12rem; /* Adjust as needed for note columns */
+  max-width: 12rem;
 }
 </style>

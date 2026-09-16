@@ -67,7 +67,7 @@ const formatDateForInput = (dateString) => {
   try {
     // Assuming NaiveDate format from backend is compatible with Date constructor or YYYY-MM-DD
     const date = new Date(dateString);
-    // Adjust for timezone offset if necessary to prevent off-by-one day issues
+    // Shift to local time so the date does not slip by one day.
     date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
     return date.toISOString().split("T")[0];
   } catch (e) {

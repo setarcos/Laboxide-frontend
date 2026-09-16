@@ -1,4 +1,3 @@
-// src/components/CourseScheduleTab.vue
 <template>
   <div>
     <!-- Teacher Controls: Add Button (Main Schedule) -->
@@ -591,7 +590,6 @@ const handleSave = async (formData) => {
 const handleDelete = async () => {
   if (!isTeacher.value || !currentItem.value) return;
 
-  // Note: Backend should handle deleting associated subschedules via cascade or logic
   try {
     await dataService.deleteSchedule(currentItem.value.id);
     closeModal();
@@ -630,8 +628,6 @@ const handleSubSave = async (subFormData) => {
   } catch (err) {
     console.error("Failed to save sub-schedule:", err);
     alert(`Failed to save step: ${err.response?.data?.error || err.message}`);
-    // Keep modal open? Or close? For now, we close it in finally if error occurs
-    // closeSubModal(); // Might want to keep open to show error in context
   } finally {
     isSavingSub.value = false;
   }
@@ -675,13 +671,10 @@ watch(
 </script>
 
 <style scoped>
-/* Add styles if needed */
 .table-sm th,
 .table-sm td {
-  padding: 0.5rem 0.75rem; /* Adjust padding if needed */
+  padding: 0.5rem 0.75rem;
 }
-/* Style for the sub-schedule row background */
-/* .bg-base-200 is usually good */
 
 /* Ensure buttons in sub-list don't cause wrapping */
 .sub-schedule-list li > div {

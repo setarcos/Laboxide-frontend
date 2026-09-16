@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { PERMISSION_ADMIN, PERMISSION_LAB_MANAGER } from "@/utils/permissions";
-// Import nextTick if you want extra safety, though often not needed for document.title
-// import { nextTick } from 'vue'
 
 // View Components (Lazy Loaded)
 const DashboardView = () => import("@/views/DashboardView.vue");
@@ -166,7 +164,6 @@ router.beforeEach(async (to, from, next) => {
 
   // 2. Check if route requires authentication
   if (requiresAuth && !authStore.isAuthenticated) {
-    console.log("Redirecting to login (or handling via UI)");
     next({ name: "login" });
   }
   // 3. Check if route requires specific permissions

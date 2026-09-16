@@ -2,7 +2,6 @@
   <div class="redirect-container">
     <h2>{{ $t("message.loginservice") }}</h2>
     <p>{{ $t("message.redirect") }}</p>
-    <!-- You can add a loading spinner here for better UX -->
 
     <!--
       This form is completely hidden and is submitted automatically by the script.
@@ -38,19 +37,15 @@ const iaaaConfig = {
 // The onMounted hook is the key. It runs once the component's
 // template has been rendered to the DOM.
 onMounted(() => {
-  console.log("LoginView component mounted. Preparing to redirect...");
-
   // By now, the `loginFormRef` is attached to the actual <form> element.
   // We can now trigger its submit() method to initiate the POST request
   // and redirect the user's browser.
   if (loginFormRef.value) {
     loginFormRef.value.submit();
   } else {
-    // This is a fallback in case something goes wrong
     console.error(
       "Could not find the login form to submit. Redirect will not occur.",
     );
-    // Optionally, you could display an error message to the user here.
   }
 });
 </script>

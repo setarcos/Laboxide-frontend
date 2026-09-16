@@ -215,7 +215,7 @@ const course = ref(null);
 const isLoading = ref(true);
 const error = ref(null);
 const baseTitle = "课程详情";
-const defaultTab = "details"; // Your default tab key
+const defaultTab = "details";
 const activeTab = ref(defaultTab); // State for the active tab, default to 'details'
 const validTabs = ["details", "schedule", "materials", "subcourse"]; // List all valid tab keys
 
@@ -239,12 +239,9 @@ const setTabFromRoute = () => {
   if (tabFromQuery && validTabs.includes(tabFromQuery)) {
     activeTab.value = tabFromQuery;
   } else {
-    // If query param is missing or invalid, set to default
+    // No valid tab in the query: fall back to the default and reflect it in the URL.
     activeTab.value = defaultTab;
-    // Optional: Update URL to reflect the default tab if it wasn't set correctly
-    // Be careful not to create infinite loops if route watching triggers this again
     if (route.query.tab !== defaultTab) {
-      // Check if query needs updating only if it's not already the default or undefined
       router.replace({ query: { ...route.query, tab: defaultTab } });
     }
   }
@@ -257,7 +254,6 @@ const fetchCourseDetails = async (courseId) => {
   course.value = null; // Reset course data
   activeTab.value = "details"; // Reset to details tab on fetch/refetch
 
-  console.log(`Fetching course with ID: ${courseId}`);
   try {
     // Use the getCourse API call with the ID
     const response = await dataService.getCourse(courseId);
@@ -302,7 +298,6 @@ watch(
     // Check if newId exists and is different from the previous one
     // Using route.params.id ensures we always react to URL changes
     if (newId && newId !== oldId) {
-      console.log(`Route ID changed from ${oldId} to ${newId}. Refetching...`);
       fetchCourseDetails(newId);
       setTabFromRoute();
     }
@@ -312,15 +307,8 @@ watch(
 </script>
 
 <style scoped>
-/* Scoped styles for the view */
 .prose p {
   margin-top: 0;
   margin-bottom: 1em;
-}
-
-/* Optional: Add slight transition for tab content visibility */
-.card-body > div[v-if] {
-  transition: opacity 0.3s ease-in-out;
-  /* Basic animation example, you might want something more sophisticated */
 }
 </style>

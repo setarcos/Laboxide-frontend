@@ -46,16 +46,14 @@ export const useAuthStore = defineStore("auth", () => {
       } else {
         // Handle case where /greet returns an error object (like user not logged in)
         resetAuth();
-        console.log("User not logged in or greet error:", response.data?.error);
       }
     } catch (error) {
-      // Handle network errors or unexpected backend responses
       resetAuth();
       console.error("Error checking authentication:", error);
-      // Re-throw if needed elsewhere, but reset state here
-      throw error; // Allow main.js to catch if needed
+      // Reset local state, then surface the error to the caller.
+      throw error;
     } finally {
-      isLoading.value = false; // Set loading false here OR in main.js after await
+      isLoading.value = false;
     }
   }
 
@@ -67,11 +65,8 @@ export const useAuthStore = defineStore("auth", () => {
       // Proceed with frontend logout even if backend call fails
     } finally {
       resetAuth();
-      // Optionally redirect after logout
-      // router.push('/login'); // If you have a login route
-      // Or simply let the UI update based on isAuthenticated
-      // In this setup, the router guard will likely redirect from protected pages
-      window.location.reload(); // Force reload to ensure clean state and trigger guards
+      // Force a reload to reset state and let the router guards redirect.
+      window.location.reload();
     }
   }
 

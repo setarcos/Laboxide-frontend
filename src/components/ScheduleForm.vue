@@ -90,7 +90,7 @@ const emit = defineEmits(["save", "close"]);
 function createInitialFormData() {
   const data = props.initialData || {};
   return {
-    week: data.week ?? null, // Use null for potentially unset numbers
+    week: data.week ?? null, // Null when the number is unset
     name: data.name ?? "",
     requirement: data.requirement ?? "",
     // course_id is added during submission
@@ -114,7 +114,6 @@ const formDataIsValid = computed(() => {
   return (
     formData.week !== null && formData.week >= 1 && formData.name.trim() !== ""
   );
-  // Requirement is optional based on model? Add check if needed.
 });
 
 // Submit handler
@@ -132,7 +131,6 @@ const submitForm = () => {
     week: Number(formData.week),
   };
 
-  console.log("Submitting schedule payload:", payload);
   emit("save", payload);
 };
 </script>

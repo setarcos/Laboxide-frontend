@@ -18,6 +18,4 @@
 // No script logic needed for a static 404 page
 </script>
 
-<style scoped>
-/* Optional specific styles for 404 page */
-</style>
+<style scoped></style>

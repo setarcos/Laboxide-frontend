@@ -231,12 +231,11 @@ function createInitialFormData() {
 }
 
 // Watch for changes in initialData to reset the form
-// This is crucial when the modal is reused for editing different items.
+// Reset the form whenever the modal is reused for another item.
 watch(
   () => props.initialData,
   () => {
-    console.log("Initial data changed, resetting form:", props.initialData);
-    // Re-create the form data structure based on the potentially new initialData
+    // Reset the form from the new initialData.
     Object.assign(formData, createInitialFormData());
   },
   { deep: true },
@@ -301,7 +300,6 @@ const submitForm = () => {
     course_id: props.courseId, // Use courseId prop directly
   };
 
-  console.log("Submitting payload:", payload);
   // Emit the complete payload expected by the backend
   emit("save", payload);
 };
@@ -313,6 +311,4 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-/* Add any specific styles if needed */
-</style>
+<style scoped></style>
