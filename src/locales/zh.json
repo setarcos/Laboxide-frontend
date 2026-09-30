@@ -269,6 +269,7 @@
     "back": "返回",
     "timeline_for": "{name} ({id}) 的时间线",
     "course_label": "课程: {name}",
+    "course": "课程",
     "loading_timeline": "正在加载时间线...",
     "error_loading_timeline": "加载时间线详情时出错",
     "no_timeline_entries": "当前分组中未找到该学生的时间线记录",

@@ -111,6 +111,8 @@ export const createTimeline = (formData) =>
   });
 export const listTimelinesByStudent = (subcourseId, studentId) =>
   api.get(`/member/timeline/student/${subcourseId}/${studentId}`);
+export const listStudentTimelineCourses = (studentId) =>
+  api.get(`/member/timeline/courses/${studentId}`);
 export const deleteTimeline = (timelineId) =>
   api.delete(`/member/timeline/${timelineId}`);
 export const downloadTimelineFile = (timelineId) =>

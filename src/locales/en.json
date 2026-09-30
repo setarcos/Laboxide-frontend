@@ -269,6 +269,7 @@
     "back": "Back",
     "timeline_for": "Timeline for {name} ({id})",
     "course_label": "Course: {name}",
+    "course": "Course",
     "loading_timeline": "Loading timeline...",
     "error_loading_timeline": "Error loading timeline details",
     "no_timeline_entries": "No timeline entries found for this student in this group.",

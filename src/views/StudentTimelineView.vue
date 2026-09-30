@@ -27,8 +27,31 @@
         $t("timeline.timeline_for", { name: studentNameDisplay, id: studentId })
       }}
     </h1>
+    <div v-if="subcourseOptions.length" class="mb-6 flex items-center gap-2">
+      <label
+        for="timeline-subcourse-select"
+        class="text-lg text-base-content text-opacity-80"
+      >
+        {{ $t("timeline.course") }}
+      </label>
+      <select
+        id="timeline-subcourse-select"
+        v-model="selectedSubcourseId"
+        class="select select-bordered select-sm max-w-xl"
+        @change="handleSubcourseChange"
+      >
+        <option
+          v-for="option in subcourseOptions"
+          :key="option.id"
+          :value="String(option.id)"
+        >
+          {{ optionLabel(option) }}
+        </option>
+      </select>
+    </div>
+    <!-- Fallback when the switchable course list is unavailable -->
     <p
-      v-if="subcourseNameDisplay"
+      v-else-if="subcourseNameDisplay"
       class="text-lg mb-6 text-base-content text-opacity-80"
     >
       {{ $t("timeline.course_label", { name: subcourseNameDisplay }) }}
@@ -255,7 +278,7 @@
 import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import * as dataService from "@/services/dataService";
-import { formatTimestamp } from "@/utils/weekday";
+import { formatTimestamp, getWeekdayName } from "@/utils/weekday";
 import { useFileHandling, isImageFile } from "@/utils/fileops";
 // --- Props, Router, Route ---
 const props = defineProps({
@@ -269,6 +292,9 @@ const route = useRoute();
 const subcourseInfo = ref(null);
 const schedules = ref([]);
 const timelines = ref([]);
+const fetchedOptions = ref([]);
+const selectedSubcourseId = ref(String(props.subcourseId));
+let loadToken = 0;
 const isLoading = ref({ page: true }); // Combined loading state
 const error = ref({ page: null }); // Combined error state
 
@@ -323,11 +349,64 @@ const groupedTimelines = computed(() => {
 
 // --- Methods ---
 
+const optionLabel = (option) =>
+  [option.course_name, option.semester_name, getWeekdayName(option.weekday)]
+    .filter(Boolean)
+    .join(" · ");
+
+// The currently viewed class is kept in the list even when the API does not
+// return it (e.g. a teacher inspecting an old class they no longer own).
+const subcourseOptions = computed(() => {
+  const options = [...fetchedOptions.value];
+  const current = selectedSubcourseId.value;
+  if (
+    current &&
+    subcourseInfo.value &&
+    !options.some((option) => String(option.id) === current)
+  ) {
+    options.unshift({
+      id: Number(current),
+      course_name: subcourseInfo.value.course_name,
+      semester_name: "",
+      weekday: subcourseInfo.value.weekday,
+    });
+  }
+  return options;
+});
+
 const goBack = () => {
   router.back();
 };
 
+const fetchCourseOptions = async () => {
+  try {
+    const response = await dataService.listStudentTimelineCourses(
+      props.studentId,
+    );
+    fetchedOptions.value = response.data?.data || response.data || [];
+  } catch (err) {
+    console.error("Failed to load the student's course list:", err);
+    fetchedOptions.value = [];
+  }
+};
+
+const handleSubcourseChange = () => {
+  if (String(route.params.subcourseId) !== selectedSubcourseId.value) {
+    router.replace({
+      name: "StudentTimeline",
+      params: {
+        subcourseId: selectedSubcourseId.value,
+        studentId: props.studentId,
+      },
+      state: { studentName: studentNameDisplay.value },
+    });
+  }
+  fetchTimelineData();
+};
+
 const fetchTimelineData = async () => {
+  const token = ++loadToken;
+  const subcourseId = selectedSubcourseId.value;
   isLoading.value.page = true;
   error.value.page = null;
   let courseId = null;
@@ -335,20 +414,18 @@ const fetchTimelineData = async () => {
   try {
     // 1. Fetch Subcourse details to get course_id
     try {
-      const subcourseResponse = await dataService.getSubcourse(
-        props.subcourseId,
-      );
+      const subcourseResponse = await dataService.getSubcourse(subcourseId);
       subcourseInfo.value =
         subcourseResponse.data?.data || subcourseResponse.data;
       courseId = subcourseInfo.value?.course_id;
-      // Update subcourse name if not passed via state or if fetched is better
-      if (!subcourseNameDisplay.value && subcourseInfo.value?.course_name) {
+      // Keep the fallback label in sync with the selected class
+      if (subcourseInfo.value?.course_name) {
         subcourseNameDisplay.value = subcourseInfo.value.course_name;
       }
     } catch (err) {
       console.error("Failed to fetch subcourse details:", err);
       throw new Error(
-        `Could not load course information for group ${props.subcourseId}.`,
+        `Could not load course information for group ${subcourseId}.`,
       );
     }
 
@@ -359,14 +436,18 @@ const fetchTimelineData = async () => {
     // 2. Fetch Schedules for the course and Timelines for the student concurrently
     const [schedulesResponse, timelinesResponse] = await Promise.all([
       dataService.getSchedules(courseId),
-      dataService.listTimelinesByStudent(props.subcourseId, props.studentId),
+      dataService.listTimelinesByStudent(subcourseId, props.studentId),
     ]);
+
+    // A newer switch happened while this request was in flight
+    if (token !== loadToken) return;
 
     schedules.value =
       schedulesResponse.data?.data || schedulesResponse.data || [];
     timelines.value =
       timelinesResponse.data?.data || timelinesResponse.data || [];
   } catch (err) {
+    if (token !== loadToken) return;
     console.error("Failed to load timeline data:", err);
     error.value.page =
       err.message || err.response?.data?.error || "An unknown error occurred.";
@@ -374,7 +455,7 @@ const fetchTimelineData = async () => {
     schedules.value = [];
     timelines.value = [];
   } finally {
-    isLoading.value.page = false;
+    if (token === loadToken) isLoading.value.page = false;
   }
 };
 
@@ -388,6 +469,7 @@ onMounted(() => {
   if (history.state?.subcourseName) {
     subcourseNameDisplay.value = history.state.subcourseName;
   }
+  fetchCourseOptions();
   fetchTimelineData();
 });
 </script>
