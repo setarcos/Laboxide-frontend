@@ -285,7 +285,11 @@
     "entries": "条记录",
     "schedule_fallback": "实验ID {id}",
     "preview_title": "预览 {name}",
-    "download_title": "下载 {name}"
+    "download_title": "下载 {name}",
+    "actions": "操作",
+    "delete_entry": "删除此记录条目",
+    "confirm_delete_entry": "确认删除此记录条目？",
+    "delete_failed": "删除失败"
   },
   "progress": {
     "student_progress": "学生进度",

@@ -285,7 +285,11 @@
     "entries": "entries",
     "schedule_fallback": "Schedule ID {id}",
     "preview_title": "Preview {name}",
-    "download_title": "Download {name}"
+    "download_title": "Download {name}",
+    "actions": "Actions",
+    "delete_entry": "Delete this log entry",
+    "confirm_delete_entry": "Delete this timeline entry?",
+    "delete_failed": "Delete failed"
   },
   "progress": {
     "student_progress": "Student Progress",

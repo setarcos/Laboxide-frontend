@@ -125,6 +125,9 @@
                   <th>{{ $t("timeline.by") }}</th>
                   <th>{{ $t("timeline.subschedule") }}</th>
                   <th>{{ $t("timeline.note_file") }}</th>
+                  <th v-if="canDeleteEntries">
+                    {{ $t("timeline.actions") }}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -174,6 +177,29 @@
                       {{ entry.note }}
                     </a>
                   </td>
+                  <td v-if="canDeleteEntries" class="text-right">
+                    <button
+                      class="btn btn-xs btn-ghost btn-circle text-error p-0"
+                      :title="$t('timeline.delete_entry')"
+                      :disabled="deletingId !== null"
+                      @click="confirmDeleteEntry(entry)"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-3 w-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 3 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -184,6 +210,20 @@
         </div>
       </div>
     </div>
+
+    <!-- Confirm Delete Modal (for timeline entries) -->
+    <ConfirmDialog
+      :show="showDeleteConfirm"
+      dialogId="student_timeline_delete_confirm_modal"
+      :title="$t('timeline.delete_entry')"
+      :message="$t('timeline.confirm_delete_entry')"
+      confirm-class="btn-error"
+      @confirm="deleteEntry"
+      @close="
+        showDeleteConfirm = false;
+        entryToDelete = null;
+      "
+    />
 
     <!-- Preview Modal -->
     <dialog
@@ -277,9 +317,12 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
 import * as dataService from "@/services/dataService";
+import { useAuthStore } from "@/stores/auth";
 import { formatTimestamp, getWeekdayName } from "@/utils/weekday";
 import { useFileHandling, isImageFile } from "@/utils/fileops";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 // --- Props, Router, Route ---
 const props = defineProps({
   subcourseId: { type: [String, Number], required: true },
@@ -287,6 +330,8 @@ const props = defineProps({
 });
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
+const { t } = useI18n();
 
 // --- State ---
 const subcourseInfo = ref(null);
@@ -297,6 +342,21 @@ const selectedSubcourseId = ref(String(props.subcourseId));
 let loadToken = 0;
 const isLoading = ref({ page: true }); // Combined loading state
 const error = ref({ page: null }); // Combined error state
+
+// Delete confirmation state (students deleting their own entries)
+const showDeleteConfirm = ref(false);
+const entryToDelete = ref(null);
+const deletingId = ref(null);
+
+// Students may delete entries only on their own timeline; admins may delete on
+// any timeline. Teachers keep using the progress page, which has its own delete
+// action.
+const canDeleteEntries = computed(
+  () =>
+    authStore.isAdmin ||
+    (!!authStore.user?.userId &&
+      String(props.studentId) === String(authStore.user.userId)),
+);
 
 // Get passed state (student name, subcourse name) - provide fallbacks
 const studentNameDisplay = ref(
@@ -376,6 +436,31 @@ const subcourseOptions = computed(() => {
 
 const goBack = () => {
   router.back();
+};
+
+const confirmDeleteEntry = (entry) => {
+  entryToDelete.value = entry;
+  showDeleteConfirm.value = true;
+};
+
+const deleteEntry = async () => {
+  const entryId = entryToDelete.value?.id;
+  showDeleteConfirm.value = false;
+  entryToDelete.value = null;
+  if (!entryId) return;
+
+  deletingId.value = entryId;
+  try {
+    await dataService.deleteTimeline(entryId);
+    timelines.value = timelines.value.filter((entry) => entry.id !== entryId);
+  } catch (err) {
+    console.error("Failed to delete timeline entry:", err);
+    alert(
+      `${t("timeline.delete_failed")}: ${err.response?.data?.error || err.message}`,
+    );
+  } finally {
+    deletingId.value = null;
+  }
 };
 
 const fetchCourseOptions = async () => {
